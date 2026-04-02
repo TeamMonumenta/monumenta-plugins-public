@@ -53,7 +53,15 @@ public class MailCache {
 			ConcurrentSkipListSet<Recipient> speedDialAndBlocked = new ConcurrentSkipListSet<>();
 			ConcurrentSkipListSet<Recipient> allowedAndBlocked = new ConcurrentSkipListSet<>();
 
-			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.speedDialListRedisKey()).toCompletableFuture().join()) {
+			CompletableFuture<Set<String>> speedDialFuture;
+			CompletableFuture<Set<String>> allowFuture;
+			CompletableFuture<Set<String>> blockFuture;
+			try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+				speedDialFuture = conn.smembers(mRecipient.speedDialListRedisKey()).toCompletableFuture();
+				allowFuture = conn.smembers(mRecipient.allowListRedisKey()).toCompletableFuture();
+				blockFuture = conn.smembers(mRecipient.blockListRedisKey()).toCompletableFuture();
+			}
+			for (String senderKey : speedDialFuture.join()) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -61,7 +69,7 @@ public class MailCache {
 				speedDialList.add(testSender);
 			}
 
-			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.allowListRedisKey()).toCompletableFuture().join()) {
+			for (String senderKey : allowFuture.join()) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -69,7 +77,7 @@ public class MailCache {
 				allowList.add(testSender);
 			}
 
-			for (String senderKey : RedisAPI.getInstance().async().smembers(mRecipient.blockListRedisKey()).toCompletableFuture().join()) {
+			for (String senderKey : blockFuture.join()) {
 				Recipient testSender = Recipient.of(senderKey).join();
 				if (testSender == null) {
 					continue;
@@ -136,10 +144,18 @@ public class MailCache {
 			mReceivedMailboxes = receivedMailboxes;
 
 			for (Recipient erroneousRecipient : speedDialAndBlocked) {
-				speedDialListRemove(erroneousRecipient, false).join();
+				speedDialListRemove(erroneousRecipient, false).exceptionally(ex -> {
+					MMLog.warning("[Mailbox] Failed to remove erroneous speed dial entry for "
+						+ erroneousRecipient.friendlyStr(MailDirection.DEFAULT) + ": " + ex.getMessage());
+					return null;
+				});
 			}
 			for (Recipient erroneousRecipient : allowedAndBlocked) {
-				allowListRemove(erroneousRecipient, false).join();
+				allowListRemove(erroneousRecipient, false).exceptionally(ex -> {
+					MMLog.warning("[Mailbox] Failed to remove erroneous allow list entry for "
+						+ erroneousRecipient.friendlyStr(MailDirection.DEFAULT) + ": " + ex.getMessage());
+					return null;
+				});
 			}
 
 			if (totalMailboxesReceived() > 0) {
@@ -161,16 +177,7 @@ public class MailCache {
 
 	public CompletableFuture<Void> awaitInitialization() {
 		CompletableFuture<Void> future = new CompletableFuture<>();
-
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			if (mInitializationFuture.isDone()) {
-				future.complete(null);
-				return;
-			}
-			mInitializationFuture.join();
-			future.complete(null);
-		});
-
+		mInitializationFuture.whenComplete((unused, ex) -> future.complete(null));
 		return future;
 	}
 
@@ -223,17 +230,20 @@ public class MailCache {
 	}
 
 	public CompletableFuture<Void> speedDialListAdd(Recipient recipient, boolean isLocal) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (mSpeedDialList.contains(recipient)) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		RedisAPI.multi(conn -> {
+			conn.srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			conn.sadd(mRecipient.speedDialListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+		}).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				future.completeExceptionally(ex);
+				return;
+			}
 			mRecipientBlockList.remove(recipient);
-			RedisAPI.getInstance().async().sadd(mRecipient.speedDialListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mSpeedDialList.add(recipient);
 
 			if (isLocal) {
@@ -249,17 +259,20 @@ public class MailCache {
 	}
 
 	public CompletableFuture<Void> allowListAdd(Recipient recipient, boolean isLocal) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (mRecipientAllowList.contains(recipient)) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		RedisAPI.multi(conn -> {
+			conn.srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			conn.sadd(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+		}).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				future.completeExceptionally(ex);
+				return;
+			}
 			mRecipientBlockList.remove(recipient);
-			RedisAPI.getInstance().async().sadd(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientAllowList.add(recipient);
 
 			if (isLocal) {
@@ -273,17 +286,20 @@ public class MailCache {
 	}
 
 	public CompletableFuture<Void> blockListAdd(Recipient recipient, boolean isLocal) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (mRecipientBlockList.contains(recipient)) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		RedisAPI.multi(conn -> {
+			conn.srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+			conn.sadd(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT));
+		}).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				future.completeExceptionally(ex);
+				return;
+			}
 			mRecipientAllowList.remove(recipient);
-			RedisAPI.getInstance().async().sadd(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
 			mRecipientBlockList.add(recipient);
 
 			if (isLocal) {
@@ -316,68 +332,71 @@ public class MailCache {
 	}
 
 	public CompletableFuture<Void> speedDialListRemove(Recipient recipient, boolean isLocal) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (!mSpeedDialList.contains(recipient)) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().srem(mRecipient.speedDialListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
-			mSpeedDialList.remove(recipient);
-
-			if (isLocal) {
-				MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.SPEED_DIAL, recipient, false);
-			}
-
-			future.complete(null);
-		});
-
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.srem(mRecipient.speedDialListRedisKey(), recipient.redisKey(MailDirection.DEFAULT))
+				.whenComplete((removedCount, ex) -> {
+					if (ex != null) {
+						future.completeExceptionally(ex);
+						return;
+					}
+					mSpeedDialList.remove(recipient);
+					if (isLocal) {
+						MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.SPEED_DIAL, recipient, false);
+					}
+					future.complete(null);
+				});
+		}
 		return future;
 	}
 
 	public CompletableFuture<Void> allowListRemove(Recipient recipient, boolean isLocal) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (!mRecipientAllowList.contains(recipient)) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
-			mRecipientAllowList.remove(recipient);
-
-			if (isLocal) {
-				MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.ALLOW, recipient, false);
-			}
-
-			future.complete(null);
-		});
-
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.srem(mRecipient.allowListRedisKey(), recipient.redisKey(MailDirection.DEFAULT))
+				.whenComplete((removedCount, ex) -> {
+					if (ex != null) {
+						future.completeExceptionally(ex);
+						return;
+					}
+					mRecipientAllowList.remove(recipient);
+					if (isLocal) {
+						MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.ALLOW, recipient, false);
+					}
+					future.complete(null);
+				});
+		}
 		return future;
 	}
 
 	public CompletableFuture<Void> blockListRemove(Recipient recipient, boolean isLocal) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (!mRecipientBlockList.contains(recipient)) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT)).toCompletableFuture().join();
-			mRecipientBlockList.remove(recipient);
-
-			if (isLocal) {
-				MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.BLOCK, recipient, false);
-			}
-
-			future.complete(null);
-		});
-
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.srem(mRecipient.blockListRedisKey(), recipient.redisKey(MailDirection.DEFAULT))
+				.whenComplete((removedCount, ex) -> {
+					if (ex != null) {
+						future.completeExceptionally(ex);
+						return;
+					}
+					mRecipientBlockList.remove(recipient);
+					if (isLocal) {
+						MailMan.broadcastBlockAllowListChange(mRecipient, BlockAllowListType.BLOCK, recipient, false);
+					}
+					future.complete(null);
+				});
+		}
 		return future;
 	}
 

@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -274,56 +273,30 @@ public abstract class MailGui extends Gui implements Comparable<MailGui> {
 		CompletableFuture<List<ItemStack>> itemSwapFuture = mailbox.swapItemInSlot(mPlayer, mailSlot, newMailItem);
 		// Mark the slot as in use to prevent additional swaps
 		update();
-		Bukkit.getScheduler().runTaskAsynchronously(mPlugin, () -> {
-			List<ItemStack> returnedItems;
-			try {
-				returnedItems = itemSwapFuture.join();
-			} catch (CompletionException completionException) {
-				Throwable cause = completionException.getCause();
-				if (cause instanceof UnacceptedItemException unacceptedItemException) {
-					Bukkit.getScheduler().runTask(mPlugin, () -> {
+		itemSwapFuture.whenComplete((returnedItems, ex) -> {
+			Bukkit.getScheduler().runTask(mPlugin, () -> {
+				if (ex != null) {
+					if (ex instanceof UnacceptedItemException unacceptedItemException) {
 						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						mPlayer.sendActionBar(Component.text(unacceptedItemException.getMessage(), NamedTextColor.YELLOW));
 						InventoryUtils.giveItem(mPlayer, newMailItem);
 						refresh();
-					});
-				} else if (cause instanceof LockException lockException) {
-					Bukkit.getScheduler().runTask(mPlugin, () -> {
+					} else if (ex instanceof LockException lockException) {
 						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
 						mPlayer.sendMessage(Component.text(lockException.getMessage(), NamedTextColor.YELLOW));
 						InventoryUtils.giveItem(mPlayer, newMailItem);
 						refresh();
-					});
-				} else if (cause instanceof NullPointerException nullPointerException) {
-					Bukkit.getScheduler().runTask(mPlugin, () -> {
+					} else {
 						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						mPlayer.sendMessage(Component.text(nullPointerException.getMessage(), NamedTextColor.YELLOW));
-						MessagingUtils.sendStackTrace(mPlayer, nullPointerException);
+						mPlayer.sendMessage(Component.text(ex.getMessage(), NamedTextColor.YELLOW));
+						MessagingUtils.sendStackTrace(mPlayer, ex);
 						InventoryUtils.giveItem(mPlayer, newMailItem);
 						refresh();
-					});
-				} else if (cause != null) {
-					Bukkit.getScheduler().runTask(mPlugin, () -> {
-						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						mPlayer.sendMessage(Component.text(cause.getMessage(), NamedTextColor.YELLOW));
-						MessagingUtils.sendStackTrace(mPlayer, cause);
-						InventoryUtils.giveItem(mPlayer, newMailItem);
-						refresh();
-					});
-				} else {
-					Bukkit.getScheduler().runTask(mPlugin, () -> {
-						mPlayer.playSound(mPlayer, Sound.ENTITY_SHULKER_HURT, SoundCategory.PLAYERS, 1.0f, 1.0f);
-						mPlayer.sendMessage(Component.text(completionException.getMessage(), NamedTextColor.YELLOW));
-						MessagingUtils.sendStackTrace(mPlayer, completionException);
-						InventoryUtils.giveItem(mPlayer, newMailItem);
-						refresh();
-					});
+					}
+					MailMan.interactionChange(mPlayer, redisLockKey, false);
+					return;
 				}
-				MailMan.interactionChange(mPlayer, redisLockKey, false);
-				return;
-			}
 
-			Bukkit.getScheduler().runTask(mPlugin, () -> {
 				if (!mPlayer.isOnline() || MonumentaRedisSyncIntegration.isPlayerTransferring(mPlayer)) {
 					Location loc = mPlayer.getLocation();
 					for (ItemStack item : returnedItems) {

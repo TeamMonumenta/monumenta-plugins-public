@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import net.kyori.adventure.text.Component;
@@ -80,7 +81,13 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
 			ConcurrentSkipListSet<Mailbox> result = new ConcurrentSkipListSet<>();
-			for (Map.Entry<String, String> entry : RedisAPI.getInstance().async().hgetall(recipient.redisKey(MailDirection.TO)).toCompletableFuture().join().entrySet()) {
+			CompletableFuture<Map<String, String>> toFuture;
+			CompletableFuture<Map<String, String>> fromFuture;
+			try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+				toFuture = conn.hgetall(recipient.redisKey(MailDirection.TO)).toCompletableFuture();
+				fromFuture = conn.hgetall(recipient.redisKey(MailDirection.FROM)).toCompletableFuture();
+			}
+			for (Map.Entry<String, String> entry : toFuture.join().entrySet()) {
 				MMLog.fine(() -> "[Mailbox] Caching "
 					+ recipient.friendlyStr(MailDirection.TO)
 					+ ": "
@@ -107,7 +114,7 @@ public class Mailbox implements Comparable<Mailbox> {
 				result.add(MailMan.getOrRegister(redisMailbox));
 			}
 
-			for (Map.Entry<String, String> entry : RedisAPI.getInstance().async().hgetall(recipient.redisKey(MailDirection.FROM)).toCompletableFuture().join().entrySet()) {
+			for (Map.Entry<String, String> entry : fromFuture.join().entrySet()) {
 				MMLog.fine(() -> "[Mailbox] Caching "
 					+ recipient.friendlyStr(MailDirection.FROM)
 					+ ": "
@@ -142,25 +149,25 @@ public class Mailbox implements Comparable<Mailbox> {
 
 	public static CompletableFuture<Mailbox> fromJson(JsonObject mailboxJson) {
 		CompletableFuture<Mailbox> future = new CompletableFuture<>();
-
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			try {
-				Recipient sender = Recipient.fromJson(mailboxJson.getAsJsonObject("sender")).join();
-				if (sender == null) {
-					throw new Exception("Could not get sender type");
-				}
-
-				Recipient receiver = Recipient.fromJson(mailboxJson.getAsJsonObject("receiver")).join();
-				if (receiver == null) {
-					throw new Exception("Could not get receiver type");
-				}
-
-				future.complete(new Mailbox(sender, receiver));
-			} catch (Throwable throwable) {
-				future.completeExceptionally(throwable);
+		CompletableFuture<Recipient> senderFuture = Recipient.fromJson(mailboxJson.getAsJsonObject("sender"));
+		CompletableFuture<Recipient> receiverFuture = Recipient.fromJson(mailboxJson.getAsJsonObject("receiver"));
+		CompletableFuture.allOf(senderFuture, receiverFuture).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				future.completeExceptionally(ex);
+				return;
 			}
+			Recipient sender = senderFuture.join();
+			if (sender == null) {
+				future.completeExceptionally(new Exception("Could not get sender type"));
+				return;
+			}
+			Recipient receiver = receiverFuture.join();
+			if (receiver == null) {
+				future.completeExceptionally(new Exception("Could not get receiver type"));
+				return;
+			}
+			future.complete(new Mailbox(sender, receiver));
 		});
-
 		return future;
 	}
 
@@ -230,53 +237,54 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		String itemSlotRedisKey = itemSlotMapRedisKey();
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			Map<Integer, ItemStack> result = new TreeMap<>();
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.hgetall(itemSlotRedisKey).whenComplete((rawMailboxItems, e) -> {
+				if (e != null) {
+					future.completeExceptionally(e);
+					return;
+				}
 
-			Map<String, String> rawMailboxItems;
-			try {
-				rawMailboxItems = RedisAPI.getInstance().async().hgetall(itemSlotRedisKey).toCompletableFuture().join();
 				if (rawMailboxItems == null) {
-					throw new Exception("Unable to load mail");
-				}
-			} catch (Exception ex) {
-				future.completeExceptionally(ex);
-				return;
-			}
-
-			for (Map.Entry<String, String> entry : rawMailboxItems.entrySet()) {
-				int slot;
-				try {
-					slot = Integer.parseInt(entry.getKey());
-				} catch (Exception ex) {
-					MMLog.warning("[Mailbox] Non-numeric slot ID in " + itemSlotRedisKey + ": " + entry.getKey() + ": ", ex);
-					continue;
+					future.completeExceptionally(new Exception("Unable to load mail"));
+					return;
 				}
 
-				JsonObject slotJson;
-				try {
-					slotJson = new Gson().fromJson(entry.getValue(), JsonObject.class);
-				} catch (Exception ex) {
-					MMLog.warning("[Mailbox] Error parsing mail json (" + itemSlotRedisKey + ", " + entry.getKey() + "): ", ex);
-					MMLog.warning(entry.getValue());
-					continue;
+				Map<Integer, ItemStack> result = new TreeMap<>();
+
+				for (Map.Entry<String, String> entry : rawMailboxItems.entrySet()) {
+					int slot;
+					try {
+						slot = Integer.parseInt(entry.getKey());
+					} catch (Exception ex) {
+						MMLog.warning("[Mailbox] Non-numeric slot ID in " + itemSlotRedisKey + ": " + entry.getKey() + ": ", ex);
+						continue;
+					}
+
+					JsonObject slotJson;
+					try {
+						slotJson = new Gson().fromJson(entry.getValue(), JsonObject.class);
+					} catch (Exception ex) {
+						MMLog.warning("[Mailbox] Error parsing mail json (" + itemSlotRedisKey + ", " + entry.getKey() + "): ", ex);
+						MMLog.warning(entry.getValue());
+						continue;
+					}
+
+					MailboxSlot mailboxSlot;
+					try {
+						mailboxSlot = new MailboxSlot(slotJson);
+					} catch (NullPointerException ex) {
+						MMLog.warning("[Mailbox] NPE processing mail slot json: (" + itemSlotRedisKey + ", " + entry.getKey() + "): ", ex);
+						MMLog.warning(entry.getValue());
+						continue;
+					}
+
+					result.put(slot, mailboxSlot.getGuiItem());
 				}
 
-				MailboxSlot mailboxSlot;
-				try {
-					mailboxSlot = new MailboxSlot(slotJson);
-				} catch (NullPointerException ex) {
-					MMLog.warning("[Mailbox] NPE processing mail slot json: (" + itemSlotRedisKey + ", " + entry.getKey() + "): ", ex);
-					MMLog.warning(entry.getValue());
-					continue;
-				}
-
-				result.put(slot, mailboxSlot.getGuiItem());
-			}
-
-			mMailItems = result;
-			future.complete(null);
-		});
+				mMailItems = result;
+				future.complete(null);
+			});
+		}
 
 		return future;
 	}
@@ -286,28 +294,27 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		String itemSlotRedisKey = itemSlotMapRedisKey();
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			try {
-				String itemSlotJson = RedisAPI.getInstance().async().hget(itemSlotRedisKey, Long.toString(slot)).toCompletableFuture().join();
-				JsonObject slotJson;
-				slotJson = itemSlotJson == null ? null : new Gson().fromJson(itemSlotJson, JsonObject.class);
-
-				MailboxSlot mailboxSlot;
-				mailboxSlot = slotJson == null ? null : new MailboxSlot(slotJson);
-
-				if (mailboxSlot == null) {
-					mMailItems.remove(slot);
-				} else {
-					mMailItems.put(slot, mailboxSlot.getGuiItem());
-				}
-
-				loadLockFromRedis(slot).join();
-
-				future.complete(null);
-			} catch (Throwable throwable) {
-				MMLog.warning("[Mailbox] Failed to refresh " + friendlyName() + " slot: " + slot, throwable);
-				future.completeExceptionally(throwable);
+		CompletableFuture<String> slotFuture;
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			slotFuture = conn.hget(itemSlotRedisKey, Long.toString(slot)).toCompletableFuture();
+		}
+		CompletableFuture<Void> lockFuture = loadLockFromRedis(slot);
+		CompletableFuture.allOf(slotFuture, lockFuture).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				MMLog.warning("[Mailbox] Failed to refresh " + friendlyName() + " slot: " + slot, ex);
+				future.completeExceptionally(ex);
+				return;
 			}
+			String itemSlotJson = slotFuture.join();
+			JsonObject slotJson = itemSlotJson == null ? null : new Gson().fromJson(itemSlotJson, JsonObject.class);
+			MailboxSlot mailboxSlot = slotJson == null ? null : new MailboxSlot(slotJson);
+
+			if (mailboxSlot == null) {
+				mMailItems.remove(slot);
+			} else {
+				mMailItems.put(slot, mailboxSlot.getGuiItem());
+			}
+			future.complete(null);
 		});
 
 		return future;
@@ -456,6 +463,15 @@ public class Mailbox implements Comparable<Mailbox> {
 			String lockId;
 			try {
 				lockId = claimLock(slot).join();
+			} catch (CompletionException wrappedEx) {
+				Throwable cause = wrappedEx.getCause();
+				if (cause != null && cause instanceof LockException) {
+					future.completeExceptionally((LockException) cause);
+				} else {
+					// Re-throw the original exception if it's not a LockException - better than nothing?
+					future.completeExceptionally(wrappedEx);
+				}
+				return;
 			} catch (LockException ex) {
 				future.completeExceptionally(ex);
 				return;
@@ -463,7 +479,11 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			String oldItemJsonStr;
 			try {
-				oldItemJsonStr = RedisAPI.getInstance().async().hget(itemSlotRedisKey, slotStr).toCompletableFuture().join();
+				CompletableFuture<String> oldItemFuture;
+				try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+					oldItemFuture = conn.hget(itemSlotRedisKey, slotStr).toCompletableFuture();
+				}
+				oldItemJsonStr = oldItemFuture.join();
 			} catch (Throwable throwable) {
 				try {
 					freeLock(slot, lockId, throwable).join();
@@ -516,7 +536,11 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			if (oldItemStack != null) {
 				try {
-					long deletedCount = RedisAPI.getInstance().async().hdel(itemSlotRedisKey, slotStr).toCompletableFuture().join();
+					CompletableFuture<Long> hdelFuture;
+					try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+						hdelFuture = conn.hdel(itemSlotRedisKey, slotStr).toCompletableFuture();
+					}
+					long deletedCount = hdelFuture.join();
 					if (deletedCount != 1) {
 						throw new Exception("Deleted " + deletedCount + " items instead of 1 item");
 					}
@@ -549,7 +573,11 @@ public class Mailbox implements Comparable<Mailbox> {
 
 			if (newItemJsonStr != null) {
 				try {
-					if (!RedisAPI.getInstance().async().hset(itemSlotRedisKey, slotStr, newItemJsonStr).toCompletableFuture().join()) {
+					CompletableFuture<Boolean> setNewItemFuture;
+					try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+						setNewItemFuture = conn.hset(itemSlotRedisKey, slotStr, newItemJsonStr).toCompletableFuture();
+					}
+					if (!setNewItemFuture.join()) {
 						throw new Exception("Failed to set value; an existing value may be present");
 					}
 					deltaItemSlots++;
@@ -612,22 +640,20 @@ public class Mailbox implements Comparable<Mailbox> {
 	 * @param deltaItemSlots +1 if an item was added, -1 if an item was removed, 0 if the count is the same
 	 */
 	public CompletableFuture<Void> updateMailSlotCounts(long deltaItemSlots) {
-		CompletableFuture<Void> future = new CompletableFuture<>();
-
 		if (deltaItemSlots == 0) {
-			future.complete(null);
-			return future;
+			return CompletableFuture.completedFuture(null);
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			RedisAPI.getInstance().async().multi();
-			RedisAPI.getInstance().async().hincrby(receiver().redisKey(MailDirection.TO), sender().redisKey(MailDirection.DEFAULT), deltaItemSlots);
-			RedisAPI.getInstance().async().hincrby(sender().redisKey(MailDirection.FROM), receiver().redisKey(MailDirection.DEFAULT), deltaItemSlots);
-			RedisAPI.getInstance().async().exec();
-
+		CompletableFuture<Void> future = new CompletableFuture<>();
+		RedisAPI.multi(conn -> {
+			conn.hincrby(receiver().redisKey(MailDirection.TO), sender().redisKey(MailDirection.DEFAULT), deltaItemSlots);
+			conn.hincrby(sender().redisKey(MailDirection.FROM), receiver().redisKey(MailDirection.DEFAULT), deltaItemSlots);
+		}).whenComplete((result, ex) -> {
+			if (ex != null) {
+				MMLog.warning("[Mailbox] Failed to update mail slot counts for " + friendlyName() + ": " + ex.getMessage());
+			}
 			future.complete(null);
 		});
-
 		return future;
 	}
 
@@ -664,27 +690,29 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		String lockSlotRedisKey = lockSlotMapRedisKey(slot);
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			try {
-				long lockExpirationMs = RedisAPI.getInstance().async().pexpiretime(lockSlotRedisKey).toCompletableFuture().join();
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.pexpiretime(lockSlotRedisKey)
+				.whenComplete((rawLockExpirationMs, ex) -> {
+					if (ex != null) {
+						MMLog.warning("[Mailbox] Failed to load lock " + friendlyName() + " slot: " + slot);
+						MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
+						future.completeExceptionally(ex);
+						return;
+					}
+					long lockExpirationMs = rawLockExpirationMs;
+					if (lockExpirationMs == PEXPIRETIME_EXISTS_NO_EXPIRATION) {
+						lockExpirationMs = DateUtils.TRUE_EPOCH.until(DateUtils.trueUtcDateTime(), ChronoUnit.MILLIS)
+							+ LOCK_TIMEOUT_MS;
+					}
 
-				if (lockExpirationMs == PEXPIRETIME_EXISTS_NO_EXPIRATION) {
-					lockExpirationMs = DateUtils.TRUE_EPOCH.until(DateUtils.trueUtcDateTime(), ChronoUnit.MILLIS)
-						+ LOCK_TIMEOUT_MS;
-				}
-
-				if (lockExpirationMs == PEXPIRETIME_DOES_NOT_EXIST) {
-					mLockedSlots.remove(slot);
-				} else {
-					mLockedSlots.put(slot, DateUtils.TRUE_EPOCH.plus(lockExpirationMs, ChronoUnit.MILLIS));
-				}
-				future.complete(null);
-			} catch (Throwable throwable) {
-				MMLog.warning("[Mailbox] Failed to load lock " + friendlyName() + " slot: " + slot);
-				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), throwable);
-				future.completeExceptionally(throwable);
-			}
-		});
+					if (lockExpirationMs == PEXPIRETIME_DOES_NOT_EXIST) {
+						mLockedSlots.remove(slot);
+					} else {
+						mLockedSlots.put(slot, DateUtils.TRUE_EPOCH.plus(lockExpirationMs, ChronoUnit.MILLIS));
+					}
+					future.complete(null);
+				});
+		}
 
 		return future;
 	}
@@ -711,12 +739,9 @@ public class Mailbox implements Comparable<Mailbox> {
 		mLockedSlots.remove(slot);
 		LockException initialLockoutException = new LockException("Mailbox Lock expired without being properly handled! Assuming locked and triggering refresh.");
 		MMLog.severe("[Mailbox] Mailbox lock expired without being properly handled! Assuming locked and triggering refresh.", initialLockoutException);
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			try {
-				loadLockFromRedis(slot).join();
-			} catch (Exception ex) {
-				MMLog.severe("Failed to refresh lockout status after initial lockout exception", ex);
-			}
+		loadLockFromRedis(slot).exceptionally(ex -> {
+			MMLog.severe("Failed to refresh lockout status after initial lockout exception", ex);
+			return null;
 		});
 		return true;
 	}
@@ -737,19 +762,25 @@ public class Mailbox implements Comparable<Mailbox> {
 		String shardPrefix = ServerProperties.getShardName().toLowerCase(Locale.ROOT) + ":";
 		String lockId = shardPrefix + UUID.randomUUID();
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			mLockedSlots.put(slot, DateUtils.trueUtcDateTime().plus(LOCK_TIMEOUT_MS, ChronoUnit.MILLIS));
-			String response = RedisAPI.getInstance().async()
-				.set(redisKey, lockId, new SetArgs().nx().px(LOCK_TIMEOUT_MS)).toCompletableFuture().join();
-			if ("OK".equals(response)) {
-				MailMan.broadcastMailSlotChange(this, slot);
-				future.complete(lockId);
-			} else {
-				mLockedSlots.remove(slot);
-				MMLog.warning("[Mailbox] Failed to get lock; Redis response to set command: " + response);
-				future.completeExceptionally(new LockException("There's a lock on that slot! Try again."));
-			}
-		});
+		mLockedSlots.put(slot, DateUtils.trueUtcDateTime().plus(LOCK_TIMEOUT_MS, ChronoUnit.MILLIS));
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.set(redisKey, lockId, new SetArgs().nx().px(LOCK_TIMEOUT_MS))
+				.whenComplete((response, ex) -> {
+					if (ex != null) {
+						mLockedSlots.remove(slot);
+						future.completeExceptionally(new LockException("Failed to claim lock: " + ex.getMessage()));
+						return;
+					}
+					if ("OK".equals(response)) {
+						MailMan.broadcastMailSlotChange(this, slot);
+						future.complete(lockId);
+					} else {
+						mLockedSlots.remove(slot);
+						MMLog.warning("[Mailbox] Failed to get lock; Redis response to set command: " + response);
+						future.completeExceptionally(new LockException("There's a lock on that slot! Try again."));
+					}
+				});
+		}
 
 		return future;
 	}
@@ -763,43 +794,49 @@ public class Mailbox implements Comparable<Mailbox> {
 
 		String redisKey = lockSlotMapRedisKey(slot);
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			String response = RedisAPI.getInstance().async().get(redisKey).toCompletableFuture().join();
-			if (response == null) {
-				mLockedSlots.remove(slot);
-				future.completeExceptionally(
-					LockException.withOptCause(
-						"The lock expired before it was freed!",
-						previousException
-					));
-				return;
-			}
-			if (!lockId.equals(response)) {
-				mLockedSlots.remove(slot);
-				future.completeExceptionally(
-					LockException.withOptCause(
-						"The lock claim was replaced before it was expected!",
-						previousException
-					));
-				return;
-			}
-
-			long deletedCount = RedisAPI.getInstance().async().del(redisKey).toCompletableFuture().join();
-			if (deletedCount != 1L) {
-				mLockedSlots.remove(slot);
-				MailMan.broadcastMailSlotChange(this, slot);
-				future.completeExceptionally(
-					LockException.withOptCause(
-						"Failed to remove lock claim! Maybe it expired just as we were done with it?",
-						previousException
-					)
-				);
-				return;
-			}
-			mLockedSlots.remove(slot);
-			MailMan.broadcastMailSlotChange(this, slot);
-			future.complete(null);
-		});
+		try (RedisAPI.BorrowedCommands<String, String> conn = RedisAPI.borrow()) {
+			conn.get(redisKey)
+				.whenComplete((response, ex) -> {
+					if (ex != null) {
+						mLockedSlots.remove(slot);
+						future.completeExceptionally(LockException.withOptCause("Failed to verify lock: " + ex.getMessage(), previousException));
+						return;
+					}
+					if (response == null) {
+						mLockedSlots.remove(slot);
+						future.completeExceptionally(LockException.withOptCause("The lock expired before it was freed!", previousException));
+						return;
+					}
+					if (!lockId.equals(response)) {
+						mLockedSlots.remove(slot);
+						future.completeExceptionally(LockException.withOptCause("The lock claim was replaced before it was expected!", previousException));
+						return;
+					}
+					try (RedisAPI.BorrowedCommands<String, String> conn2 = RedisAPI.borrow()) {
+						conn2.del(redisKey)
+							.whenComplete((deletedCount, ex2) -> {
+								if (ex2 != null) {
+									mLockedSlots.remove(slot);
+									MailMan.broadcastMailSlotChange(this, slot);
+									future.completeExceptionally(LockException.withOptCause("Failed to delete lock: " + ex2.getMessage(), previousException));
+									return;
+								}
+								if (deletedCount != 1L) {
+									mLockedSlots.remove(slot);
+									MailMan.broadcastMailSlotChange(this, slot);
+									future.completeExceptionally(LockException.withOptCause(
+										"Failed to remove lock claim! Maybe it expired just as we were done with it?",
+										previousException
+									));
+									return;
+								}
+								mLockedSlots.remove(slot);
+								MailMan.broadcastMailSlotChange(this, slot);
+								future.complete(null);
+							});
+					}
+				});
+		}
 
 		return future;
 	}

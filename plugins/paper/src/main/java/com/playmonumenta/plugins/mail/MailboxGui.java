@@ -13,7 +13,6 @@ import dev.jorel.commandapi.CommandAPICommand;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -99,14 +98,10 @@ public class MailboxGui extends MailGui {
 		boolean openedAsModerator
 	) {
 		viewer.sendMessage(Component.text("Please wait, your mail is loading...", NamedTextColor.YELLOW));
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			MailCache mailCache;
-			try {
-				mailCache = cacheFuture.join();
-			} catch (CompletionException wrappedEx) {
-				Throwable cause = wrappedEx.getCause();
-				if (cause != null) {
-					viewer.sendMessage(Component.text(cause.getMessage(), NamedTextColor.RED));
+		cacheFuture.whenComplete((mailCache, ex) -> {
+			if (ex != null) {
+				if (ex.getMessage() != null) {
+					viewer.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
 				}
 				return;
 			}

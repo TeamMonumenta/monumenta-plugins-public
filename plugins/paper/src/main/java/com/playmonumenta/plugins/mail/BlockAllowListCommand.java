@@ -92,14 +92,10 @@ public class BlockAllowListCommand {
 			return;
 		}
 
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			MailCache mailCache;
-			try {
-				mailCache = listOwnerArgs.getRecipientCache(viewer, args).join();
-			} catch (CompletionException wrappedEx) {
-				Throwable cause = wrappedEx.getCause();
-				if (cause != null) {
-					viewer.sendMessage(Component.text(cause.getMessage(), NamedTextColor.RED));
+		listOwnerArgs.getRecipientCache(viewer, args).whenComplete((mailCache, ex) -> {
+			if (ex != null) {
+				if (ex.getMessage() != null) {
+					viewer.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
 				}
 				return;
 			}

@@ -8,13 +8,13 @@ import com.playmonumenta.plugins.mail.recipient.RecipientCmdArgs;
 import com.playmonumenta.plugins.mail.recipient.RecipientCmdArgs.ArgTarget;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MessagingUtils;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.LiteralArgument;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -70,29 +70,16 @@ public class SendGui extends MailGui {
 		CompletableFuture<MailCache> receiverCacheFuture
 	) {
 		viewer.sendMessage(Component.text("Please wait, loading mail...", NamedTextColor.YELLOW));
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			MailCache senderCache;
-			try {
-				senderCache = senderCacheFuture.join();
-			} catch (CompletionException wrappedEx) {
-				Throwable cause = wrappedEx.getCause();
-				if (cause != null) {
-					viewer.sendMessage(Component.text(cause.getMessage(), NamedTextColor.RED));
+		CompletableFuture.allOf(senderCacheFuture, receiverCacheFuture).whenComplete((unused, ex) -> {
+			if (ex != null) {
+				if (ex.getMessage() != null) {
+					viewer.sendMessage(Component.text(ex.getMessage(), NamedTextColor.RED));
 				}
 				return;
 			}
 
-			MailCache receiverCache;
-			try {
-				receiverCache = receiverCacheFuture.join();
-			} catch (CompletionException wrappedEx) {
-				Throwable cause = wrappedEx.getCause();
-				if (cause != null) {
-					viewer.sendMessage(Component.text(cause.getMessage(), NamedTextColor.RED));
-				}
-				return;
-			}
-
+			MailCache senderCache = senderCacheFuture.join();
+			MailCache receiverCache = receiverCacheFuture.join();
 			Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
 				viewer.sendMessage(Component.text("Your mail is now ready!", NamedTextColor.GREEN));
 				new SendGui(viewer, senderCache, receiverCache).open();
@@ -160,12 +147,13 @@ public class SendGui extends MailGui {
 
 	@Override
 	public void refresh() {
-		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
-			try {
-				mMailbox.refreshContents().join();
+		mMailbox.refreshContents().whenComplete((unused, ex) -> {
+			if (ex != null) {
+				mPlayer.sendMessage(Component.text("Something went wrong getting mailbox contents: " + ex.getMessage()));
+				MessagingUtils.sendStackTrace(mPlayer, ex);
+				MMLog.severe("Exception getting mailbox contents for player " + mPlayer.getName(), ex);
+			} else {
 				Bukkit.getScheduler().runTask(Plugin.getInstance(), this::update);
-			} catch (Exception ex) {
-				mPlayer.sendMessage(Component.text("Something went wrong getting mailbox contents"));
 			}
 		});
 	}

@@ -123,7 +123,8 @@ public class MessagingUtils {
 		formattedMessage = formattedMessage.hoverEvent(textStackTrace);
 		audience.sendMessage(formattedMessage);
 
-		MMLog.warning(errorMessage + "\n" + rawStackTrace);
+		String audienceName = (audience instanceof Player ? ((Player) audience).getName() : audience.getClass().getSimpleName());
+		MMLog.severe("Stack trace sent to audience: " + audienceName + " message: " + errorMessage, e);
 	}
 
 	public static void sendError(CommandSender receiver, String message) {
