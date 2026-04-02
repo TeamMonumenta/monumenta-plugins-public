@@ -2,7 +2,6 @@ package com.playmonumenta.plugins.bosses.spells;
 
 import com.playmonumenta.plugins.bosses.bosses.DieIfAloneBoss;
 import com.playmonumenta.plugins.utils.DamageUtils;
-import java.util.List;
 import org.bukkit.entity.LivingEntity;
 
 public class SpellDieIfAlone extends Spell {

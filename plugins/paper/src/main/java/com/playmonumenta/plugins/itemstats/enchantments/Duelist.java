@@ -10,7 +10,6 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.EnumSet;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 
 public class Duelist implements Enchantment {
 

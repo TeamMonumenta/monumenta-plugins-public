@@ -523,7 +523,7 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(mTowerManager, this);
 		}
 
-		if(ServerProperties.getShardName().contains("valley")
+		if (ServerProperties.getShardName().contains("valley")
 			|| ServerProperties.getShardName().contains("isles")
 			|| ServerProperties.getShardName().contains("dev")) {
 			manager.registerEvents(new StructureConqueredListener(this), this);

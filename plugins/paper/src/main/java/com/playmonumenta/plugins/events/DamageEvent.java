@@ -1,7 +1,6 @@
 package com.playmonumenta.plugins.events;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.bosses.parameters.EffectsList;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;

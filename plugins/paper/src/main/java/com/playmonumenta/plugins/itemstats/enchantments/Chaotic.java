@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Trident;
 import org.jetbrains.annotations.NotNull;
 
 public class Chaotic implements Enchantment {
