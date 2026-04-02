@@ -4,11 +4,11 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.integrations.luckperms.GuildInviteLevel;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.utils.MMLog;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -28,7 +28,7 @@ import org.bukkit.entity.Player;
 import static com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration.getLoadedUsers;
 
 public class InviteNotification {
-	private static final Map<UUID, Set<String>> mUserInvitesPreSync = new HashMap<>();
+	private static final Map<UUID, Set<String>> mUserInvitesPreSync = new ConcurrentHashMap<>();
 
 	@SuppressWarnings("resource")
 	public static void registerLuckPermsEvents(Plugin plugin, EventBus eventBus) {
@@ -73,7 +73,7 @@ public class InviteNotification {
 
 		MMLog.fine("[Guild Invite Listener/PreNetworkSync] Loading current user data");
 		for (User user : getLoadedUsers()) {
-			Set<String> userGroups = new HashSet<>();
+			Set<String> userGroups = new ConcurrentSkipListSet<>();
 			for (Group group : user.getInheritedGroups(QueryOptions.nonContextual())) {
 				userGroups.add(group.getName());
 			}
@@ -86,7 +86,7 @@ public class InviteNotification {
 		if (mUserInvitesPreSync.isEmpty()) {
 			return;
 		}
-		Map<UUID, Set<String>> userInvitesPreSync = new HashMap<>(mUserInvitesPreSync);
+		Map<UUID, Set<String>> userInvitesPreSync = new ConcurrentHashMap<>(mUserInvitesPreSync);
 		mUserInvitesPreSync.clear();
 
 		Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
