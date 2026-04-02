@@ -40,6 +40,8 @@ import org.bukkit.entity.Flying;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Trident;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -201,8 +203,7 @@ public class WindBomb extends Ability {
 			@Override
 			public void run() {
 				if (!mPlayer.isOnline()) {
-					mRunnableBomb.remove();
-					mBomb = null;
+					removeWindBomb();
 					this.cancel();
 					return;
 				}
@@ -233,8 +234,7 @@ public class WindBomb extends Ability {
 		}
 
 		projectileHitAudio(mBomb);
-		mBomb.remove();
-		mBomb = null;
+		removeWindBomb();
 		World world = loc.getWorld();
 		mCosmetic.onExplode(mPlayer, world, loc, mRadius);
 
@@ -355,6 +355,26 @@ public class WindBomb extends Ability {
 				world.playSound(loc, Sound.ENTITY_ARROW_HIT, 1f, 1f);
 			}
 
+		}
+	}
+
+	private void removeWindBomb() {
+		if (mBomb != null) {
+			mBomb.getPassengers().forEach(Entity::remove);
+			mBomb.remove();
+		}
+		mBomb = null;
+	}
+
+	@Override
+	public void playerQuitEvent(PlayerQuitEvent event) {
+		removeWindBomb();
+	}
+
+	@Override
+	public void playerTeleportEvent(PlayerTeleportEvent event) {
+		if (event.getFrom().getWorld() != event.getTo().getWorld()) {
+			removeWindBomb();
 		}
 	}
 
