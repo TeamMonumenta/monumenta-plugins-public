@@ -143,7 +143,8 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 		mInventory.clear();
 		mMapFunction.clear();
 
-		if (mSlotSelected == null) {
+		// If the item is already delve infused (swapped hotbar slots in this gui) then open normal page
+		if (mSlotSelected == null || DelveInfusionUtils.getCurrentInfusion(player.getEquipment().getItem(mSlotSelected)) != null) {
 			loadDelveInfusionPage(player);
 		} else {
 			loadDelveInfusionSelection(mSlotSelected, player);
@@ -194,7 +195,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			if (infusion.isUnlocked(player)) {
 				mInventory.setItem(place, mDelvePanelList.get(infusion));
 				mMapFunction.put(place, (p, inventory, slot) -> {
-					attemptInfusion(p, infusedItem, infusion, mDelveInfusionMaterial);
+					attemptInfusion(p, p.getEquipment().getItem(equipmentSlot), infusion, mDelveInfusionMaterial);
 					mSlotSelected = null;
 				});
 			}
@@ -226,6 +227,11 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 			p.sendMessage(Component.text("This item cannot be infused.", NamedTextColor.RED));
 			return;
 		}
+		DelveInfusionSelection currentInfusion = DelveInfusionUtils.getCurrentInfusion(item);
+		if ((currentInfusion != infusion && currentInfusion != null) || DelveInfusionUtils.getInfuseLevel(item) >= DelveInfusionUtils.MAX_LEVEL) {
+			p.sendMessage(Component.text("This item is already infused.", NamedTextColor.RED));
+			return;
+		}
 
 		try {
 			if (DelveInfusionUtils.tryToPayInfusion(item, infusion, p, delveInfusionMaterial)) {
@@ -254,7 +260,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					mInventory.setItem((row * 9), mRefundItem);
 
 					mMapFunction.put((row * 9), (p, inventory, slot) -> {
-						DelveInfusionUtils.refundInfusion(item, p);
+						DelveInfusionUtils.refundInfusion(p.getEquipment().getItem(equipmentSlot), p);
 					});
 
 					//load the infusion.
@@ -279,7 +285,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 							"You will need " + DelveInfusionUtils.MAT_DEPTHS_COST_PER_INFUSION[level] + " " + delveInfusionMaterial.mItemNamePlural + ", " + DelveInfusionUtils.MAT_COST_PER_INFUSION[level] + " " + infusion.getDelveMatPlural() + ", and " + DelveInfusionUtils.getExpLvlInfuseCost(item) + " experience levels", NamedTextColor.GRAY);
 						mInventory.setItem(slot, infuseItem);
 						mMapFunction.put(slot, (p, inventory, slotClicked) -> {
-							attemptInfusion(p, item, infusion, delveInfusionMaterial);
+							attemptInfusion(p, p.getEquipment().getItem(equipmentSlot), infusion, delveInfusionMaterial);
 						});
 					} else {
 						//Max level reached
@@ -312,11 +318,7 @@ public final class DelveInfusionCustomInventory extends CustomInventory {
 					mInventory.setItem((row * 9) + 2 + 4, infuseItem);
 					mMapFunction.put((row * 9) + 2 + 4, (p, inventory, slot) -> {
 						//check if item in the slot is the same on GUI open and on GUI click, if not, reload the GUI
-						if (item.isSimilar(player.getEquipment().getItem(equipmentSlot))) {
-							mSlotSelected = equipmentSlot;
-						} else {
-							mSlotSelected = null;
-						}
+						mSlotSelected = equipmentSlot;
 					});
 				}
 			} else {

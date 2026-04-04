@@ -139,7 +139,7 @@ public class InfusionCustomInventory extends CustomInventory {
 			mInventory.setItem((row * 9), mRefundItem);
 			mMapFunction.put((row * 9), (p, inventory, slot) -> {
 				try {
-					InfusionUtils.refundInfusion(item, p);
+					InfusionUtils.refundInfusion(p.getEquipment().getItem(equipmentSlot), p);
 				} catch (WrapperCommandSyntaxException e) {
 					p.sendMessage(Component.text("Error refunding infusion. Please contact a mod: " + e.getMessage()));
 				}
@@ -183,7 +183,7 @@ public class InfusionCustomInventory extends CustomInventory {
 
 
 				mMapFunction.put(slot, (p, inventory, itemSlot) -> {
-					attemptInfusion(p, item, infusion);
+					attemptInfusion(p, p.getEquipment().getItem(equipmentSlot), infusion);
 				});
 			} else {
 				mInventory.setItem(slot, mMaxLevelReachedItem);
@@ -197,7 +197,7 @@ public class InfusionCustomInventory extends CustomInventory {
 				int loc = (row * 9) + 2 + inf.ordinal();
 				mInventory.setItem(loc, it);
 				mMapFunction.put(loc, (p, inventory, slot) -> {
-					attemptInfusion(p, item, inf);
+					attemptInfusion(p, p.getEquipment().getItem(equipmentSlot), inf);
 				});
 			});
 		}
@@ -210,6 +210,11 @@ public class InfusionCustomInventory extends CustomInventory {
 		}
 		if (!InfusionUtils.isInfusionable(item)) {
 			p.sendMessage(Component.text("This item cannot be infused.", NamedTextColor.RED));
+			return;
+		}
+		InfusionSelection currentInfusion = InfusionUtils.getCurrentInfusion(item);
+		if ((currentInfusion != infusion && currentInfusion != InfusionSelection.REFUND) || InfusionUtils.getInfuseLevel(item) >= 4) {
+			p.sendMessage(Component.text("This item is already infused.", NamedTextColor.RED));
 			return;
 		}
 

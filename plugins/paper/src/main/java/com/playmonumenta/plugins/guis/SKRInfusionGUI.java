@@ -70,7 +70,7 @@ public class SKRInfusionGUI extends Gui {
 				if (infusion != DelveInfusionSelection.CELERITY) {
 					// item is already infused, but not with celerity
 					setItem(1, 0, REFUND_ITEM).onClick((clickEvent) -> {
-						DelveInfusionUtils.refundInfusion(mainhand, mPlayer);
+						DelveInfusionUtils.refundInfusion(mPlayer.getEquipment().getItemInMainHand(), mPlayer);
 						open();
 					});
 					setItem(1, 2, GUIUtils.createBasicItem(Material.BARRIER,
@@ -80,7 +80,7 @@ public class SKRInfusionGUI extends Gui {
 				} else {
 					// item is infused with freerunner, use sturdy refund method
 					setItem(1, 0, REFUND_ITEM).onClick((clickEvent) -> {
-						refundCelerity(mainhand, mPlayer);
+						refundCelerity(mPlayer.getEquipment().getItemInMainHand(), mPlayer);
 						open();
 					});
 				}
@@ -103,9 +103,10 @@ public class SKRInfusionGUI extends Gui {
 				ItemStack infuseItem = GUIUtils.createBasicItem(Material.ENCHANTED_BOOK,
 					"Click to infuse to level " + (level + 1), NamedTextColor.DARK_AQUA, true,
 					"You will need " + MEM_COSTS[level] + " Memory Fragments, " + HAR_COSTS[level] + " Hyperchromatic Archos Rings, and " + DelveInfusionUtils.getExpLvlInfuseCost(mainhand) + " experience levels", NamedTextColor.GRAY);
-				setItem(1, 2 + level, infuseItem).onClick((clickEvent) ->
-					attemptInfusion(mPlayer, mainhand, level + 1)
-				);
+				setItem(1, 2 + level, infuseItem).onClick((clickEvent) -> {
+					ItemStack currentMainhand = mPlayer.getEquipment().getItemInMainHand();
+					attemptInfusion(mPlayer, currentMainhand, DelveInfusionUtils.getInfuseLevel(currentMainhand) + 1);
+				});
 			} else {
 				if (!ItemStatUtils.hasInfusion(mainhand, InfusionType.REVELATION)) {
 					setItem(1, 6, mMaxLevelReachedItem);
@@ -136,6 +137,11 @@ public class SKRInfusionGUI extends Gui {
 			p.sendMessage(Component.text("This item cannot be infused.", NamedTextColor.RED));
 			return;
 		}
+		DelveInfusionSelection currentInfusion = DelveInfusionUtils.getCurrentInfusion(item);
+		if ((currentInfusion != DelveInfusionSelection.CELERITY && currentInfusion != null) || level >= DelveInfusionUtils.MAX_LEVEL) {
+			p.sendMessage(Component.text("This item is already infused.", NamedTextColor.RED));
+			return;
+		}
 
 		try {
 			if (payInfusion(item, level)) {
@@ -151,7 +157,7 @@ public class SKRInfusionGUI extends Gui {
 	}
 
 	private boolean payInfusion(ItemStack item, int level) {
-		if (DelveInfusionSelection.CELERITY.getLootTable() == null || level <= 0) {
+		if (DelveInfusionSelection.CELERITY.getLootTable() == null || level <= 0 || level >= DelveInfusionUtils.MAX_LEVEL) {
 			return false;
 		}
 
