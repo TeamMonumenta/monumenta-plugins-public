@@ -138,7 +138,7 @@ public class SKRInfusionGUI extends Gui {
 			return;
 		}
 		DelveInfusionSelection currentInfusion = DelveInfusionUtils.getCurrentInfusion(item);
-		if ((currentInfusion != DelveInfusionSelection.CELERITY && currentInfusion != null) || level >= DelveInfusionUtils.MAX_LEVEL) {
+		if ((currentInfusion != DelveInfusionSelection.CELERITY && currentInfusion != null) || level > DelveInfusionUtils.MAX_LEVEL) {
 			p.sendMessage(Component.text("This item is already infused.", NamedTextColor.RED));
 			return;
 		}
@@ -157,7 +157,7 @@ public class SKRInfusionGUI extends Gui {
 	}
 
 	private boolean payInfusion(ItemStack item, int level) {
-		if (DelveInfusionSelection.CELERITY.getLootTable() == null || level <= 0 || level >= DelveInfusionUtils.MAX_LEVEL) {
+		if (DelveInfusionSelection.CELERITY.getLootTable() == null || level <= 0 || level > DelveInfusionUtils.MAX_LEVEL) {
 			return false;
 		}
 

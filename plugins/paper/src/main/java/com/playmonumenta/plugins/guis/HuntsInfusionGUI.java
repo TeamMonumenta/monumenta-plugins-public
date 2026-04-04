@@ -139,7 +139,7 @@ public class HuntsInfusionGUI extends Gui {
 			return;
 		}
 		DelveInfusionSelection currentInfusion = DelveInfusionUtils.getCurrentInfusion(item);
-		if ((currentInfusion != DelveInfusionSelection.STURDY && currentInfusion != null) || level >= DelveInfusionUtils.MAX_LEVEL) {
+		if ((currentInfusion != DelveInfusionSelection.STURDY && currentInfusion != null) || level > DelveInfusionUtils.MAX_LEVEL) {
 			p.sendMessage(Component.text("This item is already infused.", NamedTextColor.RED));
 			return;
 		}
@@ -158,7 +158,7 @@ public class HuntsInfusionGUI extends Gui {
 	}
 
 	private boolean payInfusion(ItemStack item, int level) {
-		if (DelveInfusionSelection.STURDY.getLootTable() == null || level <= 0 || level >= DelveInfusionUtils.MAX_LEVEL) {
+		if (DelveInfusionSelection.STURDY.getLootTable() == null || level <= 0 || level > DelveInfusionUtils.MAX_LEVEL) {
 			return false;
 		}
 
