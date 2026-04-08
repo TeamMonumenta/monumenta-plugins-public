@@ -30,6 +30,7 @@ public class DropKeyPacketListener extends PacketAdapter {
 			Player player = event.getPlayer();
 			if (player.getGameMode() == GameMode.CREATIVE) {
 				// Allow dropping in creative mode. Accessing the player's game mode should be reasonably thread-safe.
+				Plugin.getInstance().mBalanceModeManager.onPlayerDropItemCreative(event);
 				return;
 			}
 			event.setCancelled(true);

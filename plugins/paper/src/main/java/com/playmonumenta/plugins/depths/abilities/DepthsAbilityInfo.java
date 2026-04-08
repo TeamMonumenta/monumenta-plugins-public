@@ -42,9 +42,10 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	private Consumer<Player> mGain;
 	private Predicate<Player> mOfferable;
 	private Predicate<Integer> mFloors;
+	private @Nullable IntFunction<Description<T>> mDescriptionFunction;
 
 	public DepthsAbilityInfo(Class<T> abilityClass, String displayName, BiFunction<Plugin, Player, T> constructor,
-	                         @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
+							 @Nullable DepthsTree depthsTree, DepthsTrigger depthsTrigger) {
 		super(abilityClass, displayName, constructor);
 		mDepthsTree = depthsTree;
 		mDepthsTrigger = depthsTrigger;
@@ -137,6 +138,7 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	@Override
 	public DepthsAbilityInfo<T> descriptions(IntFunction<Description<T>> supplier, int levels) {
 		super.descriptions(supplier, levels);
+		mDescriptionFunction = supplier;
 		return this;
 	}
 
@@ -337,5 +339,14 @@ public class DepthsAbilityInfo<T extends DepthsAbility> extends AbilityInfo<T> {
 	public Component getNameWithHover(int rarity, int prevRarity, Player player, boolean useAbility) {
 		ItemStack item = createAbilityItem(rarity, prevRarity, 0, player, useAbility);
 		return getColoredName().hoverEvent(item.asHoverEvent());
+	}
+
+	// used for depths skill api
+	public DepthsAbilityInfo<T> rebuildDescriptions() {
+		if (mDescriptionFunction == null) {
+			return this;
+		}
+		super.descriptions(mDescriptionFunction, mHasLevels ? DepthsAbility.MAX_RARITY : 1);
+		return this;
 	}
 }

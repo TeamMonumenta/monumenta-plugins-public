@@ -68,6 +68,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
@@ -745,6 +746,15 @@ public class ItemStatManager implements Listener {
 		}
 	}
 
+	/**
+	 * Called when a projectile fired by the player hits something.
+	 * Note that this takes the stats at the moment of <bold>hit</bold>,
+	 * not at the moment of <bold>firing</bold>, which can lead to "sword-swapping".
+	 * @param plugin monumenta plugin
+	 * @param player player who fired the projectile
+	 * @param event projectile hit event
+	 * @param projectile the projectile that hit something
+	 */
 	public void onProjectileHit(Plugin plugin, Player player, ProjectileHitEvent event, Projectile projectile) {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
@@ -765,6 +775,14 @@ public class ItemStatManager implements Listener {
 		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
 			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
 				entry.getKey().onBlockBreak(plugin, player, entry.getValue(), event);
+			}
+		}
+	}
+
+	public void onBlockDropItem(Plugin plugin, Player player, BlockDropItemEvent event) {
+		if (mPlayerItemStatsMappings.containsKey(player.getUniqueId())) {
+			for (Entry<ItemStat, Double> entry : mPlayerItemStatsMappings.get(player.getUniqueId()).getItemStats()) {
+				entry.getKey().onBlockDropItem(plugin, player, entry.getValue(), event);
 			}
 		}
 	}

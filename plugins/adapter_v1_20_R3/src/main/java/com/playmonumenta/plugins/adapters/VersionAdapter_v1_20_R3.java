@@ -49,6 +49,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
@@ -126,22 +128,21 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		private final String mKilledUsingMsg;
 		@Nullable
 		private final net.minecraft.world.entity.Entity mDamager;
+		private final boolean mCauseKnockback;
+		private final boolean mBypassIFrames;
 
 		public CustomDamageSource(Holder<DamageType> type, @Nullable net.minecraft.world.entity.Entity damager,
-								  boolean blockable, @Nullable String killedUsingMsg) {
+								  boolean blockable, @Nullable String killedUsingMsg, boolean causeKnockback, boolean bypassIFrames) {
 			super(type, damager, damager);
 			mDamager = damager;
 			mBlockable = blockable;
 			mKilledUsingMsg = killedUsingMsg;
+			mCauseKnockback = causeKnockback;
+			mBypassIFrames = bypassIFrames;
 		}
 
 		@Override
-		public @Nullable Vec3 getSourcePosition() {
-			return mBlockable ? super.getSourcePosition() : null;
-		}
-
-		@Override
-		public Component getLocalizedDeathMessage(net.minecraft.world.entity.LivingEntity killed) {
+		public Component getLocalizedDeathMessage(@NotNull net.minecraft.world.entity.LivingEntity killed) {
 			if (this.mDamager == null) {
 				// death.attack.magic=%1$s was killed by magic
 				String s = "death.attack.magic";
@@ -155,6 +156,25 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 				String s = "death.attack.indirectMagic.item";
 				return Component.translatable(s, killed.getDisplayName(), this.mDamager.getDisplayName(), mKilledUsingMsg);
 			}
+		}
+
+		@Override
+		public boolean is(@NotNull TagKey<DamageType> tag) {
+			if (!mCauseKnockback && (tag.equals(DamageTypeTags.NO_KNOCKBACK) || tag.equals(DamageTypeTags.NO_IMPACT))) {
+				return true;
+			} else if (mBypassIFrames && tag.equals(DamageTypeTags.BYPASSES_COOLDOWN)) {
+				return true;
+			} else if (!mBlockable && tag.equals(DamageTypeTags.BYPASSES_SHIELD)) {
+				return true;
+			}
+			return super.is(tag);
+		}
+
+		@Override
+		public boolean is(@NotNull ResourceKey<DamageType> typeKey) {
+			// Stored in DamageTypes
+			// return super.is(typeKey);
+			return false;
 		}
 	}
 
@@ -273,6 +293,8 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		}
 	}
 
+	public static final ResourceKey<DamageType> CUSTOM_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation("monumenta:custom"));
+
 	public VersionAdapter_v1_20_R3(@SuppressWarnings("PMD.UnusedFormalParameter") Logger logger) {
 	}
 
@@ -289,19 +311,21 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 
 	@Override
 	public void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount,
-								   boolean blockable, @Nullable String killedUsingMsg) {
+			boolean blockable, @Nullable String killedUsingMsg, boolean causeKnockback, boolean bypassIFrames) {
 		// this will throw if not present in the datapack
 		final var type = ((CraftLivingEntity) damagee).getHandle()
 			.level()
 			.registryAccess()
 			.registryOrThrow(Registries.DAMAGE_TYPE)
-			.getHolder(ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation("monumenta:custom"))).get();
+			.getHolder(CUSTOM_DAMAGE).get();
 
 		final var reason = new CustomDamageSource(
 			type,
 			damager == null ? null : ((CraftLivingEntity) damager).getHandle(),
 			blockable,
-			killedUsingMsg
+			killedUsingMsg,
+			causeKnockback,
+			bypassIFrames
 		);
 
 		((CraftLivingEntity) damagee).getHandle().hurt(reason, (float) amount);
@@ -983,11 +1007,16 @@ public class VersionAdapter_v1_20_R3 implements VersionAdapter {
 		buf.writeVarIntArray(passengerIds.toIntArray());
 
 		return new ClientboundSetPassengersPacket(buf);
-  }
+  	}
 
-  @Override
+  	@Override
 	public double getJumpVelocity(LivingEntity entity) {
 		net.minecraft.world.entity.LivingEntity e = ((CraftLivingEntity) entity).getHandle();
 		return e.getJumpPower();
+	}
+
+	@Override
+	public void setNotOnGround(Entity entity) {
+		((CraftEntity) entity).getHandle().setOnGround(false);
 	}
 }

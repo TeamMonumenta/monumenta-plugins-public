@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -11,9 +12,11 @@ import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class Channeling extends Ability {
 	public static final String CHARM_DAMAGE = "Channeling Damage Modifier";
@@ -23,7 +26,8 @@ public class Channeling extends Ability {
 		new AbilityInfo<>(Channeling.class, "Channeling", Channeling::new)
 			.description(getDescription())
 			.canUse(player -> AbilityUtils.getClassNum(player) == Mage.CLASS_ID)
-			.priorityAmount(999);
+			.priorityAmount(999)
+			.displayItem(Material.DEAD_TUBE_CORAL);
 
 	private final double mDamage;
 
@@ -51,10 +55,13 @@ public class Channeling extends Ability {
 		return false; // only changes event damage
 	}
 
-	private static DescriptionBuilder<Channeling> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your spell damage is increased by your wand's Spell Power stat. After casting a spell, your next melee attack with a wand deals ")
-			.addPercent(a -> a.mDamage, PERCENT_MELEE_INCREASE)
-			.add(" more damage.");
+	public static DescriptionBuilder<Channeling> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("Your ability damage is boosted by")
+			.addLine("your wand's Spell Power stat.")
+			.addLine()
+			.addLine("After using an ability, your next")
+			.addLine("attack (m) deals %p more damage.")
+				.statValues(stat(a -> a.mDamage, PERCENT_MELEE_INCREASE));
 	}
 }

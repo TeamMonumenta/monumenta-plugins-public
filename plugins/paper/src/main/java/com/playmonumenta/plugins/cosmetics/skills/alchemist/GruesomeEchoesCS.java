@@ -3,9 +3,9 @@ package com.playmonumenta.plugins.cosmetics.skills.alchemist;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.math3.util.FastMath;
 import org.bukkit.Color;
@@ -15,6 +15,7 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -43,6 +44,16 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 	@Override
 	public @Nullable String getName() {
 		return NAME;
+	}
+
+	@Override
+	public Color getBrutalColor() {
+		return TWISTED_COLOR;
+	}
+
+	@Override
+	public Color getGruesomeColor() {
+		return ECHO_COLOR;
 	}
 
 	@Override
@@ -121,5 +132,69 @@ public class GruesomeEchoesCS extends GruesomeAlchemyCS {
 			}
 
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
+	}
+
+	@Override
+	public void brutalDotTickEffects(LivingEntity target) {
+		Location halfHeightLoc = LocationUtils.getHalfHeightLocation(target);
+		new PartialParticle(Particle.BLOCK_CRACK, halfHeightLoc, 24)
+			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
+			.data(Material.REDSTONE_BLOCK.createBlockData())
+			.spawnAsEnemy();
+		new PartialParticle(Particle.REDSTONE, halfHeightLoc, 36)
+			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
+			.data(new Particle.DustOptions(TWISTED_COLOR, 1f))
+			.spawnAsEnemy();
+		new PartialParticle(Particle.SOUL, halfHeightLoc, 12)
+			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
+			.spawnAsEnemy();
+	}
+
+	@Override
+	public void brutalPeriodicEffects(LivingEntity target, int stacks, int maxStacks, int level) {
+		if (stacks > maxStacks) {
+			// Explosion will happen
+			return;
+		}
+
+		Location currentLoc = LocationUtils.getHeightLocation(target, 1).add(0, 0.5, 0);
+		int stacksLeft = stacks;
+		while (stacksLeft > 0) {
+			float size = 1f;
+			int cost = 1;
+			if (stacksLeft >= 5) {
+				cost = 5;
+				size = 1.75f;
+			}
+			new PartialParticle(Particle.REDSTONE, currentLoc)
+				.count(5)
+				.data(new Particle.DustOptions(TWISTED_COLOR, size))
+				.spawnAsEnemy();
+			stacksLeft -= cost;
+			if (cost == 5 && stacksLeft >= 5) {
+				// Prevent the next "big blob" from being too close
+				currentLoc.add(0, 0.25, 0);
+			}
+			currentLoc.add(0, 0.5, 0);
+		}
+	}
+
+	@Override
+	public void brutalDotExplosionEffects(LivingEntity target) {
+		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_SQUID_SQUIRT, SoundCategory.HOSTILE, 1f, 0.7f);
+		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_STRAY_STEP, SoundCategory.HOSTILE, 1.25f, 0.5f);
+		target.getWorld().playSound(target.getLocation(), Sound.ENTITY_HUSK_STEP, SoundCategory.HOSTILE, 1.25f, 0.5f);
+		Location halfHeightLoc = LocationUtils.getHalfHeightLocation(target);
+		new PartialParticle(Particle.BLOCK_CRACK, halfHeightLoc, 80)
+			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
+			.data(Material.REDSTONE_BLOCK.createBlockData())
+			.spawnAsEnemy();
+		new PartialParticle(Particle.REDSTONE, halfHeightLoc, 120)
+			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
+			.data(new Particle.DustOptions(TWISTED_COLOR, 1f))
+			.spawnAsEnemy();
+		new PartialParticle(Particle.SOUL, halfHeightLoc, 40)
+			.delta(target.getBoundingBox().getWidthX() / 2, target.getBoundingBox().getHeight() / 2, target.getBoundingBox().getWidthZ() / 2)
+			.spawnAsEnemy();
 	}
 }

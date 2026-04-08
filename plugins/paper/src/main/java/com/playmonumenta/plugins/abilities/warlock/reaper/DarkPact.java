@@ -3,11 +3,10 @@ package com.playmonumenta.plugins.abilities.warlock.reaper;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
-import com.playmonumenta.plugins.abilities.AbilityManager;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.warlock.SoulRend;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -25,6 +24,7 @@ import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.NavigableSet;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
@@ -35,6 +35,11 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.RED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class DarkPact extends Ability {
 	public static final String PERCENT_HEAL_EFFECT_NAME = "DarkPactPercentHealEffect";
@@ -58,6 +63,8 @@ public class DarkPact extends Ability {
 	public static final String CHARM_CAP = "Dark Pact Absorption Health Cap";
 	public static final String CHARM_DURATION = "Dark Pact Buff Duration";
 	public static final String CHARM_ABSORPTION = "Dark Pact Absorption Health Per Kill";
+
+	public static final Style PACT_COLOR = Style.style(TextColor.color(0x8C1C67));
 
 	public static final AbilityInfo<DarkPact> INFO =
 		new AbilityInfo<>(DarkPact.class, "Dark Pact", DarkPact::new)
@@ -172,50 +179,51 @@ public class DarkPact extends Ability {
 	}
 
 	private static Description<DarkPact> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to cause a dark aura to form around you. For the next ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds, your melee scythe attacks deal ")
-			.addPercent(a -> a.mPercentDamageDealt, PERCENT_DAMAGE_DEALT_1, false, Ability::isLevelOne)
-			.add(" more damage. Each kill during this time increases the duration of your aura by ")
-			.addDuration(a -> a.mDurationIncreaseOnKill, DURATION_INCREASE_ON_KILL)
-			.add(" second and gives ")
-			.add(a -> a.mAbsorption, ABSORPTION_ON_KILL)
-			.add(" absorption health (up to ")
-			.add(a -> a.mMaxAbsorption, MAX_ABSORPTION)
-			.add(") for the duration of the aura. However, you cannot heal for ")
-			.addDuration(a -> a.mDuration, DURATION)
-			.add(" seconds, and healing is reduced by ")
-			.addPercent(-EXTENDED_ANTIHEAL)
-			.add(" until the aura ends. You may retrigger this ability again after ")
-			.addDuration(CANCEL_WINDOW)
-			.add(" seconds to cancel your pact.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Enter a *Dark Pact* that grants increased").styles(PACT_COLOR)
+			.addLine("melee damage but prevents you from healing.")
+			.addLine()
+			.addStat("Effect: +%p1 Melee Damage")
+				.statValues(stat(a -> a.mPercentDamageDealt, PERCENT_DAMAGE_DEALT_1))
+			.addStat("Effect: *-100% Healing*").styles(RED)
+			.tab().addLine("(after %t, becomes -66% Healing)")
+				.statValues(stat(DURATION))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("Killing a mob during the *Pact* extends its").styles(PACT_COLOR)
+			.addLine("duration and grants you absorption.")
+			.addLine()
+			.addStat("Effect: +%d Absorption per kill (max +%d)")
+				.statValues(stat(a -> a.mAbsorption, ABSORPTION_ON_KILL), stat(a -> a.mMaxAbsorption, MAX_ABSORPTION))
+			.addStat("Duration Increase: +%t per kill")
+				.statValues(stat(a -> a.mDurationIncreaseOnKill, DURATION_INCREASE_ON_KILL))
+			.addLine()
+			.addLine("You may recast *Dark Pact* after %t to").styles(UNDERLINED)
+				.statValues(stat(CANCEL_WINDOW))
+			.addLine("cancel the pact early.")
+			.addDashedLine();
 	}
 
 	private static Description<DarkPact> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage buff is increased to ")
-			.addPercent(a -> a.mPercentDamageDealt, PERCENT_DAMAGE_DEALT_2, false, Ability::isLevelTwo)
-			.add(", and your Soul Rend bypasses the healing prevention, healing you by ")
-			.add((a, p) -> {
-				Description<SoulRend> subDescription;
-				SoulRend soulRend = AbilityManager.getManager().getPlayerAbilityIgnoringSilence(p, SoulRend.class);
-				if (soulRend == null) {
-					subDescription = new DescriptionBuilder<>(() -> SoulRend.INFO)
-						.add(aa -> SoulRend.DARK_PACT_HEAL_1, SoulRend.DARK_PACT_HEAL_1)
-						.add("/")
-						.add(aa -> SoulRend.DARK_PACT_HEAL_2, SoulRend.DARK_PACT_HEAL_2)
-						.add(" health, depending on the level of Soul Rend.");
-				} else {
-					subDescription = new DescriptionBuilder<>(() -> SoulRend.INFO)
-						.add(sr -> sr.mDarkPactHeal, soulRend.isLevelOne() ? SoulRend.DARK_PACT_HEAL_1 : SoulRend.DARK_PACT_HEAL_2)
-						.add(" health.");
-				}
-				return subDescription.get(soulRend, p);
-			})
-			.add(" Nearby players are still healed as normal.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Dark Pact*'s damage boost.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Melee Damage")
+				.statValues(stat(PERCENT_DAMAGE_DEALT_1), stat(a -> a.mPercentDamageDealt, PERCENT_DAMAGE_DEALT_2))
+			.addLine()
+			.addLine("*Soul Rend* can now heal you for a reduced").styles(UNDERLINED)
+			.addLine("amount while the *Pact* is active.").styles(PACT_COLOR)
+			.addLine()
+			.addOtherAbility(() -> SoulRend.INFO, SoulRend.class,
+				desc -> desc.addStat("Healing: %d HP")
+					.statValues(perLevel(a -> a.mDarkPactHeal, SoulRend.DARK_PACT_HEAL_1, SoulRend.DARK_PACT_HEAL_2)))
+			.addDashedLine();
 	}
 
 	@Override

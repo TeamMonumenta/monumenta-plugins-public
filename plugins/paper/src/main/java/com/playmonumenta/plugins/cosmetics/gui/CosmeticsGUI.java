@@ -164,6 +164,14 @@ public class CosmeticsGUI extends CustomInventory {
 						}
 					}
 				} else if (mCurrentSpec == null) {
+					// Choose passive
+					if (slot == CosmeticSkillGUIConfig.PASSIVE_LOC) {
+						mCurrentAbility = mCurrentClass.mPassive;
+						playBookSound(player);
+						setUpCosmetics(player);
+						return;
+					}
+
 					// Choose skill
 					for (int i = 0; i < CosmeticSkillGUIConfig.SKILL_LOCS.length; i++) {
 						if (slot == CosmeticSkillGUIConfig.SKILL_LOCS[i]) {
@@ -480,6 +488,8 @@ public class CosmeticsGUI extends CustomInventory {
 			ItemStack abilityItem = createSkillItem(mCurrentClass.mAbilities.get(i));
 			mInventory.setItem(CosmeticSkillGUIConfig.SKILL_LOCS[i], abilityItem);
 		}
+		ItemStack passiveItem = createSkillItem(mCurrentClass.mPassive);
+		mInventory.setItem(CosmeticSkillGUIConfig.PASSIVE_LOC, passiveItem);
 
 		// Display spec items
 		{

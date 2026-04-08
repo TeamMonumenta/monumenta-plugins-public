@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger;
 
+import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import java.util.List;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -83,6 +85,23 @@ public class ArcaneEnhancementsCS extends EsotericEnhancementsCS {
 				.delta(aberration.getWidth() / 3)
 				.spawnAsPlayerActive(player);
 		}
+	}
+
+	@Override
+	public void periodicAppliedLocationEffects(Player player, Location loc, double radius, boolean isGruesome,
+											   @Nullable AlchemistPotions alchemistPotions) {
+		if (alchemistPotions == null) {
+			return;
+		}
+
+		Location slightlyElevatedLoc = loc.clone().add(0, 0.1, 0);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, slightlyElevatedLoc, radius)
+			.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
+			.spawnAsPlayerActive(player);
+		new PPCircle(isGruesome ? Particle.SCRAPE : Particle.WAX_ON, slightlyElevatedLoc, radius * 0.7)
+			.countPerMeter(1)
+			.offset((double) (Bukkit.getCurrentTick() % 10) / 10)
+			.spawnAsPlayerActive(player);
 	}
 
 	@Override

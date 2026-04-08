@@ -221,6 +221,7 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RejuvenationBoss.identityTag, RejuvenationBoss::new, new RejuvenationBoss.Parameters());
 		registerStatelessBoss(HandSwapBoss.identityTag, HandSwapBoss::new, new HandSwapBoss.Parameters());
 		registerStatelessBoss(UnstableBoss.identityTag, UnstableBoss::new, new UnstableBoss.Parameters());
+		registerStatelessBoss(SizeDeathBoss.identityTag, SizeDeathBoss::new, new SizeDeathBoss.Parameters());
 		registerStatelessBoss(BerserkerBoss.identityTag, BerserkerBoss::new);
 		registerStatelessBoss(NoProjectileLaunchBoss.identityTag, NoProjectileLaunchBoss::new);
 		registerStatelessBoss(SnowballDamageBoss.identityTag, SnowballDamageBoss::new, new SnowballDamageBoss.Parameters());
@@ -427,6 +428,9 @@ public class BossManager implements Listener {
 		registerStatelessBoss(RegenerationPercentBoss.identityTag, RegenerationPercentBoss::new, new RegenerationPercentBoss.Parameters());
 		registerStatelessBoss(ReplaceVexBoss.identityTag, ReplaceVexBoss::new, new ReplaceVexBoss.Parameters());
 		registerStatelessBoss(SpiritArcheryTargetBoss.identityTag, SpiritArcheryTargetBoss::new);
+		registerStatelessBoss(EruptionBoss.identityTag, EruptionBoss::new, new EruptionBoss.Parameters());
+		registerStatelessBoss(PhalanxBoss.identityTag, PhalanxBoss::new, new PhalanxBoss.Parameters());
+		registerStatelessBoss(BurrowBoss.identityTag, BurrowBoss::new, new BurrowBoss.Parameters());
 
 		/* Stateful bosses have a remembered spawn location and end location where a redstone block is set when they die */
 		registerStatefulBoss(CAxtal.identityTag, CAxtal::new);
@@ -511,6 +515,10 @@ public class BossManager implements Listener {
 		mBossDeserializers.put(identityTag, deserializer);
 	}
 
+	public static final double DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE = 12.0;
+	public static final double DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE = 75.0;
+	public static final double DEFAULT_MAXIMUM_ENTITY_HURT_RANGE = 16.0;
+
 	/********************************************************************************
 	 * Member Variables
 	 *******************************************************************************/
@@ -520,10 +528,10 @@ public class BossManager implements Listener {
 	private boolean mNearbyBlockBreakEnabled = false;
 	private boolean mNearbyBlockPlaceEnabled = false;
 	private boolean mNearbyPlayerDeathEnabled = false;
-	private static final double DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE = 12.0;
-	private static final double DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE = 75.0;
+	private boolean mNearbyEntityHurtEnabled = false;
 	private double mMaximumEntityDeathRange = DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE;
 	private double mMaximumPlayerDeathRange = DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE;
+	private double mMaximumEntityHurtRange = DEFAULT_MAXIMUM_ENTITY_HURT_RANGE;
 
 	public BossManager(Plugin plugin) {
 		INSTANCE = this;
@@ -619,6 +627,24 @@ public class BossManager implements Listener {
 			if (entity.getHealth() <= 0) {
 				unload(boss, false);
 				mBosses.remove(entity.getUniqueId());
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void entityHurtEvent(DamageEvent event) {
+		LivingEntity entity = event.getDamagee();
+
+		if (mNearbyEntityHurtEnabled) {
+			/* For performance reasons this check is only enabled when there is a loaded
+			 * boss that is using this feature
+			 */
+			for (LivingEntity m : EntityUtils.getNearbyMobs(entity.getLocation(), mMaximumEntityHurtRange)) {
+				Boss boss = mBosses.get(m.getUniqueId());
+				if (boss != null) {
+					boss.nearbyEntityHurt(event);
+				}
+
 			}
 		}
 	}
@@ -1167,12 +1193,20 @@ public class BossManager implements Listener {
 			mNearbyPlayerDeathEnabled = true;
 		}
 
+		if (ability.hasNearbyEntityHurtTrigger()) {
+			mNearbyEntityHurtEnabled = true;
+		}
+
 		if (ability.nearbyEntityDeathMaxRange() > mMaximumEntityDeathRange) {
 			mMaximumEntityDeathRange = ability.nearbyEntityDeathMaxRange();
 		}
 
 		if (ability.maxPlayerDeathRange() > mMaximumPlayerDeathRange) {
 			mMaximumPlayerDeathRange = ability.maxPlayerDeathRange();
+		}
+
+		if (ability.nearbyEntityHurtMaxRange() > mMaximumEntityHurtRange) {
+			mMaximumEntityHurtRange = ability.nearbyEntityHurtMaxRange();
 		}
 	}
 
@@ -1254,6 +1288,28 @@ public class BossManager implements Listener {
 				.max(java.util.Comparator.naturalOrder())
 				.orElse(DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE);
 		}
+
+		if (boss.hasNearbyEntityHurtTrigger()) {
+			if (!mNearbyEntityHurtEnabled) {
+				mPlugin.getLogger().log(Level.WARNING, "Unloaded Boss with hasNearbyEntityHurtTrigger but feature was not enabled. Definitely a bug!");
+			}
+
+			/*
+			 * This boss was at least contributing to keeping this feature enabled
+			 *
+			 * Need to check all other loaded bosses to see if it still needs to be enabled
+			 */
+			if (mBosses.values().stream().noneMatch(Boss::hasNearbyEntityHurtTrigger)) {
+				mNearbyEntityHurtEnabled = false;
+			}
+			mMaximumEntityHurtRange = mBosses.values().stream()
+				.map(b -> b.getAbilities().stream()
+					.map(BossAbilityGroup::nearbyEntityHurtMaxRange)
+					.max(java.util.Comparator.naturalOrder())
+					.orElse(DEFAULT_MAXIMUM_ENTITY_HURT_RANGE))
+				.max(java.util.Comparator.naturalOrder())
+				.orElse(DEFAULT_MAXIMUM_ENTITY_HURT_RANGE);
+		}
 	}
 
 	public void createBossInternal(LivingEntity targetEntity, BossAbilityGroup ability) {
@@ -1327,6 +1383,7 @@ public class BossManager implements Listener {
 		sender.sendMessage("mNearbyBlockBreakEnabled: " + mNearbyBlockBreakEnabled);
 		sender.sendMessage("mNearbyBlockPlaceEnabled: " + mNearbyBlockPlaceEnabled);
 		sender.sendMessage("mNearbyPlayerDeathEnabled: " + mNearbyPlayerDeathEnabled);
+		sender.sendMessage("mNearbyEntityHurtEnabled: " + mNearbyEntityHurtEnabled);
 
 		Map<String, Integer> bossCounts = new HashMap<>();
 		for (Boss boss : mBosses.values()) {

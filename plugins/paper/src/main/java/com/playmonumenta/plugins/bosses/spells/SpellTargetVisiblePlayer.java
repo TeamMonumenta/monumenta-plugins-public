@@ -55,7 +55,7 @@ public class SpellTargetVisiblePlayer extends Spell {
 		mCooldownRemaining -= PERIOD;
 		mTicksSinceLastSeen += PERIOD;
 
-		if (EntityUtils.isStunned(mBoss)) {
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isStaggered(mBoss)) {
 			return;
 		}
 

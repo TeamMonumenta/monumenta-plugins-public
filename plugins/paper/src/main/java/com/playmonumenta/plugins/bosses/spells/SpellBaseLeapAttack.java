@@ -217,6 +217,9 @@ public class SpellBaseLeapAttack extends Spell {
 			@Override
 			public void run() {
 				if (!mLeaping) {
+					if (EntityUtils.shouldPauseSpells(mBoss)) {
+						return;
+					}
 					if (mBoss.getLocation().distance(mLeapLocation) < 1) {
 						mLeapAesthetic.run(mWorld, mBoss.getLocation());
 						((Mob) mBoss).getPathfinder().stopPathfinding();

@@ -12,8 +12,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 public class Abyssal implements Enchantment {
-
 	private static final double DAMAGE_BONUS_PER_LEVEL = 0.1;
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 
 	@Override
 	public String getName() {
@@ -37,7 +37,7 @@ public class Abyssal implements Enchantment {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (!AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
 			return;
 		}
 		if (EntityUtils.isInWater(enemy) || EntityUtils.isInWater(player) || ZoneUtils.hasZoneProperty(player.getLocation(), ZoneUtils.ZoneProperty.ABYSSAL_FORCED)) {

@@ -10,10 +10,13 @@ import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FileUtils;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -107,6 +110,10 @@ public class DepthsUtils {
 	public static Map<Location, BlockData> iceActive = new HashMap<>();
 	//List of locations where ice is spawned by a barrier
 	public static Map<Location, Boolean> iceBarrier = new HashMap<>();
+
+	// depths content type for the shard
+	// depths skills api changes this temporarily to get descriptions for both depths and zenith
+	private static @Nullable DepthsContent depthsContentOverride = null;
 
 	public static Component getLoreForItem(DepthsTree tree, int rarity, int oldRarity, int preIncreaseRarity) {
 		Component extraComponent = Component.empty();
@@ -208,13 +215,16 @@ public class DepthsUtils {
 	 * @return if the item is an axe, sword, scythe, wand, or trident
 	 */
 	public static boolean isWeaponItem(@Nullable ItemStack item) {
-		return item != null && (ItemUtils.isAxe(item) || ItemUtils.isSword(item) || ItemUtils.isWand(item) || ItemUtils.isHoe(item));
+		return item != null
+			&& (ItemUtils.isAxe(item)
+			|| ItemUtils.isSword(item)
+			|| ItemUtils.isWand(item)
+			|| ItemUtils.isHoe(item)
+			|| (item.getType() == Material.TRIDENT && ItemStatUtils.getAttributeAmount(item, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) != 0));
 	}
 
-	private static final List<String> WEAPON_ASPECT_NAMES = DepthsManager.getWeaponAspects().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList();
-
 	public static boolean isWeaponAspectAbility(String s) {
-		return WEAPON_ASPECT_NAMES.contains(s);
+		return DepthsManager.getWeaponAspects().stream().map(AbilityInfo::getDisplayName).filter(Objects::nonNull).toList().contains(s);
 	}
 
 	public static boolean isPrismaticAbility(String s) {
@@ -364,13 +374,19 @@ public class DepthsUtils {
 
 	public static DepthsContent getDepthsContent() {
 		//TODO revisit after zenith release and split up dev shards for testing
-
-		if (ServerProperties.getShardName().contains("zenith") || ServerProperties.getShardName().startsWith("dev")) {
+		if (depthsContentOverride != null) {
+			return depthsContentOverride;
+		} else if (ServerProperties.getShardName().contains("zenith") || ServerProperties.getShardName().startsWith("dev")) {
 			return DepthsContent.CELESTIAL_ZENITH;
 		} else if (ServerProperties.getShardName().contains("depths")) {
 			return DepthsContent.DARKEST_DEPTHS;
+		} else {
+			return DepthsContent.CELESTIAL_ZENITH;
 		}
-		return DepthsContent.CELESTIAL_ZENITH;
+	}
+
+	public static void setDepthsContentOverride(@Nullable DepthsContent content) {
+		depthsContentOverride = content;
 	}
 
 	public static double getDamageMultiplier() {

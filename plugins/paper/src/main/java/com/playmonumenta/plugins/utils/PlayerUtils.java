@@ -291,6 +291,7 @@ public class PlayerUtils {
 			CurseOfDependency.OTHER_PLAYER_EVENT = event;
 		}
 		Bukkit.getPluginManager().callEvent(event);
+		// TODO: terrible hack to prevent a memory leak for players that don't have this curse - usb
 		CurseOfDependency.OTHER_PLAYER_EVENT = null;
 		if (!event.isCancelled()) {
 			double oldHealth = entity.getHealth();

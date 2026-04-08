@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.GraspingClawsCS;
@@ -40,6 +40,10 @@ import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class GraspingClaws extends Ability implements AbilityWithDuration {
 
@@ -275,43 +279,59 @@ public class GraspingClaws extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<GraspingClaws> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a projectile that pulls mobs within ")
-			.add(a -> a.mPullRadius, PULL_RADIUS)
-			.add(" blocks towards it once it makes contact with a mob or block. Pulled mobs are dealt ")
-			.add(a -> a.mPullDamage, PULL_DAMAGE)
-			.add(" magic damage and afflicted with ")
-			.addPercent(a -> a.mAmplifier, AMPLIFIER_1, false, Ability::isLevelOne)
-			.add(" slowness for ")
-			.addDuration(a -> a.mSlowDuration, DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Fire a projectile that damages, slows, and")
+			.addLine("pulls nearby mobs towards where it lands.")
+			.addLine()
+			.addStat("Damage: %d (s)")
+				.statValues(stat(a -> a.mPullDamage, PULL_DAMAGE))
+			.addStat("Effect: %p1 Slowness for %t")
+				.statValues(stat(a -> a.mAmplifier, AMPLIFIER_1), stat(a -> a.mSlowDuration, DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mPullRadius, PULL_RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<GraspingClaws> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Slowness is increased to ")
-			.addPercent(a -> a.mAmplifier, AMPLIFIER_2, false, Ability::isLevelTwo)
-			.add(". After the projectile lands, your next melee scythe attack within ")
-			.addDuration(CLEAVE_WINDOW)
-			.add(" seconds will deal ")
-			.add(a -> a.mCleaveDamageFlat, CLEAVE_FLAT_DAMAGE)
-			.add(" + ")
-			.addPercent(a -> a.mCleaveDamagePercent, CLEAVE_PERCENT_DAMAGE)
-			.add(" of the attack’s damage as magic damage to all mobs within ")
-			.add(a -> a.mCleaveRadius, CLEAVE_RADIUS)
-			.add(" blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Grasping Claws*'s slowness.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Slowness")
+				.statValues(stat(AMPLIFIER_1), stat(a -> a.mAmplifier, AMPLIFIER_2))
+			.addLine()
+			.addLine("After casting *Grasping Claws*, your next attack").styles(UNDERLINED)
+			.addLine("within %t will deal bonus magic damage (s)")
+				.statValues(stat(CLEAVE_WINDOW))
+			.addLine("to the target and other nearby mobs.")
+			.addLine()
+			.addStat("Cleave Damage: +%d + %p (s)")
+				.statValues(stat(a -> a.mCleaveDamageFlat, CLEAVE_FLAT_DAMAGE), stat(a -> a.mCleaveDamagePercent, CLEAVE_PERCENT_DAMAGE))
+			.tab().addLine("(of the attack's damage)")
+			.addStat("Cleave Radius: %r")
+				.statValues(stat(a -> a.mCleaveRadius, CLEAVE_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<GraspingClaws> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When the projectile lands, an impenetrable cage that lasts ")
-			.addDuration(a -> a.mCageDuration, CAGE_DURATION)
-			.add(" seconds is summoned at its location. Mobs within ")
-			.add(a -> a.mCageRadius, CAGE_RADIUS)
-			.add(" blocks of the center cannot enter or exit the cage, and players in the cage heal ")
-			.addPercent(a -> a.mCageHeal, HEAL_AMOUNT)
-			.add(" max health healing every second. Mobs that are immune to crowd control cannot be trapped.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("The projectile now summons a cage around")
+			.addLine("its landing location that lasts for %t.")
+				.statValues(stat(a -> a.mCageDuration, CAGE_DURATION))
+			.addLine()
+			.addLine("Mobs cannot enter or exit the cage, and")
+			.addLine("players inside the cage are healed.")
+			.addLine("(Crowd control immune mobs are unaffected)")
+			.addLine()
+			.addStat("Healing: %p HP every 1s")
+				.statValues(stat(a -> a.mCageHeal, HEAL_AMOUNT))
+			.addStat("Cage Radius: %r")
+				.statValues(stat(a -> a.mCageRadius, CAGE_RADIUS))
+			.addDashedLine();
 	}
 }

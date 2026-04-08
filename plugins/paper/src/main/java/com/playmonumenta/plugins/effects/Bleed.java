@@ -15,6 +15,8 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Set;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -29,6 +31,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Bleed extends Effect {
 	public static final String effectID = "BleedingStacks";
 	public static final String BLEED_EFFECT_NAME = "BleedEffect";
+	public static final Style BLEED_COLOR = Style.style(TextColor.color(0xD22C2C));
 	private static final double STACK_WEAKEN = 0.03;
 	private static final double BOSS_STACK_WEAKEN = 0.01;
 	public static final int HEMORRHAGE_STACKS = 8;

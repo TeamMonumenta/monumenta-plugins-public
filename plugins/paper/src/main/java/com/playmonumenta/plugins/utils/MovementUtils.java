@@ -135,6 +135,23 @@ public class MovementUtils {
 		}
 	}
 
+	public static void knockUp(LivingEntity target, float speed, boolean respectKBR) {
+		if (EntityUtils.isBoss(target)) {
+			return;
+		}
+		Vector toss = new Vector(0, speed, 0);
+		double mult = 1 - EntityUtils.getAttributeOrDefault(target, Attribute.GENERIC_KNOCKBACK_RESISTANCE, 0);
+		if (mult > 0) {
+			if (respectKBR) {
+				toss.multiply(mult);
+			}
+
+			Vector currentVel = target.getVelocity();
+			currentVel.add(toss);
+			target.setVelocity(currentVel);
+		}
+	}
+
 	public static void pullTowards(Entity towardsEntity, LivingEntity target, float speed) {
 		pullTowards(towardsEntity.getLocation(), target, speed);
 	}

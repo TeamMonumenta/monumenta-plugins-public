@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.CelestialBlessing;
 import com.playmonumenta.plugins.abilities.cleric.CleansingRain;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
@@ -18,8 +20,13 @@ import com.playmonumenta.plugins.abilities.cleric.seraph.EtherealAscension;
 import com.playmonumenta.plugins.abilities.cleric.seraph.HallowedBeam;
 import com.playmonumenta.plugins.abilities.cleric.seraph.KeeperVirtue;
 import com.playmonumenta.plugins.abilities.cleric.seraph.Rejuvenation;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.CLERIC_LORE;
 
 
 public class Cleric extends PlayerClass {
@@ -27,6 +34,8 @@ public class Cleric extends PlayerClass {
 	public static final int CLASS_ID = 3;
 	public static final int PALADIN_SPEC_ID = 5;
 	public static final int SERAPH_SPEC_ID = 6;
+
+	public static final Style HERETIC_COLOR = Style.style(TextColor.color(0xAD2E00));
 
 	public Cleric() {
 		mAbilities.add(CelestialBlessing.INFO);
@@ -81,5 +90,49 @@ public class Cleric extends PlayerClass {
 			TouchofRadiance.INFO,
 			Illuminate.INFO
 		);
+	}
+
+	@Override
+	public Component getDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> Crusade.INFO)
+			.addDashedLine()
+			.addLine("*Clerics support their allies and specialize*").styles(CLERIC_LORE)
+			.addLine("*in fighting Heretics.*").styles(CLERIC_LORE)
+			.addLine("(Heretics are Undead and Humanoid mobs)")
+			.addLine()
+			.addLine("*Crusade (Class Passive):*").styles(Style.style(mClassColor))
+			.add(Crusade.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Crusade.class), player);
+	}
+
+	@Override
+	public Component getSpecOneDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> Unwavering.INFO)
+			.addDashedLine()
+			.addLine("*Paladins are forefront fighters, charging*").styles(CLERIC_LORE)
+			.addLine("*into battle and vanquishing Heretics with*").styles(CLERIC_LORE)
+			.addLine("*heavy attacks in quick succession.*").styles(CLERIC_LORE)
+			.addLine("(DPS, Crowd Control, Bruiser)")
+			.addLine()
+			.addLine("*Unwavering (Spec. Passive):*").styles(Style.style(mClassColor))
+			.add(Unwavering.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Unwavering.class), player);
+	}
+
+	@Override
+	public Component getSpecTwoDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> Rejuvenation.INFO)
+			.addDashedLine()
+			.addLine("*Seraphim are devout casters,*").styles(CLERIC_LORE)
+			.addLine("*aiding allies and smiting enemies*").styles(CLERIC_LORE)
+			.addLine("*with divinity from above.*").styles(CLERIC_LORE)
+			.addLine("(Long Range, Support, Healing)")
+			.addLine()
+			.addLine("*Rejuvenation (Spec. Passive):*").styles(Style.style(mClassColor))
+			.add(Rejuvenation.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Rejuvenation.class), player);
 	}
 }

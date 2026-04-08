@@ -88,8 +88,8 @@ public class TransfiguredSpikeCS extends ManaLanceCS {
 		new PartialParticle(Particle.SMOKE_NORMAL, startLoc, 15, 0, 0, 0, 0.25).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.BLOCK_CRACK, startLoc, 30, 0, 0, 0, Bukkit.createBlockData(Material.NETHER_WART_BLOCK)).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.CRIMSON_SPORE, startLoc, 10, 0, 0, 0, 0.25).spawnAsPlayerActive(player);
-		spawnTendril(startLoc, endLoc, player, TWIST_COLOR_DARK, TWIST_COLOR_LIGHT);
-		spawnTendril(startLoc, endLoc, player, FLESH_COLOR_DARK, FLESH_COLOR_LIGHT);
+		spawnTendril(startLoc, endLoc, player, TWIST_COLOR_DARK, TWIST_COLOR_LIGHT, size);
+		spawnTendril(startLoc, endLoc, player, FLESH_COLOR_DARK, FLESH_COLOR_LIGHT, size);
 	}
 
 	@Override
@@ -111,13 +111,13 @@ public class TransfiguredSpikeCS extends ManaLanceCS {
 		loc.getWorld().playSound(loc, Sound.ENTITY_WITHER_HURT, SoundCategory.PLAYERS, 0.7f, 0.7f);
 	}
 
-	public static void spawnTendril(Location loc, Location to, Player mPlayer, Color color1, Color color2) {
+	public static void spawnTendril(Location loc, Location to, Player mPlayer, Color color1, Color color2, double size) {
 		double distance = loc.distance(to);
 
 		new BukkitRunnable() {
 			final Location mL = loc.clone();
-			final double mXMult = FastUtils.randomDoubleInRange(-0.7, 0.7);
-			final double mZMult = FastUtils.randomDoubleInRange(-0.7, 0.7);
+			final double mXMult = FastUtils.randomDoubleInRange(-size, size);
+			final double mZMult = FastUtils.randomDoubleInRange(-size, size);
 			final Vector mVecStep = loc.getDirection().normalize().multiply(0.2);
 
 			@Override

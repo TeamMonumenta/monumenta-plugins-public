@@ -7,11 +7,11 @@ import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.alchemist.Bezoar;
 import com.playmonumenta.plugins.abilities.alchemist.BrutalAlchemy;
-import com.playmonumenta.plugins.abilities.alchemist.EmpoweringOdor;
 import com.playmonumenta.plugins.abilities.alchemist.EnergizingElixir;
 import com.playmonumenta.plugins.abilities.alchemist.GruesomeAlchemy;
 import com.playmonumenta.plugins.abilities.alchemist.IronTincture;
 import com.playmonumenta.plugins.abilities.alchemist.UnstableAmalgam;
+import com.playmonumenta.plugins.abilities.alchemist.VolatileReaction;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.Panacea;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.TransmutationRing;
 import com.playmonumenta.plugins.abilities.alchemist.apothecary.WardingRemedy;
@@ -91,22 +91,21 @@ import com.playmonumenta.plugins.abilities.scout.hunter.SplitArrow;
 import com.playmonumenta.plugins.abilities.scout.ranger.RendingRazor;
 import com.playmonumenta.plugins.abilities.scout.ranger.TacticalManeuver;
 import com.playmonumenta.plugins.abilities.scout.ranger.WhirlingBlade;
-import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.CleansingTotem;
-import com.playmonumenta.plugins.abilities.shaman.CrystallineCombos;
+import com.playmonumenta.plugins.abilities.shaman.ChainLightning;
 import com.playmonumenta.plugins.abilities.shaman.EarthenTremor;
 import com.playmonumenta.plugins.abilities.shaman.FlameTotem;
+import com.playmonumenta.plugins.abilities.shaman.IgnitionDrive;
 import com.playmonumenta.plugins.abilities.shaman.InterconnectedHavoc;
 import com.playmonumenta.plugins.abilities.shaman.LightningTotem;
-import com.playmonumenta.plugins.abilities.shaman.TotemicEmpowerment;
+import com.playmonumenta.plugins.abilities.shaman.ShamanPassiveManager;
+import com.playmonumenta.plugins.abilities.shaman.Spiritualism;
 import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DecayedTotem;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DesecratingShot;
-import com.playmonumenta.plugins.abilities.shaman.hexbreaker.DestructiveExpertise;
 import com.playmonumenta.plugins.abilities.shaman.hexbreaker.Devastation;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.ChainHealingWave;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.Sanctuary;
-import com.playmonumenta.plugins.abilities.shaman.soothsayer.SupportExpertise;
+import com.playmonumenta.plugins.abilities.shaman.hexbreaker.SpiritcatcherOrbs;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.SpiritualCombos;
+import com.playmonumenta.plugins.abilities.shaman.soothsayer.TotemicConsecration;
 import com.playmonumenta.plugins.abilities.shaman.soothsayer.WhirlwindTotem;
 import com.playmonumenta.plugins.abilities.warlock.AmplifyingHex;
 import com.playmonumenta.plugins.abilities.warlock.CholericFlames;
@@ -132,9 +131,10 @@ import com.playmonumenta.plugins.abilities.warrior.Riposte;
 import com.playmonumenta.plugins.abilities.warrior.ShieldBash;
 import com.playmonumenta.plugins.abilities.warrior.Toughness;
 import com.playmonumenta.plugins.abilities.warrior.WeaponMastery;
+import com.playmonumenta.plugins.abilities.warrior.berserker.Bloodlust;
 import com.playmonumenta.plugins.abilities.warrior.berserker.GloriousBattle;
-import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.berserker.Rampage;
+import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Bodyguard;
 import com.playmonumenta.plugins.abilities.warrior.guardian.Challenge;
 import com.playmonumenta.plugins.abilities.warrior.guardian.ShieldWall;
@@ -326,7 +326,7 @@ public class AbilityManager {
 			//********** ALCHEMIST **********//
 			Bezoar.INFO,
 			AlchemicalArtillery.INFO,
-			EmpoweringOdor.INFO,
+			VolatileReaction.INFO,
 			UnstableAmalgam.INFO,
 			IronTincture.INFO,
 			GruesomeAlchemy.INFO,
@@ -341,8 +341,9 @@ public class AbilityManager {
 			InterconnectedHavoc.INFO,
 			EarthenTremor.INFO,
 			LightningTotem.INFO,
-			CrystallineCombos.INFO,
-			TotemicEmpowerment.INFO,
+			IgnitionDrive.INFO,
+			ShamanPassiveManager.INFO,
+			Spiritualism.INFO,
 			TotemicProjection.INFO
 		);
 
@@ -386,6 +387,7 @@ public class AbilityManager {
 			MeteorSlam.INFO,
 			Rampage.INFO,
 			GloriousBattle.INFO,
+			Bloodlust.INFO,
 
 			// GUARDIAN
 			ShieldWall.INFO,
@@ -429,16 +431,14 @@ public class AbilityManager {
 
 			//*********** SHAMAN ***********//
 			//Soothsayer
-			ChainHealingWave.INFO,
-			Sanctuary.INFO,
-			SupportExpertise.INFO,
+			TotemicConsecration.INFO,
+			SpiritualCombos.INFO,
 			WhirlwindTotem.INFO,
 
 			//Hexbreaker
 			DecayedTotem.INFO,
-			DesecratingShot.INFO,
-			Devastation.INFO,
-			DestructiveExpertise.INFO
+			SpiritcatcherOrbs.INFO,
+			Devastation.INFO
 		);
 
 		if (ServerProperties.getDepthsEnabled()) {

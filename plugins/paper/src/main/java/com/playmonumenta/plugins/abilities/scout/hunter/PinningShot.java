@@ -4,7 +4,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.hunter.PinningShotCS;
@@ -16,12 +17,17 @@ import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.HashMap;
 import java.util.Map;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class PinningShot extends Ability {
 
@@ -35,6 +41,8 @@ public class PinningShot extends Ability {
 
 	public static final String CHARM_DAMAGE = "Pinning Shot Max Health Damage";
 	public static final String CHARM_WEAKEN = "Pinning Shot Weakness Amplifier";
+
+	public static final Style PIN_COLOR = Style.style(TextColor.color(0x818C3F));
 
 	public static final AbilityInfo<PinningShot> INFO =
 		new AbilityInfo<>(PinningShot.class, "Pinning Shot", PinningShot::new)
@@ -59,9 +67,9 @@ public class PinningShot extends Ability {
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (event.getType() != DamageType.PROJECTILE || !(event.getDamager() instanceof Projectile proj) ||
+		if (!(event.getDamager() instanceof Projectile proj) ||
 			!EntityUtils.isAbilityTriggeringProjectile(proj, false) ||
-			proj.getScoreboardTags().contains("SourceQuickDrawVolley")) {
+			proj.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_VOLLEY_TAG)) {
 			return false;
 		}
 
@@ -108,27 +116,35 @@ public class PinningShot extends Ability {
 	}
 
 	private static Description<PinningShot> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The first time you shoot a non-boss enemy, pin it for ")
-			.addDuration(PINNING_SHOT_DURATION)
-			.add(" seconds. Pinned enemies are afflicted with ")
-			.addPercent(PINNING_SLOW)
-			.add(" slowness and ")
-			.addPercent(a -> a.mWeaken, PINNING_WEAKEN_1, false, Ability::isLevelOne)
-			.add(" weaken (Bosses receive ")
-			.addPercent(PINNING_SLOW_BOSS)
-			.add(" slowness and no weaken). Shooting a pinned non-boss enemy deals ")
-			.addPercent(a -> a.mDamageMultiplier, PINNING_SHOT_1_DAMAGE_MULTIPLIER, false, Ability::isLevelOne)
-			.add(" of its max health on top of regular damage and removes the pin. A mob cannot be pinned more than " +
-				"once. This ability cannot be triggered by Volleys initiated by Quickdraw.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Your first projectile against a mob *Pins*").styles(PIN_COLOR)
+			.addLine("them for %t, rooting and weakening them.")
+				.statValues(stat(PINNING_SHOT_DURATION))
+			.addLine("(Bosses are excluded)")
+			.addLine()
+			.addStat("Effect: %p1 Weakness (while Pinned)")
+				.statValues(stat(a -> a.mWeaken, PINNING_WEAKEN_1))
+			.addLine()
+			.addLine("Shooting the mob again removes the *Pin*").styles(PIN_COLOR)
+			.addLine("and deals bonus damage based on the mob's")
+			.addLine("maximum health.")
+			.addLine()
+			.addStat("Bonus Damage: %p1 of max HP")
+				.statValues(stat(a -> a.mDamageMultiplier, PINNING_SHOT_1_DAMAGE_MULTIPLIER))
+			.addDashedLine();
 	}
 
 	private static Description<PinningShot> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Weaken increased to ")
-			.addPercent(a -> a.mWeaken, PINNING_WEAKEN_2, false, Ability::isLevelTwo)
-			.add(" and bonus damage increased to ")
-			.addPercent(a -> a.mDamageMultiplier, PINNING_SHOT_2_DAMAGE_MULTIPLIER, false, Ability::isLevelTwo)
-			.add(" max health.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Pinning Shot*'s weakness").styles(UNDERLINED)
+			.addLine("and bonus damage.").styles(PIN_COLOR)
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Weakness")
+				.statValues(stat(PINNING_WEAKEN_1), stat(a -> a.mWeaken, PINNING_WEAKEN_2))
+			.addStatComparison("Bonus Damage: %p1 -> %p2 of max HP")
+				.statValues(stat(PINNING_SHOT_1_DAMAGE_MULTIPLIER), stat(a -> a.mDamageMultiplier, PINNING_SHOT_2_DAMAGE_MULTIPLIER))
+			.addDashedLine();
 	}
 }

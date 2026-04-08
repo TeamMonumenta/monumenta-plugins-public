@@ -103,6 +103,15 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 
 					@Override
 					public void run() {
+						if (EntityUtils.shouldCancelSpells(mBoss)) {
+							mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.5f);
+							this.cancel();
+							return;
+						}
+
+						if (EntityUtils.shouldPauseSpells(mBoss)) {
+							return;
+						}
 						mT++;
 						Vector vec;
 
@@ -165,11 +174,11 @@ public class VesperidysVoidCrystalFlame extends BossAbilityGroup {
 								}
 							}
 
-							mMobsAlreadyHit = mobsAlreadyHitAdjusted;
-							if (mT >= DURATION || EntityUtils.shouldCancelSpells(mBoss)) {
-								mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.5f);
-								this.cancel();
-							}
+								mMobsAlreadyHit = mobsAlreadyHitAdjusted;
+								if (mT >= DURATION) {
+									mBoss.getWorld().playSound(mBoss.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 0.5f);
+									this.cancel();
+								}
 						} else {
 							if (mT % 4 == 0) {
 								Vector forecastVec;

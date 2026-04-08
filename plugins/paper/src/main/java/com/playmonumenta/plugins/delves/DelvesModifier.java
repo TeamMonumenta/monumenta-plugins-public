@@ -51,13 +51,14 @@ public enum DelvesModifier {
 	REGENERATING(205, Regenerating::applyModifiers, createIcon(Material.FIRE_CORAL_FAN, Component.text("Regenerating", NamedTextColor.RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Regenerating.DESCRIPTION), Regenerating::rankDescription, 32, 1),
 	BLOODLUST(206, Bloodlust::applyModifiers, createIcon(Material.ROTTEN_FLESH, Component.text("Bloodlust", NamedTextColor.DARK_RED, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bloodlust.DESCRIPTION), Bloodlust::rankDescription, 33, 1),
 	CLOAKED(207, Cloaked::applyModifiers, createIcon(Material.PHANTOM_MEMBRANE, Component.text("Cloaked", NamedTextColor.GREEN, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Cloaked.DESCRIPTION), Cloaked::rankDescription, 34, 3),
-	BOUNTIFUL(208, null, createIcon(Material.GOAT_HORN, Component.text("Bountiful", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bountiful.DESCRIPTION), Bountiful::rankDescription, 36, 5);
+	BOUNTIFUL(208, null, createIcon(Material.GOAT_HORN, Component.text("Bountiful", NamedTextColor.YELLOW, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Bountiful.DESCRIPTION), Bountiful::rankDescription, 36, 5),
+	MORBID(209, null, createIcon(Material.SKELETON_SKULL, Component.text("Morbid", NamedTextColor.DARK_GRAY, TextDecoration.BOLD).decoration(TextDecoration.ITALIC, false), Morbid.DESCRIPTION), Morbid::rankDescription, 37, 5);
 
 
 	private static final List<DelvesModifier> DEATH_TRIGGER_MODIFIERS = List.of(SPECTRAL, DREADFUL, BLOODLUST);
 	private static final List<DelvesModifier> ROTATING_DELVE_MODIFIERS = List.of(ASSASSINS, ASTRAL, UNYIELDING, CHRONOLOGY, RIFTBORN, HAUNTED, FRAGILE, IDOLATRY);
 	private static final List<DelvesModifier> SPAWN_TRIGGER_MODIFIERS = List.of(ARCANIC, INFERNAL, TRANSCENDENT, CHIVALROUS, BLOODTHIRSTY, PERNICIOUS, LEGIONARY, CARAPACE, TWISTED, ASSASSINS, VENGEANCE, UNYIELDING, REGENERATING, CLOAKED, IDOLATRY);
-	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK, HEALCUT, GRAVITY, REGENERATING, BLOODLUST, CLOAKED, BOUNTIFUL);
+	private static final List<DelvesModifier> EXPERIMENTAL_DELVE_MODIFIERS = List.of(CHANCECUBES, BERSERK, HEALCUT, GRAVITY, REGENERATING, BLOODLUST, CLOAKED, BOUNTIFUL, MORBID);
 	private static final List<DelvesModifier> VARIANT_MODIFIERS = List.of(TWISTED_TORMENTED);
 
 	private final int mIndex;

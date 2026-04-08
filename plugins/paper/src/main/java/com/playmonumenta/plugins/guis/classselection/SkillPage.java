@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.guis.classselection;
 
 import com.playmonumenta.plugins.abilities.AbilityInfo;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.PlayerClass;
 import com.playmonumenta.plugins.classes.PlayerSpec;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.utils.DescriptionUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
@@ -14,7 +16,11 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ACTION_COMPLETED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ACTION_SELECT;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.LIGHT_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class SkillPage extends Page {
 	protected final PlayerClass mClass;
@@ -56,14 +62,19 @@ public class SkillPage extends Page {
 		}
 
 		// Summary
-		setHeaderIcon(GUIUtils.createBasicItem(
-			mClass.mDisplayItem, mClass.mClassName + " Class Skills", NamedTextColor.WHITE, false,
-			"Pick your skills and, if unlocked, your specialization.", NamedTextColor.LIGHT_PURPLE
-		));
+		Component description = mClass.getDescription(mGui.mPlayer).appendNewline().appendSpace();
+
+		Component name = DescriptionUtils.centeredComponent(description, mClass.mClassName, mClass.mClassColor, true);
+
+		setHeaderIcon(GUIUtils.createBasicItem(mClass.mDisplayItem, 1, name, description, 99, true));
 
 		// Back button
-		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, "Back",
-			NamedTextColor.GRAY, false, "Return to the class selection page.", NamedTextColor.GRAY);
+		Component backDescription = new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addAction("Click to go back.", ACTION_SELECT)
+			.get();
+		Component backName = DescriptionUtils.centeredComponent(backDescription, "Return", LIGHT_GREY, true);
+		ItemStack backButton = GUIUtils.createBasicItem(Material.ARROW, 1, backName, backDescription, 99, true);
 		GUIUtils.setGuiNbtTag(backButton, "texture", "skill_select_back", mGui.mGuiTextures);
 		setBackIcon(backButton).onClick(event -> {
 			if (event.isShiftClick()) {
@@ -79,18 +90,23 @@ public class SkillPage extends Page {
 		boolean isSpecOne = mGui.isClass(mClass, mClass.mSpecOne);
 		boolean isSpecTwo = mGui.isClass(mClass, mClass.mSpecTwo);
 		if (isSpecOne || isSpecTwo) {
-			ItemStack specItem = GUIUtils.createBasicItem(
-				Material.RED_BANNER, "Reset Your Specialization", NamedTextColor.WHITE, false,
-				"Click here to reset your specialization to select a new one.", NamedTextColor.LIGHT_PURPLE
-			);
-			GUIUtils.setGuiNbtTag(specItem, "texture", "cross_gui_reset_spec", mGui.mGuiTextures);
+			Component specResetDescription = new FormattedDescriptionBuilder<>()
+				.addDashedLine()
+				.addLine("Reset your class specialization, allowing")
+				.addLine("you to pick a different one.")
+				.addDashedLine()
+				.addAction("Click to reset your specialization.", ACTION_SELECT)
+				.get();
+			Component specResetName = DescriptionUtils.centeredComponent(specResetDescription, "Reset Specialization", WHITE, true);
+			ItemStack specResetItem = GUIUtils.createBasicItem(Material.RED_BANNER, 1, specResetName, specResetDescription, 99, true);
+			GUIUtils.setGuiNbtTag(specResetItem, "texture", "cross_gui_reset_spec", mGui.mGuiTextures);
 			GUIUtils.setGuiNbtTag(
-				specItem,
+				specResetItem,
 				"Spec",
 				(isSpecOne ? mClass.mSpecOne : mClass.mSpecTwo).mSpecName,
 				mGui.mGuiTextures
 			);
-			mGui.setItem(BOTTOM, 4, specItem)
+			mGui.setItem(BOTTOM, 4, specResetItem)
 				.onClick(event -> {
 					if (event.isShiftClick()) {
 						return;
@@ -128,24 +144,27 @@ public class SkillPage extends Page {
 		boolean isSpec = mGui.isClass(mClass, spec);
 		boolean otherSpec = hasSpec && !isSpec;
 
+		Component description = (spec == mClass.mSpecOne ? mClass.getSpecOneDescription(mGui.mPlayer) : mClass.getSpecTwoDescription(mGui.mPlayer))
+				.appendNewline().appendSpace();
+
 		// Unlocked and possibly using this spec
-		String lore;
+		Component instruction;
 		if (isSpec) {
-			lore = "Click to view your specialization skills.";
+			instruction = DescriptionUtils.centeredComponent(description, "Click to view your skills!", ACTION_COMPLETED);
 		} else if (isClass && !hasSpec) {
-			lore = "Click to choose this specialization!";
+			instruction = DescriptionUtils.centeredComponent(description, "Click to choose %s!".formatted(spec.mSpecName), ACTION_SELECT);
 		} else {
-			lore = "Click to view this specialization.";
+			instruction = DescriptionUtils.centeredComponent(description, "Click to view %s's skills!".formatted(spec.mSpecName), ACTION_SELECT);
 		}
+		description = description.append(instruction);
+
+		Component name = DescriptionUtils.centeredComponent(description, spec.mSpecName, mClass.mClassColor, true);
+
 		ItemStack specItem = GUIUtils.createBasicItem(
-			otherSpec ? Material.BARRIER : spec.mDisplayItem,
-			spec.mSpecName,
-			mClass.mClassColor,
-			false,
-			lore,
-			NamedTextColor.WHITE
+			otherSpec ? Material.BARRIER : spec.mDisplayItem, 1,
+			name, description, 99, true
 		);
-		addDescriptionAndPassive(specItem, spec);
+
 		mGui.setItem(BOTTOM, column, specItem)
 			.onClick(event -> {
 				if (event.isShiftClick()) {
@@ -174,24 +193,4 @@ public class SkillPage extends Page {
 			});
 	}
 
-	protected void addDescriptionAndPassive(ItemStack specItem, PlayerSpec spec) {
-		ItemMeta newMeta = specItem.getItemMeta();
-		GUIUtils.splitLoreLine(
-			newMeta,
-			"Description: " + spec.mDescription,
-			NamedTextColor.YELLOW,
-			30,
-			false
-		);
-		if (spec.mPassive != null) {
-			GUIUtils.splitLoreLine(
-				newMeta,
-				Component.text(spec.mPassive.getDisplayName() + " (Passive): ", NamedTextColor.GREEN)
-					.append(spec.mPassive.getDescription(1, mGui.mPlayer, true)),
-				30,
-				false
-			);
-		}
-		specItem.setItemMeta(newMeta);
-	}
 }

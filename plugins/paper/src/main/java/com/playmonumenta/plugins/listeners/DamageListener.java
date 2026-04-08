@@ -2,7 +2,9 @@ package com.playmonumenta.plugins.listeners;
 
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
+import com.playmonumenta.plugins.abilities.scout.Quickdraw;
 import com.playmonumenta.plugins.bosses.bosses.TrainingDummyBoss;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.depths.abilities.steelsage.RapidFire;
 import com.playmonumenta.plugins.effects.ProjectileIframe;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -182,6 +184,14 @@ public class DamageListener implements Listener {
 				// Check if projectile
 				if (damager instanceof Projectile proj) {
 					PlayerItemStats playerItemStats = mPlayerItemStatsMap.get(proj.getUniqueId());
+					if ((proj.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_TAG) || proj.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_VOLLEY_TAG)) && playerItemStats != null) {
+						event.setType(DamageEvent.DamageType.PROJECTILE_SKILL);
+						event.setAbility(ClassAbility.QUICKDRAW);
+						// Need to move the damage to event flat damage
+						PlayerItemStats.ItemStatsMap map = playerItemStats.getItemStats();
+						final ItemStat projDamageAdd = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+						event.setFlatDamage(map.get(projDamageAdd));
+					}
 					if (playerItemStats != null) {
 						mPlugin.mItemStatManager.onDamage(mPlugin, player, playerItemStats, event, damagee);
 						mPlugin.mAbilityManager.onDamage(player, event, damagee);
@@ -253,6 +263,10 @@ public class DamageListener implements Listener {
 	public static void addProjectileItemStats(Projectile proj, Player player) {
 		Plugin plugin = Plugin.getInstance();
 		PlayerItemStats stats = plugin.mItemStatManager.getPlayerItemStatsCopy(player);
+		addProjectileItemStats(proj, stats);
+	}
+
+	public static void addProjectileItemStats(Projectile proj, PlayerItemStats stats) {
 		PlayerItemStats.ItemStatsMap map = stats.getItemStats();
 		UUID uuid = proj.getUniqueId();
 		if (proj instanceof AbstractArrow arrow && !(proj instanceof Trident)) {

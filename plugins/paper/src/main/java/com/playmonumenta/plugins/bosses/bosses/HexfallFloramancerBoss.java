@@ -44,7 +44,7 @@ public class HexfallFloramancerBoss extends BossAbilityGroup {
 		Spell spell = new Spell() {
 			@Override
 			public void run() {
-				if (EntityUtils.shouldCancelSpells(mBoss)) {
+				if (EntityUtils.shouldCancelSpells(mBoss) || EntityUtils.shouldPauseSpells(mBoss)) {
 					return;
 				}
 

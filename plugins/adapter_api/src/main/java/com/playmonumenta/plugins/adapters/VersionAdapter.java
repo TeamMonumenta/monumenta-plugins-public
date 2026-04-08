@@ -29,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 public interface VersionAdapter {
 	void removeAllMetadata(Plugin plugin);
 
-	void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg);
+	void customDamageEntity(@Nullable LivingEntity damager, LivingEntity damagee, double amount, boolean blockable, @Nullable String killedUsingMsg, boolean causeKnockback, boolean bypassIFrames);
 
 	<T extends Entity> T duplicateEntity(T entity);
 
@@ -211,5 +211,7 @@ public interface VersionAdapter {
 
 	void updatePlayerNametag(Player clientPlayer, Entity...entities);
 
-  double getJumpVelocity(LivingEntity entity);
+	double getJumpVelocity(LivingEntity entity);
+
+	void setNotOnGround(Entity entity);
 }

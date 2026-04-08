@@ -59,6 +59,7 @@ public class AbilityInfo<T extends Ability> {
 
 	private @Nullable ClassAbility mLinkedSpell = null;
 	private final List<AbilityTriggerInfo<T>> mTriggers = new ArrayList<>();
+	private final List<AbilityTriggerInfo<T>> mPresetTriggers = new ArrayList<>();
 
 	private @Nullable Material mDisplayItem;
 
@@ -230,6 +231,14 @@ public class AbilityInfo<T extends Ability> {
 		return this;
 	}
 
+	public AbilityInfo<T> addAltPresetTrigger(AbilityTriggerInfo<T> trigger) {
+		if (mLinkedSpell == null) {
+			throw new IllegalStateException("Missing linked spell for ability with trigger");
+		}
+		mPresetTriggers.add(trigger);
+		return this;
+	}
+
 	public AbilityInfo<T> actionBarColor(TextColor color) {
 		mActionBarColor = color;
 		return this;
@@ -344,6 +353,10 @@ public class AbilityInfo<T extends Ability> {
 
 	public @Nullable AbilityTriggerInfo<T> getTrigger(String id) {
 		return mTriggers.stream().filter(t -> t.getId().equals(id)).findFirst().orElse(null);
+	}
+
+	public @Nullable AbilityTriggerInfo<T> getAltPresetTrigger(String id) {
+		return mPresetTriggers.stream().filter(t -> t.getId().equals(id)).findFirst().orElse(null);
 	}
 
 	public boolean doesIgnoreSilence() {
@@ -501,6 +514,11 @@ public class AbilityInfo<T extends Ability> {
 				descriptions.add(MessagingUtils.plainText(description));
 			}
 			info.add("descriptions", descriptions);
+			JsonArray formattedDescriptions = new JsonArray();
+			for (Component description : descriptionList) {
+				formattedDescriptions.add(MessagingUtils.toGson(description));
+			}
+			info.add("formattedDescriptions", formattedDescriptions);
 		}
 		if (!mTriggers.isEmpty()) {
 			JsonArray descriptions = new JsonArray();

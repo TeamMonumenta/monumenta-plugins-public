@@ -5,9 +5,10 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.bosses.bosses.HostileBoss;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.SanctifiedArmorCS;
 import com.playmonumenta.plugins.effects.Effect;
@@ -23,6 +24,8 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.Optional;
 import java.util.UUID;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -35,10 +38,16 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+
 
 public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 
 	private static final int SANCTIFY_COOLDOWN = 25 * 20;
+	private static final double MAX_HP_THRESHOLD = 0.4;
+	private static final double HEALTH_LOSS_THRESHOLD = 0.4;
 	private static final double RESISTANCE_AMPLIFIER_1 = 0.2;
 	private static final double RESISTANCE_AMPLIFIER_2 = 0.3;
 	private static final double KBR = 0.5;
@@ -61,6 +70,8 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 	public static final String CHARM_SLOW_DURATION = "Sanctified Armor Slowness Duration";
 	public static final String CHARM_ELITE_DURATION = "Sanctified Armor Elite Bonus Duration";
 	public static final String CHARM_ENHANCE_HEAL = "Sanctified Armor Enhancement Healing";
+
+	public static final Style SANCTIFY_COLOR = Style.style(TextColor.color(0xFFAE3B));
 
 	public static final AbilityInfo<SanctifiedArmor> INFO =
 		new AbilityInfo<>(SanctifiedArmor.class, "Sanctified Armor", SanctifiedArmor::new)
@@ -118,7 +129,7 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 				Bukkit.getScheduler().runTaskLater(mPlugin, () ->
 					mHealthLostCounter -= percent, 20);
 
-				if ((mHealthLostCounter >= 0.4 || (mPlayer.getHealth() - event.getFinalDamage(false)) / maxHealth <= 0.4) && !isOnCooldown()) {
+				if ((mHealthLostCounter >= HEALTH_LOSS_THRESHOLD || (mPlayer.getHealth() - event.getFinalDamage(false)) / maxHealth <= MAX_HP_THRESHOLD) && !isOnCooldown()) {
 					mDurationExtensionCounter = 0;
 					mPlugin.mEffectManager.addEffect(mPlayer, RESISTANCE_EFFECT_NAME, new PercentDamageReceived(mDuration, -mResistance) {
 						@Override
@@ -208,35 +219,65 @@ public class SanctifiedArmor extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<SanctifiedArmor> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When taking damage that leaves you at 40% of your max health or lower, or taking 40% of your max health or more damage within 1 second, sanctify your armor for the next ")
-			.addDuration(a -> a.mDuration, SANCTIFY_DURATION)
-			.add(" seconds. While sanctified, you gain ")
-			.addPercent(a -> a.mResistance, RESISTANCE_AMPLIFIER_1, false, Ability::isLevelOne)
-			.add(" resistance and ")
-			.addPercent(a -> a.mKBR, KBR)
-			.add(" knockback resistance, and you knock away and apply ")
-			.addPercent(a -> a.mSlowness, SLOWNESS_AMPLIFIER_1, false, Ability::isLevelOne)
-			.add(" slowness for ")
-			.addDuration(a -> a.mSlownessDuration, SLOWNESS_DURATION)
-			.add(" seconds to any Heretic that hits you with a melee or projectile attack in the duration.")
-			.addCooldown(SANCTIFY_COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When you lose %p of your max HP within %t,")
+				.statValues(
+					stat(MAX_HP_THRESHOLD),
+					stat(20))
+			.addLine("or when your health drops below %p,")
+				.statValues(stat(HEALTH_LOSS_THRESHOLD))
+			.addLine("*Sanctify* yourself for %t.").styles(SANCTIFY_COLOR)
+				.statValues(stat(a -> a.mDuration, SANCTIFY_DURATION))
+			.addLine()
+			.addLine("While *Sanctified*, you gain resistance and").styles(SANCTIFY_COLOR)
+			.addLine("knockback resistance. Any *Heretic* that attacks").styles(Cleric.HERETIC_COLOR)
+			.addLine("you will be knocked away and slowed.")
+			.addLine()
+			.addStat("Effect: +%p1 Resistance")
+				.statValues(stat(a -> a.mResistance, RESISTANCE_AMPLIFIER_1))
+			.addStat("Effect: +%p Knockback Resistance")
+				.statValues(stat(a -> a.mKBR, KBR))
+			.addStat("Effect: %p1 Slowness for %t")
+				.statValues(
+					stat(a -> a.mSlowness, SLOWNESS_AMPLIFIER_1),
+					stat(a -> a.mSlownessDuration, SLOWNESS_DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(SANCTIFY_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<SanctifiedArmor> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Resistance is increased to ")
-			.addPercent(a -> a.mResistance, RESISTANCE_AMPLIFIER_2, false, Ability::isLevelTwo)
-			.add(", and slowness is increased to ")
-			.addPercent(a -> a.mSlowness, SLOWNESS_AMPLIFIER_2, false, Ability::isLevelTwo)
-			.add(". Killing an Elite while Sanctified Armor is active extends its duration by ")
-			.addDuration(a -> a.mEliteDurationExtension, ELITE_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Sanctified Armor*'s").styles(UNDERLINED)
+			.addLine("resistance and slowness.")
+			.addLine()
+			.addLine("Killing an Elite while *Sanctified*").styles(SANCTIFY_COLOR)
+			.addLine("extends its duration by +%t.")
+				.statValues(stat(a -> a.mEliteDurationExtension, ELITE_DURATION))
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Resistance")
+				.statValues(
+					stat(RESISTANCE_AMPLIFIER_1),
+					stat(a -> a.mResistance, RESISTANCE_AMPLIFIER_2))
+			.addStatComparison("Effect: %p1 -> %p2 Slowness")
+				.statValues(
+					stat(SLOWNESS_AMPLIFIER_1),
+					stat(a -> a.mSlowness, SLOWNESS_AMPLIFIER_2))
+			.addDashedLine();
 	}
 
 	private static Description<SanctifiedArmor> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("If the most recently slowed mob is killed while active, regain half the health lost from the last damage taken.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("While *Sanctified*, killing the most").styles(SANCTIFY_COLOR)
+			.addLine("recently slowed mob partially heals")
+			.addLine("the damage you took from them.")
+			.addLine()
+			.addStat("Healing: %p (of damage taken)")
+				.statValues(stat(a -> a.mEnhanceHealing, ENHANCE_HEALING))
+			.addDashedLine();
 	}
 
 	@Override

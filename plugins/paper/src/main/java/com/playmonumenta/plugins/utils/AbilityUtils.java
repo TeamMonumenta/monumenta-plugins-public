@@ -25,6 +25,7 @@ import com.playmonumenta.plugins.effects.PercentHeal;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.potion.PotionManager.PotionID;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
@@ -178,6 +179,7 @@ public class AbilityUtils {
 			if (entity instanceof Mob mob) {
 				if (mob.getTarget() != null && mob.getTarget().getUniqueId().equals(player.getUniqueId())) {
 					mob.setTarget(null);
+					mob.getPathfinder().stopPathfinding();
 				}
 			}
 		}
@@ -372,6 +374,10 @@ public class AbilityUtils {
 			debuffCount++;
 		}
 
+		if (EntityUtils.isStaggered(entity)) {
+			debuffCount++;
+		}
+
 		if (EntityUtils.isParalyzed(plugin, entity)) {
 			debuffCount++;
 		}
@@ -407,7 +413,11 @@ public class AbilityUtils {
 		return debuffCount;
 	}
 
-	public static int getEffectiveTotalSkillPoints(Player player) {
+	public static int getEffectiveTotalSkillPoints(@Nullable Player player) {
+		if (player == null) {
+			return 0;
+		}
+
 		// fast track: full skill and spec points in R3; and also in plots if having been to R3 at least once
 		if (ServerProperties.getAbilityEnhancementsEnabled(player)
 			&& PlayerUtils.hasUnlockedRing(player)) {
@@ -564,11 +574,13 @@ public class AbilityUtils {
 
 	private static final EnumSet<ClassAbility> TRIGGERS_ASPECTS = EnumSet.of(
 		ClassAbility.ERUPTION,
-		ClassAbility.QUAKE,
+		ClassAbility.QUAKE_MELEE,
+		ClassAbility.QUAKE_PROJ,
 		ClassAbility.SWEEPING_EDGE,
 		ClassAbility.ARCANE_THRUST,
 		ClassAbility.EXPLOSIVE,
 		ClassAbility.ARCANE_STRIKE_ENHANCED,
+		ClassAbility.QUICKDRAW,
 		ClassAbility.PREDATOR_STRIKE,
 		ClassAbility.ALCHEMIST_POTION,
 		ClassAbility.ALCHEMICAL_ARTILLERY, // NOT its enhancement
@@ -619,8 +631,9 @@ public class AbilityUtils {
 								return false;
 							}
 						}
-						case ALCHEMICAL_ARTILLERY -> {
-							return false;
+						default -> {
+							// Avoids a warning
+							return true;
 						}
 					}
 				}
@@ -666,16 +679,6 @@ public class AbilityUtils {
 			indicatorName = indicatorName.append(Component.text("☠", NamedTextColor.DARK_GREEN)
 				.append(Component.text("☠", NamedTextColor.BLACK)));
 		}
-
-		target.customName(indicatorName);
-		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
-	}
-
-	public static void produceChargeUpString(LivingEntity totem, ArmorStand target, int chargeDuration, int currentDuration) {
-		Component indicatorName = Component.empty();
-		indicatorName = indicatorName.append(Component.text("[", NamedTextColor.WHITE));
-		indicatorName = indicatorName.append(Component.text("   Charging Up...   ", NamedTextColor.RED));
-		indicatorName = indicatorName.append(Component.text("]", NamedTextColor.WHITE));
 
 		target.customName(indicatorName);
 		target.teleport(totem.getEyeLocation().add(0, 0.5, 0));
@@ -728,6 +731,10 @@ public class AbilityUtils {
 	}
 
 	public static Item spawnAbilityItem(World world, Location loc, Material mat, String name, boolean dropNaturally, double velocity, boolean glow, boolean invulnerable) {
+		return spawnAbilityItem(world, loc, mat, name, dropNaturally, velocity, glow, invulnerable, NamedTextColor.WHITE);
+	}
+
+	public static Item spawnAbilityItem(World world, Location loc, Material mat, String name, boolean dropNaturally, double velocity, boolean glow, boolean invulnerable, NamedTextColor glowColor) {
 		ItemStack stack = new ItemStack(mat);
 		ItemMeta meta = stack.getItemMeta();
 		meta.displayName(Component.text(name, NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
@@ -746,7 +753,10 @@ public class AbilityUtils {
 			droppedItem.setVelocity(vel);
 		}
 		droppedItem.setPickupDelay(Integer.MAX_VALUE);
-		droppedItem.setGlowing(glow);
+		if (glow) {
+			GlowingManager.startGlowing(droppedItem, glowColor, -1, GlowingManager.PLAYER_ABILITY_PRIORITY);
+		}
+
 		if (invulnerable) {
 			EntityUtils.makeItemInvulnerable(droppedItem);
 		}
@@ -775,17 +785,21 @@ public class AbilityUtils {
 		ClassAbility.METEOR_SLAM,
 		ClassAbility.SCORCHED_EARTH,
 		ClassAbility.BRUTAL_ALCHEMY,
-		ClassAbility.PANACEA,
+		ClassAbility.VOLATILE_REACTION_DOT,
 		ClassAbility.ESOTERIC_ENHANCEMENTS,
 		ClassAbility.ELEMENTAL_SPIRIT_ICE,
 		ClassAbility.FLAME_TOTEM,
 		ClassAbility.LIGHTNING_TOTEM,
 		ClassAbility.INTERCONNECTED_HAVOC,
-		ClassAbility.CRYSTALLINE_COMBOS,
+		ClassAbility.SPIRITUAL_COMBOS,
 		ClassAbility.DECAYED_TOTEM,
+		ClassAbility.SPIRITCATCHER_ORBS,
 		ClassAbility.ILLUMINATE_DOT,
 		ClassAbility.KEEPER_VIRTUE,
-		ClassAbility.REFLECTION
+		ClassAbility.CURSED_WOUND_DOT,
+		ClassAbility.WITHERING_GAZE,
+		ClassAbility.REFLECTION,
+		ClassAbility.BLEEDING
 	);
 
 	// Intended for the purpose of damage that shouldn't be considered when spoiling some hunts quarries
@@ -795,10 +809,24 @@ public class AbilityUtils {
 			return true;
 		}
 		DamageEvent.DamageType type = event.getType();
-		if (type == DamageEvent.DamageType.AILMENT || type == DamageEvent.DamageType.THORNS || type == DamageEvent.DamageType.POISON || type == DamageEvent.DamageType.FIRE) {
+		if (type == DamageEvent.DamageType.AILMENT
+			|| type == DamageEvent.DamageType.THORNS
+			|| type == DamageEvent.DamageType.POISON
+			|| type == DamageEvent.DamageType.FIRE) {
 			return true;
 		}
 		ClassAbility ca = event.getAbility();
 		return INDIRECT_ABILITIES.contains(ca);
+	}
+
+	public static int getPlayerLevel(@Nullable Player player) {
+		if (player == null) {
+			return 0;
+		}
+
+		int charmLevel = ScoreboardUtils.getScoreboardValue(player, CHARM_POWER).orElse(0);
+		charmLevel = (charmLevel > 0) ? (charmLevel / 3) - 2 : 0;
+
+		return getEffectiveTotalSkillPoints(player) + getEffectiveTotalSpecPoints(player) + ScoreboardUtils.getScoreboardValue(player, TOTAL_ENHANCE).orElse(0) + charmLevel;
 	}
 }

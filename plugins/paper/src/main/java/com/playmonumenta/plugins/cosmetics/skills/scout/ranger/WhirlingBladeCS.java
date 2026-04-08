@@ -46,7 +46,7 @@ public class WhirlingBladeCS implements CosmeticSkill {
 			.spawnAsPlayerActive(player);
 	}
 
-	public void tick(Player player, Location bladeLoc, World world, Location loc, double throwRadius, double bladeRadius, int degrees) {
+	public void tick(Player player, Location bladeLoc, World world, Location loc, double throwRadius, double bladeRadius, int degrees, int startingTick, boolean isFirstCycle) {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 0.5f, 0.9f);
 		world.playSound(loc, Sound.ENTITY_DROWNED_SHOOT, SoundCategory.PLAYERS, 0.4f, 1.2f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.3f, 1.7f);
@@ -69,7 +69,11 @@ public class WhirlingBladeCS implements CosmeticSkill {
 		}
 	}
 
-	public void end(World world, Location loc, Player player) {
+	public void end(World world, Location loc, Player player, int startingTick) {
 		world.playSound(loc, Sound.ENTITY_PLAYER_ATTACK_SWEEP, SoundCategory.PLAYERS, 1f, 0.75f);
+	}
+
+	public void onDeath() {
+
 	}
 }

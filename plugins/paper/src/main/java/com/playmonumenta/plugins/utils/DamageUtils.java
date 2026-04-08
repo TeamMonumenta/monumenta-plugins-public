@@ -19,7 +19,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class DamageUtils {
@@ -197,7 +196,6 @@ public class DamageUtils {
 
 		int originalIFrames = damagee.getNoDamageTicks();
 		double originalLastDamage = damagee.getLastDamage();
-		Vector originalVelocity = damagee.getVelocity();
 		if (bypassIFrames) {
 			damagee.setNoDamageTicks(0);
 		}
@@ -210,17 +208,14 @@ public class DamageUtils {
 
 		nextEventMetadata = metadata;
 		try {
-			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName());
+			NmsUtils.getVersionAdapter().customDamageEntity(damager, damagee, amountFinal, blockable, metadata.getBossSpellName(), causeKnockback, bypassIFrames);
 		} finally {
 			nextEventMetadata = null;
 
+			// usb: this is needed because we check NoDamageTicks elsewhere other than inside mixins
 			if (bypassIFrames) {
 				damagee.setNoDamageTicks(originalIFrames);
 				damagee.setLastDamage(originalLastDamage);
-			}
-
-			if (!causeKnockback) {
-				damagee.setVelocity(originalVelocity);
 			}
 
 			if (damager != null) {

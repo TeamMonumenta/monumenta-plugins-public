@@ -5,7 +5,6 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
-import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -85,6 +83,75 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 	}
 
 	@Override
+	public void bounceEffect(Player caster, Location loc, int bounceCount, Vector actualBouncePosition, Vector hitFaceDirection) {
+		loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1.3f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.5f, 1.1f + 0.3f * bounceCount);
+		Location actualBounceLocation = actualBouncePosition.toLocation(caster.getWorld());
+
+		if (hitFaceDirection.getX() != 0) {
+			new PPCircle(
+				Particle.WAX_OFF,
+				actualBounceLocation.add(
+					hitFaceDirection.getX() * 0.1,
+					0,
+					0
+				),
+				0.5
+			)
+				.directionalMode(true)
+				.rotateDelta(true)
+				.delta(0, 0, 5)
+				.extra(1)
+				.countPerMeter(3)
+				.axes(
+					new Vector(0, 0, 1),
+					new Vector(0, 1, 0)
+				)
+				.spawnAsPlayerActive(caster);
+		} else if (hitFaceDirection.getZ() != 0) {
+			new PPCircle(
+				Particle.WAX_OFF,
+				actualBounceLocation.add(
+					0,
+					0,
+					hitFaceDirection.getZ() * 0.1
+				),
+				0.5
+			)
+				.directionalMode(true)
+				.rotateDelta(true)
+				.delta(0, 5, 0)
+				.extra(1)
+				.countPerMeter(3)
+				.axes(
+					new Vector(0, 1, 0),
+					new Vector(1, 0, 0)
+				)
+				.spawnAsPlayerActive(caster);
+		} else {
+			new PPCircle(
+				Particle.WAX_OFF,
+				actualBounceLocation.add(
+					0,
+					hitFaceDirection.getY() * 0.1,
+					0
+				),
+				0.5
+			)
+				.directionalMode(true)
+				.rotateDelta(true)
+				.delta(5, 0, 0)
+				.extra(1)
+				.countPerMeter(3)
+				.axes(
+					new Vector(1, 0, 0),
+					new Vector(0, 0, 1)
+				)
+				.spawnAsPlayerActive(caster);
+		}
+	}
+
+	@Override
 	public void explosionEffect(Player caster, Location loc, double radius) {
 
 		loc.setDirection(loc.toVector().subtract(caster.getLocation().toVector()));
@@ -145,24 +212,5 @@ public class ArcaneArtilleryCS extends AlchemicalArtilleryCS {
 			Location l = loc.clone().add(VectorUtils.rotateYAxis(new Vector(radius * 0.6, 0, 0), rot));
 			ArcanePotionsCS.SULPHUR.draw(new ArcanePotionsCS.Transform(l, radius * 0.3, rot + 90), Particle.WAX_ON, caster);
 		}
-
 	}
-
-	@Override
-	public void aftershockEffect(Player caster, Location loc, double radius, List<LivingEntity> hitMobs) {
-		World world = loc.getWorld();
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1.3f);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1.3f);
-		double scale = radius * 0.3;
-
-		ArcanePotionsCS.SMALL_SYMBOLS.get(FastUtils.randomIntInRange(0, ArcanePotionsCS.SMALL_SYMBOLS.size() - 1))
-			.draw(new ArcanePotionsCS.Transform(loc, scale, 0), Particle.FLAME, caster);
-
-		for (LivingEntity mob : hitMobs) {
-			new PPCircle(Particle.ELECTRIC_SPARK, LocationUtils.getHalfHeightLocation(mob), mob.getWidth())
-				.ringMode(true).countPerMeter(2).delta(0, LocationUtils.getHeightLocation(mob, 0.25).getY(), 0)
-				.extra(0.5).spawnAsPlayerActive(caster);
-		}
-	}
-
 }

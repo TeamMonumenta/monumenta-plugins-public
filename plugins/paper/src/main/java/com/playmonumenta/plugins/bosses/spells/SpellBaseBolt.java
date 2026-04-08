@@ -88,13 +88,16 @@ public abstract class SpellBaseBolt extends Spell {
 
 				@Override
 				public void run() {
-					mTicks++;
-					tickAction(mCaster, mTicks);
-
 					if (mCaster.isDead() || EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
 						this.cancel();
 						return;
 					}
+
+					if (EntityUtils.shouldPauseSpells(mCaster)) {
+						return;
+					}
+					mTicks++;
+					tickAction(mCaster, mTicks);
 
 					if (mTicks >= mDelay) {
 						this.cancel();

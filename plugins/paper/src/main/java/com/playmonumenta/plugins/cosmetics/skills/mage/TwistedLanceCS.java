@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.mage;
 
+import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
@@ -13,6 +14,7 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,26 +56,40 @@ public class TwistedLanceCS extends ManaLanceCS {
 
 		Location l = startLoc.clone();
 		Vector dir = startLoc.getDirection().multiply(1.0 / 3);
-		double rotation = 0;
-		double radius = 0.75;
-		double distance = startLoc.distance(endLoc);
-		for (int i = 0; i < distance * 3; i++) {
-			l.add(dir);
-			new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.175, 0.2, 0.2, 0.05).spawnAsPlayerActive(player);
-			rotation += 6;
-			radius -= 0.75D / (distance * 3);
-			for (int j = 0; j < 3; j++) {
-				double radian = FastMath.toRadians(rotation + (j * 120));
-				Vector vec = new Vector(FastUtils.cos(radian) * radius, 0,
-					FastUtils.sin(radian) * radius);
-				vec = VectorUtils.rotateXAxis(vec, l.getPitch() + 90);
-				vec = VectorUtils.rotateYAxis(vec, l.getYaw());
-				Location helixLoc = l.clone().add(vec);
-				new PartialParticle(Particle.DUST_COLOR_TRANSITION, helixLoc, 3, 0.05, 0.05, 0.05, 0.25,
-					new Particle.DustTransition(DARK_COLOR, TWISTED_COLOR, 1f))
-					.spawnAsPlayerActive(player);
+		final double distance = startLoc.distance(endLoc);
+
+		new BukkitRunnable() {
+			int mT = 0;
+			double mRotation = 0;
+			double mRadius = size;
+
+			@Override
+			public void run() {
+				if (mT >= 3) {
+					this.cancel();
+				}
+
+				for (int i = 0; i < distance; i++) {
+					l.add(dir);
+					new PartialParticle(Particle.SMOKE_NORMAL, l, 3, 0.175, 0.2, 0.2, 0.05).spawnAsPlayerActive(player);
+					mRotation += 6;
+					mRadius -= size / (distance * 3);
+					for (int j = 0; j < 3; j++) {
+						double radian = FastMath.toRadians(mRotation + (j * 120));
+						Vector vec = new Vector(FastUtils.cos(radian) * mRadius, 0,
+							FastUtils.sin(radian) * mRadius);
+						vec = VectorUtils.rotateXAxis(vec, l.getPitch() + 90);
+						vec = VectorUtils.rotateYAxis(vec, l.getYaw());
+						Location helixLoc = l.clone().add(vec);
+						new PartialParticle(Particle.DUST_COLOR_TRANSITION, helixLoc, 3, 0.05, 0.05, 0.05, 0.25,
+							new Particle.DustTransition(DARK_COLOR, TWISTED_COLOR, 1f))
+							.spawnAsPlayerActive(player);
+					}
+				}
+
+				mT++;
 			}
-		}
+		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 
 	@Override

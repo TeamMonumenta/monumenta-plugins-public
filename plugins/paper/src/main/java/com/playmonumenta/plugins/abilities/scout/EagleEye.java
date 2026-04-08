@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.EagleEyeCS;
@@ -24,6 +24,10 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class EagleEye extends Ability {
 
@@ -150,31 +154,49 @@ public class EagleEye extends Ability {
 	}
 
 	private static Description<EagleEye> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to reveal all enemies within ")
-			.add(a -> a.mRadius, EAGLE_EYE_RADIUS)
-			.add(" blocks, giving them the glowing effect for ")
-			.addDuration(a -> a.mDuration, EAGLE_EYE_DURATION)
-			.add(" seconds. Affected enemies have ")
-			.addPercent(a -> a.mVulnLevel, EAGLE_EYE_1_VULN_LEVEL, false, Ability::isLevelOne)
-			.add(" vulnerability. If a mob under the effect of Eagle Eye dies the cooldown of Eagle Eye is reduced by ")
-			.addDuration(a -> a.mRefresh, EAGLE_EYE_REFRESH)
-			.add(" seconds.")
-			.addCooldown(EAGLE_EYE_COOLDOWN);
+			.addDashedLine()
+			.addLine("Reveal all nearby mobs and afflict them")
+			.addLine("with vulnerability.")
+			.addLine()
+			.addLine("When a mob revealed by *Eagle Eye* dies,").styles(UNDERLINED)
+			.addLine("reduce this ability's cooldown.")
+			.addLine()
+			.addStat("Effect: Glowing for %t")
+				.statValues(stat(a -> a.mDuration, EAGLE_EYE_DURATION))
+			.addStat("Effect: %p1 Vulnerability for %t")
+				.statValues(stat(a -> a.mVulnLevel, EAGLE_EYE_1_VULN_LEVEL), stat(a -> a.mDuration, EAGLE_EYE_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, EAGLE_EYE_RADIUS))
+			.addStat("Cooldown Reduction: %t per kill")
+				.statValues(stat(a -> a.mRefresh, EAGLE_EYE_REFRESH))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(EAGLE_EYE_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<EagleEye> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The vulnerability is increased to ")
-			.addPercent(a -> a.mVulnLevel, EAGLE_EYE_2_VULN_LEVEL, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Eagle Eye*'s vulnerability.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Vulnerability")
+				.statValues(stat(EAGLE_EYE_1_VULN_LEVEL), stat(a -> a.mVulnLevel, EAGLE_EYE_2_VULN_LEVEL))
+			.addDashedLine();
 	}
 
 	private static Description<EagleEye> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your first attack against every enemy affected by this ability will deal ")
-			.addPercent(ENHANCEMENT_DAMAGE_PERCENT)
-			.add(" extra damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Your first attack against each")
+			.addLine("revealed mob deals increased damage.")
+			.addLine()
+			.addStat("Damage Boost: +%p")
+				.statValues(stat(a -> a.mDamage, ENHANCEMENT_DAMAGE_PERCENT))
+			.addIf((a, p) -> a != null && a.mHits != 1, desc -> desc
+				.addStat("Boosted Hits: %d")
+				.statValues(stat(a -> a.mHits, 1)))
+			.addDashedLine();
 	}
 }

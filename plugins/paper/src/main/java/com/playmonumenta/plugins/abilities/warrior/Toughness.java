@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.ToughnessCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -20,6 +20,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Toughness extends Ability {
 
@@ -83,31 +88,44 @@ public class Toughness extends Ability {
 	}
 
 	private static Description<Toughness> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain ")
-			.addPercent(a -> a.mBaseHealthBoost, PERCENT_HEALTH_1, false, Ability::isLevelOne)
-			.add(" max health and take ")
-			.addPercent(a -> a.mDoTDamageReduction, DOT_DAMAGE_REDUCTION_1, false, Ability::isLevelOne)
-			.add(" less damage from poison, wither, and drowning.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Gain increased max health and")
+			.addLine("take less damage from drowning,")
+			.addLine("poison, and wither.")
+			.addLine()
+			.addStat("Effect: +%p1e Max Health")
+				.statValues(stat(a -> a.mBaseHealthBoost, PERCENT_HEALTH_1))
+			.addStat("Effect: +%p1 Ailment Resistance")
+				.statValues(stat(a -> a.mDoTDamageReduction, DOT_DAMAGE_REDUCTION_1))
+			.addDashedLine();
 	}
 
 	private static Description<Toughness> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The max health is increased to ")
-			.addPercent(a -> a.mBaseHealthBoost, PERCENT_HEALTH_2, false, Ability::isLevelTwo)
-			.add(" and the damage reduction is increased to ")
-			.addPercent(a -> a.mDoTDamageReduction, DOT_DAMAGE_REDUCTION_2, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Toughness*'s health boost and").styles(UNDERLINED)
+			.addLine("ailment resistance.")
+			.addLine()
+			.addStatComparison("Effect: +%p1e -> +%p2e Max Health")
+				.statValues(stat(PERCENT_HEALTH_1), stat(a -> a.mBaseHealthBoost, PERCENT_HEALTH_2))
+			.addStatComparison("Effect: +%p1 -> +%p2 Ailment Resistance")
+				.statValues(stat(DOT_DAMAGE_REDUCTION_1), stat(a -> a.mDoTDamageReduction, DOT_DAMAGE_REDUCTION_2))
+			.addDashedLine();
 	}
 
 	private static Description<Toughness> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain an additional ")
-			.addPercent(PERCENT_HEALTH_ENHANCEMENT)
-			.add(" max health. Additionally, when below ")
-			.addPercent(a -> a.mHealthThreshold, HEALTH_THRESHHOLD)
-			.add(" health, gain ")
-			.addPercent(a -> a.mHealing, HEALING_INCREASE)
-			.add(" healing.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Toughness*'s health boost even").styles(UNDERLINED)
+			.addLine("further.")
+			.addLine()
+			.addLine("Gain increased healing while at low HP.")
+			.addLine()
+			.addStatComparison("Effect: +%p1e -> +%p3 Max Health")
+				.statValues(perLevel(PERCENT_HEALTH_1, PERCENT_HEALTH_2), perLevel(a -> a.mHealthBoost, PERCENT_HEALTH_1 + PERCENT_HEALTH_ENHANCEMENT, PERCENT_HEALTH_2 + PERCENT_HEALTH_ENHANCEMENT))
+			.addStat("Effect: +%p Healing *while below* %p HP").styles(GREY)
+				.statValues(stat(a -> a.mHealing, HEALING_INCREASE), stat(a -> a.mHealthThreshold, HEALTH_THRESHHOLD))
+			.addDashedLine();
 	}
 }

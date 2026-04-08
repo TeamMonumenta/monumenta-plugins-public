@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.itemstats;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.effects.*;
 import com.playmonumenta.plugins.effects.hexfall.CreepingDeath;
@@ -235,6 +236,21 @@ public enum EffectType {
 	ANTI_HEAL("AntiHeal", "Healing Rate", false, false, false, pluginApplicator(
 		(duration, strength, source) -> new PercentHeal(duration, -strength)
 	)),
+
+	CUSTOM_HEALTH_OVER_TIME("HealOverTime", "Health", true, false, false,
+		(effectType, entity, duration, strength, source, applySickness) -> {
+			Plugin plugin = Plugin.getInstance();
+			double maxHealth = EntityUtils.getMaxHealth(entity);
+			int pulses = duration / Constants.QUARTER_TICKS_PER_SECOND;
+			double amount = (maxHealth * strength) / pulses;
+			addEffect(entity, source,
+				new CustomRegeneration(duration, amount, Constants.QUARTER_TICKS_PER_SECOND, null, false, plugin)
+			);
+			if (entity instanceof Player player) {
+				applyHealingSickness(player, applySickness, plugin);
+			}
+		}
+	),
 
 	ARROW_SAVING("ArrowSaving", "Arrow Save Chance", true, false, false, pluginApplicator(
 		(duration, strength, source) -> new ArrowSaving(duration, strength)
@@ -527,6 +543,12 @@ public enum EffectType {
 		return null;
 	}
 
+	/** Method to create components for visual display on consumables, like +20% Strength (1:30).
+	 * @param effectType Effect type.
+	 * @param strength   Effect strength.
+	 * @param duration   Duration (in ticks) of the effect
+	 * @return Returns the line of text that appears on a potion.
+	 */
 	public static Component getComponent(@Nullable EffectType effectType, double strength, int duration) {
 		if (effectType == null) {
 			return Component.empty();
@@ -534,6 +556,7 @@ public enum EffectType {
 
 		String color;
 		String add;
+		String text;
 
 		if (effectType.isPositive()) {
 			color = "#4AC2E5";
@@ -551,7 +574,6 @@ public enum EffectType {
 			}
 		}
 
-		String text;
 		boolean includeTime = true;
 
 		if (effectType == STARVATION) {
@@ -577,10 +599,16 @@ public enum EffectType {
 		if (includeTime) {
 			String timeString;
 			int minutes = duration / 1200;
+			int seconds = (duration / 20) % 60;
 			if (minutes > 999 || duration < 0) {
 				timeString = "(∞)";
+			} else if (effectType == CUSTOM_HEALTH_OVER_TIME) {
+				if (minutes > 0) {
+					timeString = "over " + minutes + ":" + (seconds > 9 ? seconds : "0" + seconds);
+				} else {
+					timeString = "over " + seconds + "s";
+				}
 			} else {
-				int seconds = (duration / 20) % 60;
 				timeString = "(" + minutes + ":" + (seconds > 9 ? seconds : "0" + seconds) + ")";
 			}
 			component = component.append(Component.text(" " + timeString, TextColor.fromHexString("#555555")).decoration(TextDecoration.ITALIC, false));

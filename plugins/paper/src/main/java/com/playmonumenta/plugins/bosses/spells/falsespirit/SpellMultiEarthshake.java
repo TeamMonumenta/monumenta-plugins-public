@@ -97,13 +97,11 @@ public class SpellMultiEarthshake extends Spell {
 
 			@Override
 			public void run() {
-
 				if (mBoss.isDead() || !mBoss.isValid() || EntityUtils.isStunned(mBoss)) {
 					mBoss.setAI(true);
 					this.cancel();
 					return;
 				}
-
 
 				for (Location playerLoc : locs) {
 					targetLocation = playerLoc;

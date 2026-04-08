@@ -19,8 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import me.clip.placeholderapi.PlaceholderAPI;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -32,6 +30,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
+import me.clip.placeholderapi.PlaceholderAPI;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 
 // PlaceholderAPI really likes strings over components
 @SuppressWarnings("deprecation")
@@ -211,12 +211,7 @@ public class PlaceholderAPIIntegration extends PlaceholderExpansion {
 
 		// %monumenta_level%
 		if (identifier.equalsIgnoreCase("level")) {
-			int charmPower = ScoreboardUtils.getScoreboardValue(player, AbilityUtils.CHARM_POWER).orElse(0);
-			charmPower = (charmPower > 0) ? (charmPower / 3) - 2 : 0;
-			return Integer.toString(AbilityUtils.getEffectiveTotalSkillPoints(player) +
-				AbilityUtils.getEffectiveTotalSpecPoints(player) +
-				ScoreboardUtils.getScoreboardValue(player, AbilityUtils.TOTAL_ENHANCE).orElse(0) +
-				charmPower);
+			return Integer.toString(AbilityUtils.getPlayerLevel(player));
 		}
 
 		//Player equipped title

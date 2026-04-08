@@ -191,6 +191,31 @@ public class CooldownTimers {
 		return abilitiesReduced;
 	}
 
+	public void updateCooldownPercent(Player player, ClassAbility spell, double modifier) {
+		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
+		AbilityCollection abilityCollection = mPlugin.mAbilityManager.getPlayerAbilities(player);
+		Ability ability = abilityCollection.getAbility(spell);
+		if (ability == null) {
+			return;
+		}
+
+		if (cds != null && cds.containsKey(spell)) {
+			int cd = cds.get(spell);
+			cd = (int) (cd - ability.getModifiedCooldown() * modifier);
+			if (cd <= 0) {
+				showOffCooldownMessage(player, spell);
+				cds.remove(spell);
+			} else {
+				cds.put(spell, cd);
+			}
+			ClientModHandler.updateAbility(player, spell);
+
+			if (cds.isEmpty()) {
+				mTimers.remove(player.getUniqueId());
+			}
+		}
+	}
+
 	public void updateCooldown(Player player, ClassAbility spell, int ticks) {
 		HashMap<ClassAbility, Integer> cds = mTimers.get(player.getUniqueId());
 

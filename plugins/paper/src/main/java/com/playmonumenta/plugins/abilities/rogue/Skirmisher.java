@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.SkirmisherCS;
@@ -22,6 +22,9 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Skirmisher extends Ability {
 
@@ -104,32 +107,41 @@ public class Skirmisher extends Ability {
 	}
 
 	private static Description<Skirmisher> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When dealing melee damage to a mob that is targeting you and has at least one other mob within ")
-			.add(a -> a.mFriendlyRadius, SKIRMISHER_FRIENDLY_RADIUS)
-			.add(" blocks while holding two swords, deal + ")
-			.add(a -> a.mGroupedFlatDamage, GROUPED_FLAT_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" + ")
-			.addPercent(a -> a.mGroupedPercentDamage, GROUPED_PERCENT_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" final damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Deal increased melee damage to mobs that")
+			.addLine("have another mob near them.")
+			.addLine()
+			.addStat("Damage Boost: +%d1 + %p1 (m)")
+				.statValues(stat(a -> a.mGroupedFlatDamage, GROUPED_FLAT_DAMAGE_1), stat(a -> a.mGroupedPercentDamage, GROUPED_PERCENT_DAMAGE_1))
+			.addStat("Mob Range: %r")
+				.statValues(stat(a -> a.mFriendlyRadius, SKIRMISHER_FRIENDLY_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<Skirmisher> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage bonus now also applies to mobs not targeting you, and the damage bonus is increased to ")
-			.add(a -> a.mGroupedFlatDamage, GROUPED_FLAT_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.addPercent(a -> a.mGroupedPercentDamage, GROUPED_PERCENT_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" final damage done.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Skirmisher*'s damage boost.").styles(UNDERLINED)
+			.addLine()
+			.addLine("*Skirmisher* can now apply to mobs that").styles(UNDERLINED)
+			.addLine("are alone and aren't targeting you.")
+			.addLine()
+			.addStatComparison("Damage Boost: +%d1 + %p1 -> +%d2 + %p2 (m)")
+				.statValues(stat(GROUPED_FLAT_DAMAGE_1), stat(GROUPED_PERCENT_DAMAGE_1), stat(a -> a.mGroupedFlatDamage, GROUPED_FLAT_DAMAGE_2), stat(a -> a.mGroupedPercentDamage, GROUPED_PERCENT_DAMAGE_2))
+			.addDashedLine();
+
 	}
 
 	private static Description<Skirmisher> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you hit a mob while holding two swords, the nearest mob within ")
-			.add(a -> a.mSplashRadius, ENHANCEMENT_SPLASH_RADIUS)
-			.add(" blocks takes ")
-			.addPercent(a -> a.mSplashDamage, ENHANCEMENT_SPLASH_PERCENT_DAMAGE)
-			.add(" of the original attack's damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When you attack a mob, the nearest")
+			.addLine("mob within %d blocks of the target")
+				.statValues(stat(ENHANCEMENT_SPLASH_RADIUS))
+			.addLine("takes %p of the attack's damage.")
+				.statValues(stat(ENHANCEMENT_SPLASH_PERCENT_DAMAGE))
+			.addDashedLine();
 	}
 }
 

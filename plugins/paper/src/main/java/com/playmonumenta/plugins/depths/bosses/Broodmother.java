@@ -93,6 +93,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 	// Needed references to cancel structure pastings on death.
 	private final SpellLegSweep mLegSweep;
 	private final SpellTantrum mTantrum;
+	private final SpellSlam mSpellSlam;
 	private final @Nullable PassiveLaserCores mLaserCores;
 
 	private int mVulnerableTicks = 0;
@@ -137,7 +138,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 		SpellWebCarpet spellWebCarpet = new SpellWebCarpet(mBoss, mParty);
 		SpellEggThrow spellEggThrow = new SpellEggThrow(mBoss, mParty);
 		SpellDashBroodmother spellDashBroodmother = new SpellDashBroodmother(mBoss, mParty);
-		SpellSlam spellSlam = new SpellSlam(mBoss, mParty);
+		mSpellSlam = new SpellSlam(mBoss, mParty);
 		SpellBloodyFang spellBloodyFang = new SpellBloodyFang(mBoss, mParty);
 		mTantrum = new SpellTantrum(mBoss, mParty);
 
@@ -206,7 +207,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 				spellDashBroodmother,
 				mLegSweep,
 				spellVenomSpray,
-				spellSlam,
+				mSpellSlam,
 				spellWebCarpet,
 				spellEggThrow,
 				spellBloodyFang,
@@ -303,6 +304,7 @@ public class Broodmother extends SerializedLocationBossAbilityGroup {
 
 		mLegSweep.stopLegTasks();
 		mTantrum.stopTantrumTasks();
+		mSpellSlam.stopQuake();
 
 		// Prepare for explosion
 		Bukkit.getScheduler().runTaskLater(mPlugin, () -> {

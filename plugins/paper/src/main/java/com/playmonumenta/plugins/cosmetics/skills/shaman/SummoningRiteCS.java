@@ -79,7 +79,6 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-
 			@Override
 			public void run() {
 				if (!proj.isValid() || mTicks >= 100) {
@@ -107,8 +106,7 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 							new PartialParticle(Particle.DUST_COLOR_TRANSITION, projLoc).data(DECAYED_COLOR).spawnAsPlayerActive(player);
 							new PartialParticle(Particle.SPORE_BLOSSOM_AIR, projLoc).delta(0.25).extra(1).spawnAsPlayerActive(player);
 						}
-						default -> {
-						}
+						default -> { }
 					}
 				}
 				mTicks++;
@@ -117,14 +115,13 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 	}
 
 	@Override
-	public void projectionCast(Player player, Projectile proj, @Nullable List<LivingEntity> totems) {
+	public void projectionCast(Player player, Projectile proj) {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PHANTOM_FLAP, SoundCategory.PLAYERS, 2.5f, 1.8f);
 		player.playSound(player.getLocation(), Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.5f, 0.9f);
 		player.playSound(player.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, SoundCategory.PLAYERS, 0.9f, 1.8f);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-
 			@Override
 			public void run() {
 				if (!proj.isValid() || mTicks >= 100) {
@@ -141,55 +138,29 @@ public class SummoningRiteCS extends TotemicProjectionCS implements GalleryCS {
 	}
 
 	@Override
-	public void projectionCollision(Player player, Location dropCenter, double radius, List<LivingEntity> totems) {
+	public void projectionCollision(Player player, Location dropCenter) {
 		dropCenter.subtract(0, LocationUtils.distanceToGround(dropCenter, -64, 1), 0);
-		switch (totems.size()) {
-			case 2, 3 ->
-				player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_2, SoundCategory.PLAYERS, 0.75f, 1.4f);
-			case 4 ->
-				player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.7f, 1.4f);
-			default ->
-				player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.4f);
-		}
+		player.getWorld().playSound(dropCenter, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 0.8f, 1.4f);
 
 		player.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_CAST_SPELL, SoundCategory.PLAYERS, 1.45f, 1.35f);
 		player.getWorld().playSound(dropCenter, Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, SoundCategory.PLAYERS, 1.3f, 1.6f);
 		player.getWorld().playSound(dropCenter, Sound.ENTITY_STRIDER_HAPPY, SoundCategory.PLAYERS, 0.5f, 1.0f);
 		player.getWorld().playSound(dropCenter, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.6f, 0.8f);
 
-		new PPCircle(Particle.END_ROD, dropCenter.clone().add(0, 0.1, 0), 0.1 * radius).countPerMeter(5).spawnAsPlayerActive(player);
-		new PPCircle(Particle.DUST_COLOR_TRANSITION, dropCenter, 0.5 * radius).countPerMeter(8).delta(0.06).data(CRIMSON).spawnAsPlayerActive(player);
+		new PPCircle(Particle.END_ROD, dropCenter.clone().add(0, 0.1, 0), 0.1).countPerMeter(5).spawnAsPlayerActive(player);
+		new PPCircle(Particle.DUST_COLOR_TRANSITION, dropCenter, 0.5).countPerMeter(8).delta(0.06).data(CRIMSON).spawnAsPlayerActive(player);
 
 		new BukkitRunnable() {
 			int mTicks = 0;
-
 			@Override
 			public void run() {
-				Vector dir = new Vector(radius * 0.4, 0, 0);
+				Vector dir = new Vector(0.4, 0, 0);
 				for (int i = 0; i < 3; i++) {
 					Vector dir2 = VectorUtils.rotateTargetDirection(dir, i * 120 + 40 * mTicks, 0);
 					new PPLine(Particle.WAX_OFF, dropCenter.clone().add(dir2), dropCenter.clone().add(VectorUtils.rotateTargetDirection(dir2, 120, 0))).countPerMeter(4).delta(dir2.getX(), 0, dir2.getZ()).extra(0.1).directionalMode(true).spawnAsPlayerActive(player);
 				}
 				mTicks++;
 				if (mTicks >= 3) {
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(Plugin.getInstance(), 1, 1);
-	}
-
-	@Override
-	public void projectionAOE(Player player, Location dropCenter, double radius) {
-		dropCenter.subtract(0, LocationUtils.distanceToGround(dropCenter, -64, 1), 0);
-		new BukkitRunnable() {
-			int mTicks = 0;
-
-			@Override
-			public void run() {
-				new PPCircle(Particle.DUST_COLOR_TRANSITION, dropCenter, radius * (0.75 + 0.25 * mTicks)).countPerMeter(8).delta(0.06).data(CRIMSON).spawnAsPlayerActive(player);
-				new PPCircle(Particle.CRIMSON_SPORE, dropCenter, radius * (0.75 + 0.25 * mTicks)).countPerMeter(0.1).delta(0.15).spawnAsPlayerActive(player);
-				mTicks++;
-				if (mTicks >= 2) {
 					this.cancel();
 				}
 			}

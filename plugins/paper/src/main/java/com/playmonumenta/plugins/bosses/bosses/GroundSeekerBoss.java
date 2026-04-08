@@ -115,8 +115,13 @@ public class GroundSeekerBoss extends BossAbilityGroup {
 					@Override
 					public void run() {
 						if (EntityUtils.shouldCancelSpells(mBoss)) {
-							this.cancel();
 							EntityUtils.cancelSelfRoot(mBoss);
+							this.cancel();
+							return;
+						}
+
+						if (EntityUtils.shouldPauseSpells(mBoss)) {
+							return;
 						}
 
 						p.PARTICLE_CHARGE.spawn(mBoss, mBoss.getLocation().clone().add(0, 1, 0));

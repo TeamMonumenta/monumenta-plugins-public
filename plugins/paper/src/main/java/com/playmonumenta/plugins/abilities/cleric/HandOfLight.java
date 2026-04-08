@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.HandOfLightCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -27,6 +28,11 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class HandOfLight extends Ability {
 	public static final int RANGE = 12;
@@ -165,54 +171,80 @@ public class HandOfLight extends Ability {
 	}
 
 	private static Description<HandOfLight> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to heal all other players in a ")
-			.add(a -> a.mRange, RANGE)
-			.add(" block cone in front of you or within ")
-			.add(a -> NEARBY_SPHERE_RANGE, NEARBY_SPHERE_RANGE)
-			.add(" blocks of you for ")
-			.add(a -> a.mFlat, FLAT_1, false, Ability::isLevelOne)
-			.add(" health + ")
-			.addPercent(a -> a.mPercent, PERCENT_1, false, Ability::isLevelOne)
-			.add(" of their max health, and give them Regeneration ")
-			.addPotionAmplifier(a -> a.mRegenerationLevel, REGEN_LEVEL)
-			.add(" for ")
-			.addDuration(REGEN_DURATION)
-			.add(" seconds. Additionally, if there is at least one Heretic in the area, damage all mobs in the area with magic damage equal to ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" + ")
-			.add(a -> a.mDamagePer, DAMAGE_PER_1, false, Ability::isLevelOne)
-			.add(" * the number of Heretics in the range, up to ")
-			.add(a -> a.mMaxMobs, MAX_MOBS_1, false, Ability::isLevelOne)
-			.add(" mobs.")
-			.addCooldown(HEALING_1_COOLDOWN, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Heal other players in front of you")
+			.addLine("and give them regeneration.")
+			.addLine()
+			.addStat("Healing: %d1 + %p1 HP")
+				.statValues(
+					stat(a -> a.mFlat, FLAT_1),
+					stat(a -> a.mPercent, PERCENT_1))
+			.addStat("Effect: Regeneration %d for %t")
+				.statValues(
+					stat(a -> a.mRegenerationLevel + 1, REGEN_LEVEL + 1),
+					stat(REGEN_DURATION))
+			.addLine()
+			.addLine("If there's at least *1* *Heretic* in the").styles(WHITE, Cleric.HERETIC_COLOR)
+			.addLine("area, deal damage to all mobs there, plus")
+			.addLine("bonus damage for each *Heretic* in the area.").styles(Cleric.HERETIC_COLOR)
+			.addLine()
+			.addStat("Damage: %d1 (s), +%d1 per *Heretic* (max %d1)").styles(Cleric.HERETIC_COLOR)
+				.statValues(
+					stat(a -> a.mDamage, DAMAGE_1),
+					stat(a -> a.mDamagePer, DAMAGE_PER_1),
+					stat(a -> a.mMaxMobs, MAX_MOBS_1))
+			.addStat("Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(HEALING_1_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<HandOfLight> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The healing is improved to ")
-			.add(a -> a.mFlat, FLAT_2, false, Ability::isLevelTwo)
-			.add(" health + ")
-			.addPercent(a -> a.mPercent, PERCENT_2, false, Ability::isLevelTwo)
-			.add(" of their max health. Damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" + ")
-			.add(a -> a.mDamagePer, DAMAGE_PER_2, false, Ability::isLevelOne)
-			.add(" * the number of Heretics in the range, up to ")
-			.add(a -> a.mMaxMobs, MAX_MOBS_2, false, Ability::isLevelOne)
-			.add(" mobs.")
-			.addCooldown(HEALING_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Hand of Light*'s healing and damage,").styles(UNDERLINED)
+			.addLine("and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Healing: %d1 + %p1 -> %d2 + %p2 HP")
+				.statValues(
+					stat(FLAT_1),
+					stat(PERCENT_1),
+					stat(a -> a.mFlat, FLAT_2),
+					stat(a -> a.mPercent, PERCENT_2))
+			.addStatComparison("Damage: %d1, +%d1 -> %d2 (s), +%d2 per *Heretic* (max %d2)").styles(Cleric.HERETIC_COLOR)
+				.statValues(
+					stat(DAMAGE_1),
+					stat(DAMAGE_PER_1),
+					stat(a -> a.mDamage, DAMAGE_2),
+					stat(a -> a.mDamagePer, DAMAGE_PER_2),
+					stat(a -> a.mMaxMobs, MAX_MOBS_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(
+					cooldown(HEALING_1_COOLDOWN),
+					cooldown(HEALING_2_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<HandOfLight> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The cone is changed to a sphere of equal range, centered on the Cleric. The cooldown is reduced by ")
-			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED)
-			.add(" for each 4 health healed, capped at ")
-			.addPercent(ENHANCEMENT_COOLDOWN_REDUCTION_MAX)
-			.add(" cooldown. All Heretics caught in the radius are stunned for ")
-			.addDuration(ENHANCEMENT_HERETIC_STUN_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Hand of Light* now affects a full sphere").styles(UNDERLINED)
+			.addLine("around you instead of only a frontal cone.")
+			.addLine()
+			.addLine("All *Heretics* hit by *Hand of Light* are stunned.").styles(Cleric.HERETIC_COLOR, UNDERLINED)
+			.addLine()
+			.addLine("Reduce *Hand of Light*'s cooldown by %p").styles(UNDERLINED)
+				.statValues(stat(ENHANCEMENT_COOLDOWN_REDUCTION_PER_4_HP_HEALED))
+			.addLine("for every *4* HP it heals, up to %p.").styles(WHITE)
+				.statValues(stat(ENHANCEMENT_COOLDOWN_REDUCTION_MAX))
+			.addLine()
+			.addStat("Radius: %r (Sphere-Shaped)")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(ENHANCEMENT_HERETIC_STUN_DURATION))
+			.addDashedLine();
 	}
 }

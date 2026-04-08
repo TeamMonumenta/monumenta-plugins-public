@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.warlock.reaper.DarkPact;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -27,6 +27,11 @@ import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.DARK_GREY;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class SoulRend extends Ability {
 
@@ -186,36 +191,46 @@ public class SoulRend extends Ability {
 	}
 
 	private static Description<SoulRend> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you attack a mob with a critical scythe attack, heal ")
-			.add(a -> a.mHeal, HEAL)
-			.add(" health.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Critical scythe attacks heal you.")
+			.addLine()
+			.addStat("Healing: %d HP")
+				.statValues(stat(a -> a.mHeal, HEAL))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<SoulRend> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The attacked mob is marked for ")
-			.addDuration(a -> a.mMarkDuration, MARK_DURATION)
-			.add(" seconds, causing your next ")
-			.add(a -> a.mMarks, MARK_COUNT)
-			.add(" critical scythe attacks against them to heal you for ")
-			.addPercent(a -> a.mHealPercent, MARK_HEAL_PERCENT)
-			.add(" of the damage dealt, capped at ")
-			.add(a -> a.mHealCap, MARK_HEAL_CAP)
-			.add(" health per hit. Killing the mob heals you for ")
-			.add(a -> a.mRemainingHeal, REMAINING_MARK_HEAL)
-			.add(" health for each remaining mark on the mob. Healing from this ability now applies to all players within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks of you.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("*Soul Rend* marks the mob you hit for %t.").styles(UNDERLINED)
+				.statValues(stat(a -> a.mMarkDuration, MARK_DURATION))
+			.addLine()
+			.addLine("Your next %d critical attacks against that")
+				.statValues(stat(a -> a.mMarks, MARK_COUNT))
+			.addLine("mob heal for a portion of the damage dealt.")
+			.addLine("*(If that mob dies, heal %d HP for each*").styles(DARK_GREY)
+				.statValues(stat(REMAINING_MARK_HEAL))
+			.addLine("*remaining mark it had)*").styles(DARK_GREY)
+			.addLine()
+			.addLine("*Soul Rend* now heals all nearby players.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Healing: %p of damage dealt (max %d HP)")
+				.statValues(stat(a -> a.mHealPercent, MARK_HEAL_PERCENT), stat(a -> a.mHealCap, MARK_HEAL_CAP))
+			.addStat("Heal Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<SoulRend> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Healing from the initial attack that is above max health or negated by Dark Pact is converted into up to ")
-			.add(a -> a.mAbsorptionCap, ABSORPTION_CAP)
-			.add(" absorption health, which lasts ")
-			.addDuration(a -> a.mAbsorptionDuration, ABSORPTION_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Soul Rend* healing that exceeds your max HP").styles(UNDERLINED)
+			.addLine("or is negated by *Dark Pact* is converted").styles(UNDERLINED)
+			.addLine("into up to %d absorption that lasts for %t.")
+				.statValues(stat(a -> a.mAbsorptionCap, ABSORPTION_CAP), stat(a -> a.mAbsorptionDuration, ABSORPTION_DURATION))
+			.addDashedLine();
 	}
 }

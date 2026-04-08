@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
+import com.playmonumenta.plugins.utils.ParticleUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import org.bukkit.Bukkit;
@@ -69,7 +70,7 @@ public class RitualRingCS extends TransmutationRingCS implements GalleryCS {
 	}
 
 	@Override
-	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks) {
+	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks, int killCount, int maxKills) {
 		if (tick % 40 == 0) {
 			player.getWorld().playSound(center, Sound.BLOCK_LAVA_AMBIENT, SoundCategory.PLAYERS, 1.2f, 1.2f);
 		}
@@ -148,10 +149,51 @@ public class RitualRingCS extends TransmutationRingCS implements GalleryCS {
 	}
 
 	@Override
-	public void effectOnKill(Player mPlayer, Location loc) {
-		mPlayer.getWorld().playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.6f, 0.7f);
-		mPlayer.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.75f, 0.75f);
-		new PartialParticle(Particle.CRIMSON_SPORE, loc.clone().add(0, 0.8, 0), 20, 0, 0.5, 0, 0.001).spawnAsPlayerActive(mPlayer);
-		new PartialParticle(Particle.SOUL, loc.clone().add(0, 0.8, 0), 8, 0.2, 0.5, 0.2, 0.001).spawnAsPlayerActive(mPlayer);
+	public void effectOnKill(Player player, Location loc, Location centerLoc, int killCount, int maxKills, boolean isElite) {
+		player.getWorld().playSound(loc, Sound.ENTITY_GENERIC_DRINK, SoundCategory.PLAYERS, 0.6f, 0.7f);
+		player.getWorld().playSound(loc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 0.75f, 0.75f);
+		new PartialParticle(Particle.CRIMSON_SPORE, loc.clone().add(0, 0.8, 0), 20, 0, 0.5, 0, 0.001).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SOUL, loc.clone().add(0, 0.8, 0), 8, 0.2, 0.5, 0.2, 0.001).spawnAsPlayerActive(player);
+		if (isElite) {
+			ParticleUtils.spawnTendril(
+				loc,
+				player,
+				14,
+				19,
+				4,
+				12,
+				2f,
+				BLOODY_COLOR1.getColor(),
+				BLOODY_COLOR2.getColor()
+			);
+		} else {
+			ParticleUtils.spawnTendril(
+				loc,
+				player,
+				7,
+				11,
+				3,
+				8,
+				1f,
+				BLOODY_COLOR1.getColor(),
+				BLOODY_COLOR2.getColor()
+			);
+		}
+	}
+
+	@Override
+	public void explode(Player player, Location centerLoc, double radius) {
+		centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_BUBBLE_COLUMN_WHIRLPOOL_INSIDE, SoundCategory.PLAYERS, 1.5f, 0.75f);
+		centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		PPCircle circle = new PPCircle(Particle.BLOCK_CRACK, centerLoc, radius)
+			.ringMode(true)
+			.data(BLOOD_BLOCK)
+			.countPerMeter(1);
+		circle.location(centerLoc.clone().add(0, 1.6, 0)).spawnAsPlayerActive(player);
+		circle.location(centerLoc.clone().add(0, 3.2, 0)).spawnAsPlayerActive(player);
+		circle.location(centerLoc.clone().add(0, 4.8, 0)).spawnAsPlayerActive(player);
+		circle.location(centerLoc.clone().add(0, -1.6, 0)).spawnAsPlayerActive(player);
+		circle.location(centerLoc.clone().add(0, -3.2, 0)).spawnAsPlayerActive(player);
+		circle.location(centerLoc.clone().add(0, -4.8, 0)).spawnAsPlayerActive(player);
 	}
 }

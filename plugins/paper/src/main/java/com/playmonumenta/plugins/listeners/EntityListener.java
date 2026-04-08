@@ -533,7 +533,8 @@ public class EntityListener implements Listener {
 				// Check if the player has an infinity snowball and not throw rate
 				if (itemInMainHand.getType().equals(Material.SNOWBALL)
 					&& (itemInMainHand.getEnchantmentLevel(Enchantment.ARROW_INFINITE) > 0 || ItemStatUtils.hasEnchantment(itemInMainHand, EnchantmentType.INFINITY))
-					&& ItemStatUtils.getAttributeAmount(itemInMainHand, AttributeType.THROW_RATE, Operation.ADD, Slot.MAINHAND) == 0) {
+					&& ItemStatUtils.getAttributeAmount(itemInMainHand, AttributeType.THROW_RATE, Operation.ADD, Slot.MAINHAND) == 0
+					&& !ItemStatUtils.hasEnchantment(itemInMainHand, EnchantmentType.CONSUMPTION)) {
 					Snowball newBall = (Snowball) origBall.getWorld().spawnEntity(origBall.getLocation(), EntityType.SNOWBALL);
 
 					// Copy the item's name/etc. so it can be textured
@@ -713,13 +714,13 @@ public class EntityListener implements Listener {
 		}
 
 		for (Player p : affectedPlayers) {
-			Collection<PotionEffect> appliedEffects = p.getActivePotionEffects();
+			Collection<PotionEffect> appliedEffects = potion.getEffects();
 			for (PotionEffect pe : appliedEffects) {
 				if (pe.getType().equals(PotionEffectType.SLOW_FALLING) &&
 					p.getGameMode().equals(GameMode.ADVENTURE)) {
 					//Remove Slow Falling effects in Adventure mode areas (#947)
 					p.sendMessage(Component.text("You cannot apply slow falling potion effects in adventure mode areas, other effects were still applied.", NamedTextColor.RED));
-					Bukkit.getScheduler().runTaskLater(mPlugin, () -> p.removePotionEffect(PotionEffectType.SLOW_FALLING), 1);
+					Bukkit.getScheduler().runTask(mPlugin, () -> p.removePotionEffect(PotionEffectType.SLOW_FALLING));
 				}
 			}
 		}
@@ -966,7 +967,7 @@ public class EntityListener implements Listener {
 		Entity entity = event.getEntity();
 		LivingEntity target = event.getTarget();
 
-		if (entity instanceof Creature && EntityUtils.isStunned(entity)) {
+		if (entity instanceof Creature && (EntityUtils.isStunned(entity) || EntityUtils.isStaggered(entity))) {
 			event.setCancelled(true);
 			return;
 		}

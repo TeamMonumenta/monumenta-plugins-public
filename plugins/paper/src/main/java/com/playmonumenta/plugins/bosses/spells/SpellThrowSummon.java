@@ -88,6 +88,10 @@ public class SpellThrowSummon extends Spell {
 					return;
 				}
 
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
+
 				mTicks++;
 
 				for (LivingEntity entity : mTargets.getTargetsList(mBoss)) {

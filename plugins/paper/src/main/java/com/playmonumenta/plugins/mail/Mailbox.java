@@ -236,8 +236,7 @@ public class Mailbox implements Comparable<Mailbox> {
 				try {
 					slot = Integer.parseInt(entry.getKey());
 				} catch (Exception ex) {
-					MMLog.warning("[Mailbox] Non-numeric slot ID in " + itemSlotRedisKey + ": " + entry.getKey() + ": "
-						+ ex.getMessage());
+					MMLog.warning("[Mailbox] Non-numeric slot ID in " + itemSlotRedisKey + ": " + entry.getKey() + ": ", ex);
 					continue;
 				}
 
@@ -245,10 +244,8 @@ public class Mailbox implements Comparable<Mailbox> {
 				try {
 					slotJson = new Gson().fromJson(entry.getValue(), JsonObject.class);
 				} catch (Exception ex) {
-					MMLog.warning("[Mailbox] Error parsing mail json (" + itemSlotRedisKey + ", " + entry.getKey() + "): "
-						+ ex.getMessage());
+					MMLog.warning("[Mailbox] Error parsing mail json (" + itemSlotRedisKey + ", " + entry.getKey() + "): ", ex);
 					MMLog.warning(entry.getValue());
-					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 					continue;
 				}
 
@@ -256,10 +253,8 @@ public class Mailbox implements Comparable<Mailbox> {
 				try {
 					mailboxSlot = new MailboxSlot(slotJson);
 				} catch (NullPointerException ex) {
-					MMLog.warning("[Mailbox] NPE processing mail slot json: (" + itemSlotRedisKey + ", " + entry.getKey() + "): "
-						+ ex.getMessage());
+					MMLog.warning("[Mailbox] NPE processing mail slot json: (" + itemSlotRedisKey + ", " + entry.getKey() + "): ", ex);
 					MMLog.warning(entry.getValue());
-					MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), ex);
 					continue;
 				}
 
@@ -297,8 +292,7 @@ public class Mailbox implements Comparable<Mailbox> {
 
 				future.complete(null);
 			} catch (Throwable throwable) {
-				MMLog.warning("[Mailbox] Failed to refresh " + friendlyName() + " slot: " + slot);
-				MessagingUtils.sendStackTrace(Bukkit.getConsoleSender(), throwable);
+				MMLog.warning("[Mailbox] Failed to refresh " + friendlyName() + " slot: " + slot, throwable);
 				future.completeExceptionally(throwable);
 			}
 		});
@@ -702,8 +696,16 @@ public class Mailbox implements Comparable<Mailbox> {
 		}
 
 		mLockedSlots.remove(slot);
-		MMLog.severe("[Mailbox] Mailbox lock expired without being properly handled!");
-		return false;
+		LockException initialLockoutException = new LockException("Mailbox Lock expired without being properly handled! Assuming locked and triggering refresh.");
+		MMLog.severe("[Mailbox] Mailbox lock expired without being properly handled! Assuming locked and triggering refresh.", initialLockoutException);
+		Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+			try {
+				loadLockFromRedis(slot).join();
+			} catch (Exception ex) {
+				MMLog.severe("Failed to refresh lockout status after initial lockout exception", ex);
+			}
+		});
+		return true;
 	}
 
 	/**

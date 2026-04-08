@@ -29,6 +29,11 @@ public class SpellFireball extends Spell {
 		void run(Location loc);
 	}
 
+	@FunctionalInterface
+	public interface FilterPlayers {
+		List<Player> run(List<Player> players);
+	}
+
 	private final Plugin mPlugin;
 	private final LivingEntity mBoss;
 	private final int mRange;
@@ -39,6 +44,7 @@ public class SpellFireball extends Spell {
 	private final boolean mSingleTarget;
 	private final LaunchFireballEffect mLaunchEffect;
 	private final int mDuration;
+	private final FilterPlayers mFilterPlayers;
 
 	/**
 	 * @param plugin       Plugin
@@ -54,6 +60,12 @@ public class SpellFireball extends Spell {
 	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count, int duration,
 	                     float yield, boolean isIncendiary, boolean singleTarget,
 	                     LaunchFireballEffect launchEffect) {
+		this(plugin, boss, range, delay, count, duration, yield, isIncendiary, singleTarget, launchEffect, (players) -> players);
+	}
+
+	public SpellFireball(Plugin plugin, LivingEntity boss, int range, int delay, int count, int duration,
+						 float yield, boolean isIncendiary, boolean singleTarget,
+						 LaunchFireballEffect launchEffect, FilterPlayers filterPlayers) {
 		mPlugin = plugin;
 		mBoss = boss;
 		mRange = range;
@@ -64,6 +76,7 @@ public class SpellFireball extends Spell {
 		mIsIncendiary = isIncendiary;
 		mSingleTarget = singleTarget;
 		mLaunchEffect = launchEffect;
+		mFilterPlayers = filterPlayers;
 	}
 
 	@Override
@@ -71,7 +84,7 @@ public class SpellFireball extends Spell {
 		BukkitRunnable runnable = new BukkitRunnable() {
 			private int mTicks = 0;
 			private int mLaunches = 0;
-			private List<Player> mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true);
+			private List<Player> mPlayers = mFilterPlayers.run(PlayerUtils.playersInRange(mBoss.getLocation(), mRange, true));
 
 			@Override
 			public void run() {
@@ -84,7 +97,8 @@ public class SpellFireball extends Spell {
 					mLaunches++;
 					mTicks = 0;
 
-					mPlayers = PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false);
+					mPlayers = mFilterPlayers.run(PlayerUtils.playersInRange(mBoss.getLocation(), mRange, false));
+
 					if (mSingleTarget) {
 						// Single target chooses a random player within range that has line of sight
 						Collections.shuffle(mPlayers);

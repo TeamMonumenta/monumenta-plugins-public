@@ -95,7 +95,7 @@ public class SpellBaseTrail extends Spell {
 
 	@Override
 	public void run() {
-		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss)) {
+		if (EntityUtils.isStunned(mBoss) || EntityUtils.isSilenced(mBoss) || EntityUtils.isStaggered(mBoss)) {
 			return;
 		}
 		mTicks += mTickRate;

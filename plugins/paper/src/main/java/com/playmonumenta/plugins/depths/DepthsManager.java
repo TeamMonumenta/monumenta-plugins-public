@@ -808,7 +808,7 @@ public class DepthsManager {
 			BowAspect.INFO);
 	}
 
-	public static List<DepthsAbilityInfo<?>> getAbilitiesOfTree(DepthsTree tree) {
+	public static List<DepthsAbilityInfo<?>> getAbilitiesOfTree(@Nullable DepthsTree tree) {
 		return getAbilities().stream().filter(info -> info.getDepthsTree() == tree).toList();
 	}
 

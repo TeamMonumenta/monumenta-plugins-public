@@ -33,6 +33,7 @@ public class Quake implements Enchantment {
 	private static final Particle.DustOptions BLEED_COLOR = new Particle.DustOptions(Color.fromRGB(210, 44, 44), 1.0f);
 	private static final String DAMAGE_DEALT_METADATA = "QuakeDamageDealt";
 	private static final String DAMAGED_THIS_TICK_METADATA = "QuakeThisTick";
+	private static final String DAMAGE_IS_PROJ_METADATA = "QuakeIsProj";
 
 	@Override
 	public String getName() {
@@ -63,7 +64,7 @@ public class Quake implements Enchantment {
 			if (e.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
 				damage = e.getDamage();
 			} else if (MetadataUtils.happenedThisTick(target, DAMAGED_THIS_TICK_METADATA) && target.hasMetadata(DAMAGE_DEALT_METADATA)) {
-				damage = target.getMetadata(DAMAGE_DEALT_METADATA).get(0).asDouble();
+				damage = target.getMetadata(DAMAGE_DEALT_METADATA).getFirst().asDouble();
 			} else {
 				return;
 			}
@@ -80,7 +81,7 @@ public class Quake implements Enchantment {
 
 			double finalDamage = damage * DAMAGE_MODIFIER_PER_LEVEL * level;
 			for (LivingEntity mob : mobs) {
-				DamageUtils.damage(player, mob, DamageType.TRUE, finalDamage, ClassAbility.QUAKE, false, true);
+				DamageUtils.damage(player, mob, DamageType.TRUE, finalDamage, target.getMetadata(DAMAGE_IS_PROJ_METADATA).getFirst().asBoolean() ? ClassAbility.QUAKE_PROJ : ClassAbility.QUAKE_MELEE, false, true);
 			}
 
 			if (fire + ice + thunder + decay + bleed + wind == 0) {
@@ -119,10 +120,11 @@ public class Quake implements Enchantment {
 		if (event.getType() == DamageType.MELEE || event.getType() == DamageType.PROJECTILE) {
 			//Store the highest damage dealt with a quake weapon this tick
 			double damage = event.getDamage();
-			if (MetadataUtils.checkOnceThisTick(plugin, enemy, DAMAGED_THIS_TICK_METADATA) && enemy.hasMetadata(DAMAGE_DEALT_METADATA) && enemy.getMetadata(DAMAGE_DEALT_METADATA).get(0).asDouble() > damage) {
+			if (MetadataUtils.checkOnceThisTick(plugin, enemy, DAMAGED_THIS_TICK_METADATA) && enemy.hasMetadata(DAMAGE_DEALT_METADATA) && enemy.getMetadata(DAMAGE_DEALT_METADATA).getFirst().asDouble() > damage) {
 				return;
 			}
 			enemy.setMetadata(DAMAGE_DEALT_METADATA, new FixedMetadataValue(plugin, damage));
+			enemy.setMetadata(DAMAGE_IS_PROJ_METADATA, new FixedMetadataValue(plugin, event.getType() == DamageType.PROJECTILE));
 		}
 	}
 }

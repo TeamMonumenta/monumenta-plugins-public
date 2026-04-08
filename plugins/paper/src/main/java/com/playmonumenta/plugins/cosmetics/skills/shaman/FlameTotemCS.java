@@ -7,13 +7,10 @@ import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.ParticleUtils;
-import java.util.List;
-import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
@@ -31,8 +28,6 @@ public class FlameTotemCS implements CosmeticSkill {
 		return Material.MAGMA_BLOCK;
 	}
 
-	private static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
-
 	public void flameTotemSpawn(Location standLocation, Player player, ArmorStand stand, double radius) {
 
 	}
@@ -47,39 +42,46 @@ public class FlameTotemCS implements CosmeticSkill {
 		fireRing.spawnAsPlayerActive(player);
 	}
 
-	public void flameTotemBombEnhanced(Player player, List<LivingEntity> targets, Location standLocation, Plugin plugin, double mBombRadius) {
-		Location standEyeLocation = standLocation.clone().add(0, 1.5, 0);
-		for (LivingEntity target : targets) {
-			Location targetLocation = target.getLocation();
-			new PPLine(Particle.SOUL_FIRE_FLAME, standEyeLocation, targetLocation)
-				.countPerMeter(8).delta(0).spawnAsPlayerActive(player);
-			ParticleUtils.explodingRingEffect(plugin, targetLocation.clone().add(0, 0.1, 0),
-				mBombRadius, 1.2, 5, 0.2,
-				loc -> new PartialParticle(Particle.SOUL_FIRE_FLAME, loc, 1, 0, 0.1, 0, 0)
-					.spawnAsPlayerActive(player));
-		}
-		standLocation.getWorld().playSound(standLocation, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE,
-			SoundCategory.PLAYERS, 0.3f, 0.5f);
+	public void flameTotemPulse(Player player, Location standLocation, double radius) {
+		PPCircle fireArea = new PPCircle(Particle.FLAME, standLocation, radius).ringMode(false).count(50).delta(0.01).extra(0.05);
+		fireArea.spawnAsPlayerActive(player);
+
+		standLocation.getWorld().playSound(standLocation, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE, 0.3f, 0.5f);
 	}
 
-	public void flameTotemBomb(Player player, List<LivingEntity> targets, Location standLocation, Plugin plugin, double mBombRadius) {
-		Location standEyeLocation = standLocation.clone().add(0, 1.5, 0);
-		for (LivingEntity target : targets) {
-			Location targetLocation = target.getLocation();
-			new PPLine(Particle.FLAME, standEyeLocation, targetLocation)
-				.countPerMeter(8).delta(0).spawnAsPlayerActive(player);
-			ParticleUtils.explodingRingEffect(plugin, targetLocation.clone().add(0, 0.1, 0),
-				mBombRadius, 1.2, 5, 0.2,
-				loc -> new PartialParticle(Particle.FLAME, loc, 1, 0, 0.1, 0, 0)
-					.spawnAsPlayerActive(player));
+	public void flameTotemBomb(Player player, LivingEntity target, Location standLocation, Plugin plugin, double mBombRadius) {
+		Location targetLocation = target.getLocation();
+		new PPLine(Particle.FLAME, standLocation, targetLocation)
+			.countPerMeter(8).delta(0).spawnAsPlayerActive(player);
+		ParticleUtils.explodingRingEffect(plugin, targetLocation.clone().add(0, 0.1, 0),
+			mBombRadius, 1.2, 5, 0.2,
+			loc -> new PartialParticle(Particle.FLAME, loc, 1, 0, 0.1, 0, 0)
+				.spawnAsPlayerActive(player));
+
+		for (int i = 0; i < 3; i++) {
+			new PartialParticle(Particle.LAVA, targetLocation.clone().add(0, 0.2 * i, 0), 8, mBombRadius * 0.4, 0.1 * i, mBombRadius * 0.4, 0)
+				.spawnAsPlayerActive(player);
 		}
-		standLocation.getWorld().playSound(standLocation, Sound.ENTITY_GENERIC_EXTINGUISH_FIRE,
-			SoundCategory.PLAYERS, 0.3f, 0.5f);
+
+		new PPCircle(Particle.FLAME, targetLocation.clone().add(0, 0.1, 0), mBombRadius)
+			.ringMode(true)
+			.countPerMeter(2.0)
+			.delta(0.05)
+			.spawnAsPlayerActive(player);
+
+		ParticleUtils.explodingRingEffect(plugin, targetLocation.clone().add(0, 0.5, 0),
+			mBombRadius, 1.5, 8, 0.3,
+			loc -> new PartialParticle(Particle.FLAME, loc, 1, 0, 0.1, 0, 0.1)
+				.spawnAsPlayerActive(player));
+
+		new PartialParticle(Particle.SMOKE_LARGE, targetLocation.clone().add(0, 1.0, 0), 20, mBombRadius * 0.6, mBombRadius * 0.3, mBombRadius * 0.6, 0.05)
+			.spawnAsPlayerActive(player);
+
+		new PartialParticle(Particle.SMALL_FLAME, targetLocation.clone().add(0, 0.5, 0), 15, mBombRadius * 0.7, mBombRadius * 0.5, mBombRadius * 0.7, 0.15)
+			.spawnAsPlayerActive(player);
 	}
 
 	public void flameTotemExpire(World world, Player player, Location standLocation) {
-		new PartialParticle(Particle.REDSTONE, standLocation, 45, 0.2, 1.1, 0.2, 0.1, COLOR).spawnAsPlayerActive(player);
-		new PartialParticle(Particle.SMOKE_NORMAL, standLocation, 40, 0.3, 1.1, 0.3, 0.15).spawnAsPlayerActive(player);
-		world.playSound(standLocation, Sound.ENTITY_BLAZE_DEATH, SoundCategory.PLAYERS, 0.7f, 0.5f);
+
 	}
 }

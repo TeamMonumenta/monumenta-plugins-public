@@ -4,14 +4,15 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.VolleyCS;
 import com.playmonumenta.plugins.events.DamageEvent;
-import com.playmonumenta.plugins.events.DamageEvent.DamageType;
+import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
+import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.HashMap;
@@ -32,6 +33,11 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Volley extends Ability {
 
@@ -98,17 +104,23 @@ public class Volley extends Ability {
 				if (!isEnhanced()) {
 					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows, arrowSpeed, 5, projectile.getType());
 				} else {
-					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 5, arrowSpeed, 360.0 / (mArrows * 5), projectile.getType());
+					projectiles = EntityUtils.spawnVolley(mPlayer, mArrows * 2, arrowSpeed, 5, projectile.getType());
 				}
 
-				int piercing = (projectile instanceof AbstractArrow) ? (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
+				int piercing = (projectile instanceof AbstractArrow) ? ((AbstractArrow) projectile).getPierceLevel() + (int) CharmManager.getLevel(mPlayer, CHARM_PIERCING) : 0;
 
 				for (Projectile proj : projectiles) {
-
 					mVolley.add(proj);
+					ProjectileLaunchEvent event = new ProjectileLaunchEvent(proj);
+					Bukkit.getPluginManager().callEvent(event);
 
-					if (projectile.getScoreboardTags().contains("SourceQuickDraw")) {
-						proj.addScoreboardTag("SourceQuickDrawVolley");
+					if (projectile.getScoreboardTags().contains(Quickdraw.SOURCE_QUICKDRAW_TAG)) {
+						proj.addScoreboardTag(Quickdraw.SOURCE_QUICKDRAW_VOLLEY_TAG);
+						final ItemStatManager.PlayerItemStats itemStats = DamageListener.getProjectileItemStats(projectile);
+						if (itemStats != null) {
+							DamageListener.removeProjectileItemStats(proj);
+							DamageListener.addProjectileItemStats(proj, itemStats);
+						}
 					}
 
 					if (proj instanceof AbstractArrow arrow) {
@@ -121,9 +133,6 @@ public class Volley extends Ability {
 					}
 
 					mPlugin.mProjectileEffectTimers.addEntity(proj, Particle.SMOKE_NORMAL);
-
-					ProjectileLaunchEvent event = new ProjectileLaunchEvent(proj);
-					Bukkit.getPluginManager().callEvent(event);
 				}
 
 				// We can't just use arrow.remove() because that cancels the event and refunds the arrow
@@ -139,7 +148,7 @@ public class Volley extends Ability {
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
 		Entity proj = event.getDamager();
-		if (event.getType() == DamageType.PROJECTILE && mVolley.contains(proj)) {
+		if (proj instanceof Projectile && mVolley.contains(proj)) {
 			if (notBeenHit(enemy)) {
 				event.updateDamageWithMultiplier(mMultiplier);
 				mCosmetic.volleyHit(mPlayer, enemy);
@@ -161,26 +170,38 @@ public class Volley extends Ability {
 	}
 
 	private static Description<Volley> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you shoot a projectile while sneaking, you shoot a volley consisting of ")
-			.add(a -> a.mArrows, VOLLEY_1_ARROW_COUNT, false, Ability::isLevelOne)
-			.add(" projectiles instead. Only one arrow is consumed, and each projectile deals ")
-			.addPercent(a -> a.mMultiplier - 1, VOLLEY_1_DAMAGE_MULTIPLIER - 1, false, Ability::isLevelOne)
-			.add(" bonus damage.")
-			.addCooldown(VOLLEY_COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Firing a projectile while sneaking")
+			.addLine("fires a volley of %d1 projectiles")
+				.statValues(stat(a -> a.mArrows, VOLLEY_1_ARROW_COUNT))
+			.addLine("that deal increased damage.")
+			.addLine()
+			.addStat("Damage Boost: +%p1 (p)")
+				.statValues(stat(a -> a.mMultiplier - 1, VOLLEY_1_DAMAGE_MULTIPLIER - 1))
+			.addStat("Cooldown: %t")
+			.statValues(cooldown(VOLLEY_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Volley> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Increases the number of projectiles to ")
-			.add(a -> a.mArrows, VOLLEY_2_ARROW_COUNT, false, Ability::isLevelTwo)
-			.add(" and enhances the damage bonus to ")
-			.addPercent(a -> a.mMultiplier - 1, VOLLEY_2_DAMAGE_MULTIPLIER - 1, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Volley*'s number of").styles(UNDERLINED)
+			.addLine("projectiles and its damage boost.")
+			.addLine()
+			.addStatComparison("Projectiles: %d1 -> %d2")
+				.statValues(stat(VOLLEY_1_ARROW_COUNT), stat(a -> a.mArrows, VOLLEY_2_ARROW_COUNT))
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 (p)")
+				.statValues(stat(VOLLEY_1_DAMAGE_MULTIPLIER - 1), stat(a -> a.mMultiplier - 1, VOLLEY_2_DAMAGE_MULTIPLIER - 1))
+			.addDashedLine();
 	}
 
 	private static Description<Volley> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Volley now fires in a 360 degree arc.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Volley* now fires *2* times the amount of").styles(UNDERLINED, WHITE)
+			.addLine("projectiles an arc twice as wide.").styles(WHITE)
+			.addDashedLine();
 	}
 }

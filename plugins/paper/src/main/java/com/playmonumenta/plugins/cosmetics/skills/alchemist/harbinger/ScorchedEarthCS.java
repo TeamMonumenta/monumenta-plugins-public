@@ -35,6 +35,10 @@ public class ScorchedEarthCS implements CosmeticSkill {
 		return this;
 	}
 
+	public Material getFragmentMaterial() {
+		return Material.ORANGE_CONCRETE_POWDER;
+	}
+
 	public void landEffects(Player player, Location loc, double radius, int duration) {
 		loc = loc.clone().add(0, 0.25, 0);
 		World world = player.getWorld();
@@ -78,6 +82,31 @@ public class ScorchedEarthCS implements CosmeticSkill {
 		new PartialParticle(Particle.REDSTONE, loc, 15, 0.35, 0.5, 0.35,
 			new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.0f)).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.LAVA, loc, 3, 0.25, 0.5, 0.25, 0).spawnAsPlayerActive(alchemist);
+	}
+
+	public void potionLandInZoneEffect(Location loc, Player player) {
+		loc.getWorld().playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 1f, 0.5f);
+	}
+
+	public void shrapnelLandEffect(Location loc, double radius, boolean isGruesome, Player player) {
+		loc.getWorld().playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.35f, 2f);
+		new PartialParticle(Particle.EXPLOSION_LARGE, loc, 1)
+			.spawnAsPlayerActive(player);
+		new PPCircle(Particle.LAVA, loc, radius)
+			.ringMode(false)
+			.countPerMeter(1)
+			.spawnAsPlayerActive(player);
+	}
+
+	public void shrapnelFlyEffect(Location loc, boolean isGruesome, Player player) {
+		new PartialParticle(Particle.REDSTONE, loc, 1)
+			.data(new Particle.DustOptions(SCORCHED_EARTH_COLOR_DARK, 1.5f))
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.REDSTONE, loc, 1)
+			.data(new Particle.DustOptions(SCORCHED_EARTH_COLOR_LIGHT, 1.5f))
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.CRIT, loc, 1)
+			.spawnAsPlayerActive(player);
 	}
 
 }

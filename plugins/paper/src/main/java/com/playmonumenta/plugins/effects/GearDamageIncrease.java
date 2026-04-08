@@ -125,7 +125,8 @@ public class GearDamageIncrease extends Effect {
 	@Override
 	public @Nullable Component getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount)
-			.append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " " + getDisplayedName()));
+			.appendSpace()
+			.append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + getDisplayedName()));
 	}
 
 	@Override

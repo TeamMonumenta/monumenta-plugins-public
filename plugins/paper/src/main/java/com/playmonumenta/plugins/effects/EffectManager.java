@@ -1196,6 +1196,8 @@ public final class EffectManager implements Listener {
 			}
 		}, 1);
 	}
+
+	// TODO: fix memory leak? somehow entity.isValid is returning true for invalid entities
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
 	public void entityRemoveFromWorld(EntityRemoveFromWorldEvent event) {
 		Entity entity = event.getEntity();

@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
@@ -65,8 +66,20 @@ public class AbsorptionUtils {
 
 	// Doesn't work for subtracting absorption because newAbsorption makes sure it never drops (in case absorption is higher than maxAmount)
 	public static void addAbsorption(LivingEntity entity, double amount, double maxAmount, int duration) {
+		addAbsorption(entity, (UUID) null, amount, maxAmount, duration);
+	}
+
+	public static void addAbsorption(LivingEntity entity, @Nullable LivingEntity source, double amount, double maxAmount, int duration) {
+		if (source == null) {
+			addAbsorption(entity, (UUID) null, amount, maxAmount, duration);
+			return;
+		}
+		addAbsorption(entity, source.getUniqueId(), amount, maxAmount, duration);
+	}
+
+	public static void addAbsorption(LivingEntity entity, @Nullable UUID source, double amount, double maxAmount, int duration) {
 		double absorption = getAbsorption(entity);
-		EntityGainAbsorptionEvent event = new EntityGainAbsorptionEvent(entity, amount, maxAmount, duration);
+		EntityGainAbsorptionEvent event = new EntityGainAbsorptionEvent(entity, source, amount, maxAmount, duration);
 		Bukkit.getPluginManager().callEvent(event);
 
 		if (event.isCancelled()) {

@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.swordsage.DeadlyRondeCS;
@@ -28,6 +28,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 
@@ -211,28 +215,43 @@ public class DeadlyRonde extends Ability implements AbilityWithChargesOrStacks {
 	}
 
 	private static Description<DeadlyRonde> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("After casting an ability, gain a stack of Deadly Ronde for ")
-			.addDuration(a -> a.mDecayTime, RONDE_DECAY_TIMER)
-			.add(" seconds, stacking up to ")
-			.add(a -> a.mMaxStacks, RONDE_1_MAX_STACKS, false, Ability::isLevelOne)
-			.add(" times. While Deadly Ronde is active, you gain ")
-			.addPercent(a -> a.mSpeed, RONDE_SPEED_BONUS)
-			.add(" speed, and your next melee attack consumes a stack to fire a flurry of blades in a thin cone with a radius of ")
-			.add(a -> a.mRadius, RONDE_RADIUS)
-			.add(" blocks, dealing ")
-			.add(a -> a.mDamage, RONDE_1_DAMAGE, false, Ability::isLevelOne)
-			.add(" melee damage to mobs they hit. Ronde damage is reduced by ")
-			.addPercent(a -> a.mAttackSpeedScalingPortion, RONDE_ATTACK_SPEED_SCALING_PORTION)
-			.add("%, proportional to how far from fully charged your melee attack is.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Casting an ability grants you %d stack of")
+				.statValues(stat(a -> a.mStackGain, 1))
+			.addLine("*Deadly Ronde*, which begins to decay after").styles(UNDERLINED)
+			.addLine("%t of not gaining any.")
+				.statValues(stat(a -> a.mDecayTime, RONDE_DECAY_TIMER))
+			.addLine()
+			.addLine("While you have at least *1* stack,").styles(WHITE)
+			.addLine("gain increased speed.")
+			.addLine()
+			.addStat("Effect: +%p Speed")
+				.statValues(stat(a -> a.mSpeed, RONDE_SPEED_BONUS))
+			.addLine()
+			.addLine("Attacks spend *1* stack to deal bonus").styles(WHITE)
+			.addLine("damage to mobs in front of you.")
+			.addLine("(Deals less damage if attack isn't charged)")
+			.addLine()
+			.addStat("Damage: %d1 (m)")
+				.statValues(stat(a -> a.mDamage, RONDE_1_DAMAGE))
+			.addStat("Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRadius, RONDE_RADIUS))
+			.addStat("Max Rondes: %d1")
+				.statValues(stat(a -> a.mMaxStacks, RONDE_1_MAX_STACKS))
+			.addDashedLine();
 	}
 
 	private static Description<DeadlyRonde> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mDamage, RONDE_2_DAMAGE, false, Ability::isLevelTwo)
-			.add(", and you can now have up to ")
-			.add(a -> a.mMaxStacks, RONDE_2_MAX_STACKS, false, Ability::isLevelTwo)
-			.add(" stacks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Deadly Ronde*'s").styles(UNDERLINED)
+			.addLine("damage and maximum stacks.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (m)")
+				.statValues(stat(RONDE_1_DAMAGE), stat(a -> a.mDamage, RONDE_2_DAMAGE))
+			.addStatComparison("Max Stacks: %d1 -> %d2")
+				.statValues(stat(RONDE_1_MAX_STACKS), stat(a -> a.mMaxStacks, RONDE_2_MAX_STACKS))
+			.addDashedLine();
 	}
 }

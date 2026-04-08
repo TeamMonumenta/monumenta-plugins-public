@@ -3,11 +3,12 @@ package com.playmonumenta.plugins.depths.abilities.aspects;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.depths.DepthsContent;
 import com.playmonumenta.plugins.depths.DepthsRarity;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.abilities.DepthsAbilityInfo;
 import com.playmonumenta.plugins.depths.abilities.DepthsTrigger;
 import com.playmonumenta.plugins.depths.abilities.WeaponAspectDepthsAbility;
-import com.playmonumenta.plugins.server.properties.ServerProperties;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -25,7 +26,7 @@ public class RandomAspect extends WeaponAspectDepthsAbility {
 	}
 
 	private static Description<RandomAspect> getDescription() {
-		if (ServerProperties.getShardName().contains("zenith")) {
+		if (DepthsUtils.getDepthsContent() == DepthsContent.CELESTIAL_ZENITH) {
 			return new DescriptionBuilder<>(() -> INFO)
 				.add("Obtain a random ability at ")
 				.add(DepthsRarity.TWISTED.getDisplay())

@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.CursedWoundCS;
@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.MMLog;
+import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.PotionUtils;
 import java.util.Collection;
@@ -35,10 +36,12 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.potion.PotionEffect;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class CursedWound extends Ability {
 
@@ -51,6 +54,7 @@ public class CursedWound extends Ability {
 	private static final int CURSED_WOUND_CAP = 3;
 	private static final String DOT_EFFECT_NAME = "CursedWoundDamageOverTimeEffect";
 	private static final double DAMAGE_PER_EFFECT_RATIO = 0.03;
+	private static final String ATTACKED_THIS_TICK = "CursedWoundAttackedThisTick";
 
 	public static final String CHARM_DAMAGE = "Cursed Wound Damage Modifier";
 	public static final String CHARM_RADIUS = "Cursed Wound Radius";
@@ -97,6 +101,10 @@ public class CursedWound extends Ability {
 		if (type == DamageType.MELEE || type == DamageType.MELEE_ENCH) {
 			World world = mPlayer.getWorld();
 
+			if (isEnhanced()) {
+				MetadataUtils.markThisTick(mPlugin, enemy, ATTACKED_THIS_TICK);
+			}
+
 			if (isEnhanced() && type == DamageType.MELEE && mStoredPotionEffects != null && mStoredCustomEffects != null) {
 				int debuffCount = mStoredPotionEffects.size() + mStoredCustomEffects.size();
 
@@ -109,8 +117,10 @@ public class CursedWound extends Ability {
 				if (damage > 0) {
 					Map<String, JsonObject> serializedEffects = new HashMap<>();
 					mStoredCustomEffects.forEach((source, effect) -> serializedEffects.put(source, effect.serialize()));
+
 					for (LivingEntity mob : EntityUtils.getNearbyMobs(enemy.getLocation(), mRadius)) {
 						mStoredPotionEffects.forEach(mob::addPotionEffect);
+
 						EntityUtils.applyFire(mPlugin, mStoredFireTicks, mob, mPlayer, null);
 						serializedEffects.forEach((source, jsonEffect) -> {
 							try {
@@ -153,7 +163,7 @@ public class CursedWound extends Ability {
 					mCosmetic.onEffectApplication(mPlayer, mob);
 					mPlugin.mEffectManager.addEffect(mob, DOT_EFFECT_NAME,
 						new CustomDamageOverTime(CURSED_WOUND_DURATION, mDOTDamage,
-							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, mInfo.getLinkedSpell(), DamageType.MAGIC));
+							CURSED_WOUND_DOT_PERIOD, mPlayer, playerItemStats, ClassAbility.CURSED_WOUND_DOT, DamageType.MAGIC));
 				}
 			}
 			return true;
@@ -169,8 +179,7 @@ public class CursedWound extends Ability {
 		World world = event.getEntity().getWorld();
 		Location loc = mPlayer.getLocation();
 		LivingEntity entity = event.getEntity();
-		EntityDamageEvent entityDamageEvent = entity.getLastDamageCause();
-		if (isEnhanced() && entityDamageEvent != null && entityDamageEvent.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
+		if (isEnhanced() && MetadataUtils.happenedThisTick(entity, ATTACKED_THIS_TICK)) {
 
 			mStoredPotionEffects = entity.getActivePotionEffects();
 			mStoredPotionEffects.removeIf(effect -> effect.getType().isInstant() || PotionUtils.hasPositiveEffects(effect.getType()));
@@ -199,33 +208,52 @@ public class CursedWound extends Ability {
 	}
 
 	private static Description<CursedWound> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Attacking a mob with a critical scythe attack passively afflicts it and all mobs within ")
-			.add(a -> a.mRadius, CURSED_WOUND_RADIUS)
-			.add(" blocks around it with ")
-			.add(a -> a.mDOTDamage, CURSED_WOUND_DOT_DAMAGE)
-			.add(" magic damage every second for ")
-			.addDuration(CURSED_WOUND_DURATION)
-			.add(" seconds. Your melee scythe attacks passively deal ")
-			.addPercent(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" more damage per ability on cooldown, capped at ")
-			.add(a -> a.mAbilityCap, CURSED_WOUND_CAP)
-			.add(" abilities.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Deal increased melee damage for each")
+			.addLine("ability you have on cooldown.")
+			.addLine()
+			.addStat("Damage Boost: +%p1 (m) per ability")
+			.statValues(stat(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_1), stat(a -> a.mAbilityCap, CURSED_WOUND_CAP))
+			.addStat("Max Abilities: %d")
+			.statValues(stat(a -> a.mAbilityCap, CURSED_WOUND_CAP))
+			.addLine()
+			.addLine("Critical scythe attacks inflict the target")
+			.addLine("and nearby mobs with damage over time.")
+			.addLine()
+			.addStat("Damage: %d (s) every %t for %t")
+			.statValues(stat(a -> a.mDOTDamage, CURSED_WOUND_DOT_DAMAGE), stat(CURSED_WOUND_DOT_PERIOD), stat(CURSED_WOUND_DURATION))
+			.addStat("Radius: %r")
+			.statValues(stat(a -> a.mRadius, CURSED_WOUND_RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<CursedWound> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your melee scythe attacks now passively deal ")
-			.addPercent(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" more damage per ability on cooldown instead.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Cursed Wound*'s damage boost.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 (m)")
+			.statValues(stat(CURSED_WOUND_DAMAGE_1), stat(a -> a.mCursedWoundDamage, CURSED_WOUND_DAMAGE_2))
+			.addDashedLine();
 	}
 
 	private static Description<CursedWound> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When you kill a mob with a melee scythe attack, all debuffs (excluding stuns and silences) on the mob get stored in your scythe. Then, on your next melee scythe attack, all mobs within ")
-			.add(a -> a.mRadius, CURSED_WOUND_RADIUS)
-			.add(" blocks of the target are inflicted with the effects stored in your scythe, as well as ")
-			.addPercent(DAMAGE_PER_EFFECT_RATIO)
-			.add(" of your melee attack's damage as magic damage per effect.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Killing a mob with a scythe attack will store all")
+			.addLine("debuffs that were on that mob.")
+			.addLine("(Excluding stun, silence, and stagger)")
+			.addLine()
+			.addLine("Your next attack will inflict the stored debuffs")
+			.addLine("onto the target and nearby mobs, and deal bonus")
+			.addLine("magic damage (s) for each debuff stored.")
+			.addLine()
+			.addStat("Bonus Damage: %p (s) per debuff")
+			.statValues(stat(DAMAGE_PER_EFFECT_RATIO))
+			.tab().addLine("(of the attack's damage)")
+			.addStat("Radius: %r")
+			.statValues(stat(a -> a.mRadius, CURSED_WOUND_RADIUS))
+			.addDashedLine();
 	}
 }

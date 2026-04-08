@@ -4,6 +4,7 @@ import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkill;
 import com.playmonumenta.plugins.particle.PPPeriodic;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -34,6 +35,10 @@ public class BezoarCS implements CosmeticSkill {
 
 	public String bezoarName(boolean philosophersStone) {
 		return philosophersStone ? "Philosopher's Stone" : "Bezoar";
+	}
+
+	public NamedTextColor bezoarGlowColor(boolean philosophersStone) {
+		return philosophersStone ? NamedTextColor.RED : NamedTextColor.WHITE;
 	}
 
 	public void periodicBezoarEffects(Player mPlayer, Location loc, int tick, boolean philosophersStone) {

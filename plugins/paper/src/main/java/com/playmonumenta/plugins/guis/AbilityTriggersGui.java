@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.depths.guis.DepthsSummaryGUI;
 import com.playmonumenta.plugins.guis.classselection.ClassSelectionGui;
+import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import java.util.ArrayList;
@@ -156,6 +157,22 @@ public class AbilityTriggersGui extends Gui {
 
 						playButtonSoundCancel(mPlayer);
 					});
+			}
+
+			// trigger swap button(s) for shaman
+			if (AbilityUtils.getClassNum(mPlayer) == 8) {
+				setupTriggerPreset(7, Material.BOW,
+					"Set all triggers to preset: Projectile Shaman",
+					"This resets all of your Shaman triggers to the preset: Projectile Shaman.",
+					"trigger_projectile_shaman_preset_trigger",
+					false
+				);
+				setupTriggerPreset(6, Material.WOODEN_AXE,
+					"Set all triggers to preset: Melee Shaman (default)",
+					"This resets all of your Shaman triggers to the preset: Melee Shaman.",
+					"trigger_melee_shaman_preset_trigger",
+					true
+				);
 			}
 		} else {
 			// back icon
@@ -420,6 +437,31 @@ public class AbilityTriggersGui extends Gui {
 		}
 	}
 
+	private void setupTriggerPreset(int slot, Material iconMaterial, String title, String body, String textureTag, boolean isDefault) {
+		ItemStack tempItem = GUIUtils.createBasicItem(iconMaterial, 1, title, NamedTextColor.GOLD, false,
+			Component.text(body, NamedTextColor.YELLOW), 40, true);
+		GUIUtils.setGuiNbtTag(tempItem, "texture", textureTag, mGuiTextures);
+		setItem(slot, tempItem)
+			.onLeftClick(() -> {
+				for (Ability ability : mPlugin.mAbilityManager.getPlayerAbilities(mPlayer).getAbilitiesInTriggerOrder()) {
+					for (AbilityTriggerInfo<?> trigger : ability.getCustomTriggers()) {
+						AbilityTrigger abilityTrigger;
+						if (isDefault) {
+							abilityTrigger = new AbilityTrigger(Objects.requireNonNull(ability.getInfo().getTrigger(trigger.getId())).getTrigger());
+						} else {
+							abilityTrigger = new AbilityTrigger(Objects.requireNonNullElse(ability.getInfo().getAltPresetTrigger(trigger.getId()), ability.getInfo().getTrigger(trigger.getId())).getTrigger());
+						}
+
+						trigger.setTrigger(abilityTrigger);
+						mPlugin.mAbilityManager.setCustomTrigger(mPlayer, ability.getInfo(), trigger.getId(), abilityTrigger);
+					}
+				}
+				ProtocolLibrary.getProtocolManager().updateEntity(mPlayer, ProtocolLibrary.getProtocolManager().getEntityTrackers(mPlayer));
+				update();
+
+				playButtonSoundSpecial(mPlayer);
+			});
+	}
 
 	private void makeOptionIcons(int row, int column, ItemStack display, AbilityTrigger.BinaryOption value, Runnable onClick) {
 		Material indicatorMaterial = value == AbilityTrigger.BinaryOption.TRUE ? Material.GREEN_STAINED_GLASS_PANE

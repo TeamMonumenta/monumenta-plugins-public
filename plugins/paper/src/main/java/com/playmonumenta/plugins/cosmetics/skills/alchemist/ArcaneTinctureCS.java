@@ -80,6 +80,33 @@ public class ArcaneTinctureCS extends IronTinctureCS {
 	}
 
 	@Override
+	public void hitGroundEffect(Location location, Player caster, double stunRadius) {
+		location.getWorld().playSound(location, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1.5f, 2f);
+		Location particleLoc = location.clone().add(0, 0.25, 0);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, particleLoc, stunRadius)
+			.countPerMeter(4)
+			.ringMode(true)
+			.directionalMode(true)
+			.delta(0, -0.25, 0)
+			.extra(1)
+			.spawnAsPlayerActive(caster);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, particleLoc, stunRadius / 2)
+			.countPerMeter(2)
+			.ringMode(true)
+			.directionalMode(true)
+			.delta(0, -0.25, 0)
+			.extra(1)
+			.spawnAsPlayerActive(caster);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, particleLoc, stunRadius / 4)
+			.countPerMeter(1)
+			.ringMode(true)
+			.directionalMode(true)
+			.delta(0, -0.25, 0)
+			.extra(1)
+			.spawnAsPlayerActive(caster);
+	}
+
+	@Override
 	public void tinctureExpireEffects(Location location, Player caster) {
 		location.getWorld().playSound(location, Sound.BLOCK_MEDIUM_AMETHYST_BUD_BREAK, SoundCategory.PLAYERS, 1, 0.5f);
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, location.clone().add(0, 0.3, 0))

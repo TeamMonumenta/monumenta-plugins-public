@@ -29,6 +29,7 @@ public enum InfusionType {
 	ANTIGRAV(new AntiGrav(), "", true, false, false, false, true, true, true, false),
 	ARDOR(new Ardor(), "", true, false, false, false, true, true, true, false),
 	AURA(new Aura(), "", true, false, false, false, true, true, true, false),
+	BLOODLUST(new Bloodlust(), "", true, false, false, false, true, true, true, false),
 	CARAPACE(new Carapace(), "", true, false, false, false, true, true, true, false),
 	CELERITY(new Celerity(), "", true, false, false, false, true, true, true, false),
 	CELESTIAL(new Celestial(), "", true, false, false, false, true, true, true, false),
@@ -61,6 +62,7 @@ public enum InfusionType {
 	// Other Added Tags
 	LOCKED(new Locked(), "", false, false, false, false, false, false, false, false),
 	ENLIGHTENING(new Enlightening(), "", false, false, false, false, true, false, false, false),
+	HEARTWARMING(new Heartwarming(), "", false, false, false, false, true, false, false, false),
 	BARKING(new Barking(), "", true, false, true, false, false, false, false, false),
 	DEBARKING(new Debarking(), "", false, false, false, false, false, false, false, false),
 	RUSTWORTHY(new Rustworthy(), "", true, true, false, false, false, false, false, false),

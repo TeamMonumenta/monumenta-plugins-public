@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SharpshooterCS;
@@ -24,6 +24,9 @@ import org.bukkit.entity.Projectile;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks {
 	private static final double PERCENT_BASE_DAMAGE = 0.15;
@@ -165,35 +168,54 @@ public class Sharpshooter extends Ability implements AbilityWithChargesOrStacks 
 	}
 
 	private static Description<Sharpshooter> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your projectiles deal ")
-			.addPercent(PERCENT_BASE_DAMAGE)
-			.add(" more damage. Additionally, each enemy hit with a critical projectile gives you a stack of Sharpshooter, up to ")
-			.add(a -> a.mMaxStacks, MAX_STACKS)
-			.add(". Stacks decay after ")
-			.addDuration(a -> a.mDecayTime, SHARPSHOOTER_DECAY_TIMER)
-			.add(" seconds of not gaining a stack. Each stack increases the damage bonus by an additional ")
-			.addPercent(a -> a.mDamagePerStack, PERCENT_DAMAGE_PER_STACK)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Deal increased projectile damage.")
+			.addLine()
+			.addLine("Hitting a mob with a critical projectile")
+			.addLine("gives you *1* stack of *Sharpshooter*,").styles(WHITE, UNDERLINED)
+			.addLine("which decays after %t of not gaining any.")
+				.statValues(stat(a -> a.mDecayTime, SHARPSHOOTER_DECAY_TIMER))
+			.addLine()
+			.addLine("Each stack increases the projectile")
+			.addLine("damage boost even further.")
+			.addLine()
+			.addStat("Damage Boost: +%p1 (p), +%p per stack")
+				.statValues(stat(a -> PERCENT_BASE_DAMAGE, PERCENT_BASE_DAMAGE), stat(a -> a.mDamagePerStack, PERCENT_DAMAGE_PER_STACK))
+			.addStat("Max Stacks: %d1")
+				.statValues(stat(a -> a.mMaxStacks, MAX_STACKS))
+			.addDashedLine();
 	}
 
 	private static Description<Sharpshooter> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Sharpshooter's Max Stacks is increased to ")
-			.add(a -> a.mMaxStacks, MAX_STACKS_2)
-			.add(". The base projectile damage bonus is increased to ")
-			.addPercent(PERCENT_BASE_DAMAGE_L2)
-			.add(". Additionally, gain a ")
-			.addPercent(a -> a.mArrowSaveChance, ARROW_SAVE_CHANCE)
-			.add(" chance to not consume arrows.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Sharpshooter*'s projectile").styles(UNDERLINED)
+			.addLine("damage boost even further, and")
+			.addLine("increase its maximum stacks.")
+			.addLine()
+			.addLine("Passively gain a %p chance not to")
+				.statValues(stat(a -> a.mArrowSaveChance, ARROW_SAVE_CHANCE))
+			.addLine("consume arrows.")
+			.addLine()
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 (p)")
+				.statValues(stat(PERCENT_BASE_DAMAGE), stat(a -> PERCENT_BASE_DAMAGE_L2, PERCENT_BASE_DAMAGE_L2))
+			.addStatComparison("Max Stacks: %d1 -> %d2")
+				.statValues(stat(MAX_STACKS), stat(a -> a.mMaxStacks, MAX_STACKS_2))
+			.addDashedLine();
 	}
 
 	private static Description<Sharpshooter> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage bonus is further increased by ")
-			.addPercent(DAMAGE_PER_BLOCK)
-			.add(" per block of distance between you and the target, up to ")
-			.add(a -> a.mMaxDistance, MAX_DISTANCE)
-			.add(" blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Sharpshooter*'s damage boost").styles(UNDERLINED)
+			.addLine("even further for each block between you")
+			.addLine("and the target.")
+			.addLine()
+			.addStat("Damage Boost: +%p (p) per block")
+				.statValues(stat(DAMAGE_PER_BLOCK))
+			.tab().addLine("(max %d blocks)")
+				.statValues(stat(a -> a.mMaxDistance, MAX_DISTANCE))
+			.addDashedLine();
 	}
 }

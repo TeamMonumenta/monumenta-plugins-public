@@ -5,11 +5,14 @@ import com.playmonumenta.plugins.bosses.bosses.FrostGiant;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -64,9 +67,7 @@ public final class SpellFrostbite extends Spell {
 		final Collection<Player> players = mFrostGiant.getArenaParticipants();
 		players.forEach(player -> {
 			final Location playerLoc = player.getLocation();
-			// The too high check is really lenient because of Meteor Slam's Jump Boost 5. If this lets people cheese
-			// I will find a different way to do this
-			final boolean tooHigh = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y >= 5.1;
+			final boolean tooHigh = BossUtils.isTooHigh(mFrostGiant.mBoss, player, FrostGiant.ARENA_FLOOR_Y, 4.1);
 			final boolean tooLow = playerLoc.getY() - FrostGiant.ARENA_FLOOR_Y <= -2;
 
 			if (tooHigh || tooLow) {

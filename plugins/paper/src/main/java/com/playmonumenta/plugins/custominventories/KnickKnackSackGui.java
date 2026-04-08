@@ -14,8 +14,10 @@ import com.playmonumenta.plugins.guis.GuiItem;
 import com.playmonumenta.plugins.integrations.luckperms.LuckPermsIntegration;
 import com.playmonumenta.plugins.integrations.luckperms.guildgui.GuildGui;
 import com.playmonumenta.plugins.itemstats.enums.Location;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionsGui;
 import com.playmonumenta.plugins.utils.GUIUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
+import com.playmonumenta.plugins.utils.ItemStackUtils;
 import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -221,6 +223,7 @@ public class KnickKnackSackGui extends Gui {
 		int guildSlot = 25;     // Guild GUI
 		int questSlot = 28;     // Quest guide
 		int enchantSlot = 29;   // Enchantopedia
+		int communitySlot = 30; // Community missions
 
 		// Information sign
 		ItemStack info = GUIUtils.createBasicItem(Material.OAK_SIGN, "Trinkets", NamedTextColor.WHITE, true);
@@ -300,6 +303,16 @@ public class KnickKnackSackGui extends Gui {
 		).onClick((evt) -> runConsoleCommand("battlepass gui @S"));
 		setItem(passSlot, tPass);
 
+		// Community missions trinket, always unlocked
+		GuiItem tCommunity = makeTrinketGuiItem(
+			"epic:pass/community_trinket",
+			"Click to show active community mission progress."
+		).onClick((evt) -> {
+			mPlayer.closeInventory();
+			new CommunityMissionsGui(mPlayer).open();
+		});
+		setItem(communitySlot, tCommunity);
+
 		// Cosmetics Trinket, always unlocked
 		GuiItem tCosmetics = makeTrinketGuiItem(
 			"epic:pass/personal_cosmetic_interface",
@@ -330,7 +343,7 @@ public class KnickKnackSackGui extends Gui {
 			setItem(recordSlot, tRecord);
 		} else {
 			// Locked item if neither record player nor soulsinger is unlocked
-			record = record.withType(Material.BARRIER);
+			record = ItemStackUtils.withTypePreserveName(record, Material.BARRIER);
 			GUIUtils.splitLoreLine(record, "Complete the quest \"Halid's Song\" to unlock!", NamedTextColor.YELLOW, true);
 			setItem(recordSlot, record);
 		}
@@ -581,7 +594,7 @@ public class KnickKnackSackGui extends Gui {
 					update();
 				});
 		} else {
-			talisman = talisman.withType(Material.BARRIER);
+			talisman = ItemStackUtils.withTypePreserveName(talisman, Material.BARRIER);
 			GUIUtils.splitLoreLine(talisman, "Purchase the " + t.mTreeName + " " + (celestialZenith ? "Zenith" : "Depths") + " Talisman to unlock!", NamedTextColor.YELLOW, true);
 			return new GuiItem(talisman);
 		}

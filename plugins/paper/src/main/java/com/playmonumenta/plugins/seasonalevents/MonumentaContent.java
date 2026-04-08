@@ -63,6 +63,7 @@ public enum MonumentaContent {
 	CELSIAN_BOUNTY("r2daily", ContentType.OTHER, 0),
 	RING_BOUNTY("r3daily", ContentType.OTHER, 0),
 	DELVE_BOUNTY("delvebounty", ContentType.OTHER, 0),
+	OVERWORLD3_POI("overworld3", ContentType.POI, 0),
 	STARPOINT_POI("starpoint", ContentType.POI, 0),
 	KEEP_POI("keep", ContentType.POI, 0),
 	WOLFSWOOD_POI("wolfswood", ContentType.POI, 0),

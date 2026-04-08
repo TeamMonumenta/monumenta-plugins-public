@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 public class ShamanCooldownDecreasePerSecond extends Effect {
-	public static final String effectID = "ShamanCDRPerSecond";
+	public static final String effectID = "ShamanCDR";
 
 	private final double mPercent;
 	private final int mMaxDecrease;
@@ -73,7 +73,7 @@ public class ShamanCooldownDecreasePerSecond extends Effect {
 
 	@Override
 	public @Nullable String getDisplayedName() {
-		return "Cooldown Reduction Per Second";
+		return "Whirlwind Totem Cooldown Reduction";
 	}
 
 	@Override

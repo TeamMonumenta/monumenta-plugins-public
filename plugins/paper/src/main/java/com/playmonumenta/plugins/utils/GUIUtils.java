@@ -1,8 +1,5 @@
 package com.playmonumenta.plugins.utils;
 
-import de.tr7zw.nbtapi.NBT;
-import de.tr7zw.nbtapi.iface.ReadWriteNBT;
-import de.tr7zw.nbtapi.iface.ReadableNBT;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +21,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.Nullable;
+import de.tr7zw.nbtapi.NBT;
+import de.tr7zw.nbtapi.iface.ReadWriteNBT;
+import de.tr7zw.nbtapi.iface.ReadableNBT;
 
 
 public class GUIUtils {
@@ -168,7 +168,7 @@ public class GUIUtils {
 			}
 		}
 		if (!currentLine.toString().isEmpty()) {
-			finalMinis.add(currentLine.toString());
+			finalMinis.add(currentLine.toString().trim());
 		}
 
 		return finalMinis.stream()

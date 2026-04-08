@@ -63,6 +63,7 @@ public class ZoneUtils {
 		NO_SUMMONS("No Summons"),
 		NO_SPECTATOR_ON_DEATH("No Spectator On Death"),
 		NO_SPECTATOR_ON_RESPAWN("No Spectator On Respawn"),
+		NO_TRANSPOSING("No Transposing"),
 		NO_TRAPDOOR_CLICKS("No Trapdoor Clicks"),
 		NO_TRICKY_TRANSFORMATION("NoTrickyTransformation"),
 		NO_VEHICLES("No Vehicles"),

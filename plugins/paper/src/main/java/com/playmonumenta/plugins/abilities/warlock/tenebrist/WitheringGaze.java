@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.WitheringGazeCS;
@@ -21,6 +21,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class WitheringGaze extends Ability {
 
@@ -110,28 +114,35 @@ public class WitheringGaze extends Ability {
 	}
 
 	private static Description<WitheringGaze> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to unleash a ")
-			.add(a -> a.mRange, WITHERING_GAZE_RANGE)
-			.add(" block long cone in the direction you are facing. Mobs in the cone are stunned for ")
-			.addDuration(a -> a.mStunDuration, WITHERING_GAZE_STUN_DURATION)
-			.add(" seconds (elites and bosses are rooted instead) and dealt ")
-			.add(a -> a.mDOTDamage, WITHERING_GAZE_DOT_DAMAGE)
-			.add(" magic damage every ")
-			.addDuration(WITHERING_GAZE_DOT_PERIOD)
-			.add(" seconds for ")
-			.addDuration(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_1, false, Ability::isLevelOne)
-			.add(" seconds.")
-			.addCooldown(WITHERING_GAZE_1_COOLDOWN, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Stun and inflict damage over time")
+			.addLine("on all mobs in front of you.")
+			.addLine("(Elites/Bosses are rooted instead)")
+			.addLine()
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, WITHERING_GAZE_STUN_DURATION))
+			.addStat("Damage: %d (s) every %t for %t1")
+				.statValues(stat(a -> a.mDOTDamage, WITHERING_GAZE_DOT_DAMAGE), stat(WITHERING_GAZE_DOT_PERIOD), stat(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_1))
+			.addStat("Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRange, WITHERING_GAZE_RANGE))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(WITHERING_GAZE_1_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<WitheringGaze> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage over time duration is increased to ")
-			.addDuration(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_2, false, Ability::isLevelTwo)
-			.add(" seconds.")
-			.addCooldown(WITHERING_GAZE_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Withering Gaze*'s damage").styles(UNDERLINED)
+			.addLine("duration and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Damage Duration: %t1 -> %t2")
+				.statValues(stat(WITHERING_GAZE_DOT_DURATION_1), stat(a -> a.mDOTDuration, WITHERING_GAZE_DOT_DURATION_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(WITHERING_GAZE_1_COOLDOWN), cooldown(WITHERING_GAZE_2_COOLDOWN))
+			.addDashedLine();
 	}
 
 }

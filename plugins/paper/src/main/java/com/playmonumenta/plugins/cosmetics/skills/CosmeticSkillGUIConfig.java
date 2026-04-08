@@ -9,7 +9,8 @@ public class CosmeticSkillGUIConfig {
 	public static final int SPEC_ONE_LOC = 47;
 	public static final int SPEC_TWO_LOC = 51;
 
-	public static final int[] SKILL_LOCS = {19, 21, 23, 25, 28, 30, 32, 34};
+	public static final int PASSIVE_LOC = 22;
+	public static final int[] SKILL_LOCS = {18, 20, 24, 26, 28, 30, 32, 34};
 	public static final int[] SPEC_SKILL_LOCS = {20, 22, 24};
 
 	public static final int SHOP_LOC = 40;

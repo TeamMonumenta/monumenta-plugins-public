@@ -78,6 +78,8 @@ public class DarkRetaliation extends Spell {
 			&& mBoss.getLocation().distance(player.getLocation()) > TRIGGER_DISTANCE
 			&& event.getType() != DamageEvent.DamageType.AILMENT
 			&& event.getAbility() != ClassAbility.BRUTAL_ALCHEMY
+			&& event.getAbility() != ClassAbility.SCORCHED_EARTH
+			&& event.getAbility() != ClassAbility.VOLATILE_REACTION_DOT
 			&& event.getType() != DamageEvent.DamageType.THORNS) {
 			attackPlayer(player, event.getDamage() * DAMAGE_TRANSFER_PERCENT);
 			mTicks = COOLDOWN;

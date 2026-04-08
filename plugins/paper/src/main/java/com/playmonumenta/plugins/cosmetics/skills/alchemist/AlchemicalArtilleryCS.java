@@ -9,7 +9,6 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
-import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -44,6 +42,14 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 		Location particleLoc = LocationUtils.getHalfHeightLocation(grenade);
 		new PartialParticle(Particle.SMOKE_LARGE, particleLoc, 2, 0, 0, 0, 0.05).spawnAsPlayerActive(caster);
 		new PartialParticle(Particle.FLAME, particleLoc, 3, 0, 0, 0, 0.05).spawnAsPlayerActive(caster);
+	}
+
+	public void bounceEffect(Player caster, Location loc, int bounceCount, Vector actualBouncePosition, Vector hitFaceDirection) {
+		loc.getWorld().playSound(loc, Sound.BLOCK_ANCIENT_DEBRIS_BREAK, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_NETHERITE_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_SLIME_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 2f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1f, 1.1f + 0.3f * bounceCount);
+		new PartialParticle(Particle.FLAME, loc, 50).extra(0.15).spawnAsPlayerActive(caster);
 	}
 
 	public void explosionEffect(Player caster, Location loc, double radius) {
@@ -115,31 +121,6 @@ public class AlchemicalArtilleryCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 0f);
 		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.5f, 1.25f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 1.5f, 2f);
-	}
-
-	public void aftershockEffect(Player caster, Location loc, double radius, List<LivingEntity> hitMobs) {
-		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1f, 1.75f);
-
-		if (hitMobs.isEmpty()) {
-			new PartialParticle(Particle.EXPLOSION_LARGE, loc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(caster);
-			return;
-		}
-
-		for (LivingEntity mob : hitMobs) {
-			Location mobLoc = mob.getLocation();
-			new PartialParticle(Particle.BLOCK_CRACK, mobLoc, 25, 0, 0, 0, 1, world.getBlockData(mobLoc.clone().subtract(0, 1, 0))).spawnAsPlayerActive(caster);
-			new PartialParticle(Particle.EXPLOSION_LARGE, mobLoc, 5, 0.2, 0.2, 0.2, 0.1).spawnAsPlayerActive(caster);
-		}
-
-		new PPCircle(Particle.REDSTONE, loc, radius)
-			.count(25)
-			.extra(0.0025)
-			.data(new Particle.DustOptions(Color.fromRGB(255, 0, 0), 1.0f))
-			.spawnAsPlayerActive(caster);
-
-		// explosion effect
-		new PartialParticle(Particle.FLAME, loc, 40, radius / 4, 0, radius / 4, 0.03 * radius).spawnAsPlayerActive(caster);
 	}
 
 }

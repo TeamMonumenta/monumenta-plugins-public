@@ -132,7 +132,7 @@ public class AbyssalEffigyCS extends LightningTotemCS {
 	}
 
 	@Override
-	public void lightningTotemStrike(Player player, Location standLocation, LivingEntity target) {
+	public void lightningTotemStrike(Player player, Location standLocation, LivingEntity target, boolean meleeActivated) {
 		Location targetLocation = LocationUtils.getHalfHeightLocation(target);
 		standLocation.add(0, 1, 0);
 

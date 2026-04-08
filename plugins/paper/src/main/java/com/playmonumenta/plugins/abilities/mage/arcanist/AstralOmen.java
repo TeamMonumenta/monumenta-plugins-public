@@ -5,7 +5,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.arcanist.AstralOmenCS;
@@ -27,10 +27,15 @@ import com.playmonumenta.plugins.utils.MovementUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NavigableSet;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class AstralOmen extends Ability {
 	public static final String NAME = "Astral Omen";
@@ -58,6 +63,8 @@ public class AstralOmen extends Ability {
 	public static final String CHARM_PULL = "Astral Omen Pull Speed";
 
 	private static final Map<ClassAbility, Type> mElementClassification;
+
+	public static final Style OMEN_COLOR = Style.style(TextColor.color(0xBF308B));
 
 	public static final AbilityInfo<AstralOmen> INFO =
 		new AbilityInfo<>(AstralOmen.class, NAME, AstralOmen::new)
@@ -196,26 +203,42 @@ public class AstralOmen extends Ability {
 	}
 
 	private static Description<AstralOmen> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Dealing spell damage to an enemy marks its fate, giving it an omen based on the spell type (Arcane, Fire, Ice, Thunder). If an enemy hits ")
-			.add(a -> a.mStackThreshold, STACK_THRESHOLD)
-			.add(" omens of different types, its fate is sealed, clearing its omens and causing a magical implosion, dealing ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" magic damage to it and all enemies within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks. An enemy loses all its omens after ")
-			.addDuration(STACK_TICKS)
-			.add(" seconds of it not gaining another omen. That implosion's damage cannot apply omens. Omens cannot be applied or sealed by Elemental Arrows.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Damaging a mob with a ability gives it")
+			.addLine("an *Omen* based on the ability's element").styles(OMEN_COLOR)
+			.addLine("that lasts for %t.")
+				.statValues(stat(STACK_TICKS))
+			.addLine("(Arcane, Fire, Ice, and Thunder)")
+			.addLine()
+			.addLine("Once a mob reaches %d *Omens* of different").styles(OMEN_COLOR)
+				.statValues(stat(a -> a.mStackThreshold, STACK_THRESHOLD))
+			.addLine("elements, it implodes, dealing damage")
+			.addLine("to itself and other nearby mobs.")
+			.addLine()
+			.addLine("*Omens* cannot be applied or triggered").styles(OMEN_COLOR)
+			.addLine("by *Elemental Arrows*.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mDamage, DAMAGE_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<AstralOmen> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The implosion now pulls all enemies inwards and deals ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" damage. Enemies hit by the implosion now take ")
-			.addPercent(a -> a.mLevelBonusMultiplier, BONUS_MULTIPLIER)
-			.add(" more damage from you for ")
-			.addDuration(BONUS_TICKS)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Astral Omen*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addLine("All mobs hit by the implosion are")
+			.addLine("pulled inward and take increased")
+			.addLine("damage from you for a short period.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mDamage, DAMAGE_2))
+			.addStat("Effect: +%p Damage for %t")
+				.statValues(stat(a -> a.mLevelBonusMultiplier, BONUS_MULTIPLIER), stat(BONUS_TICKS))
+			.addDashedLine();
 	}
 }

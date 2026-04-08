@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.managers.travelanchor.gui.AnchorGroupGui;
 import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
 import java.util.List;
@@ -22,12 +23,14 @@ public class TravelAnchorCommands {
 
 	public static void register() {
 		new CommandAPICommand("travelanchor")
-			.withPermission("monumenta.command.travelanchor")
+			.withPermission(CommandPermission.fromString("monumenta.command.travelanchor"))
 			.withSubcommand(getAddSubcommand())
 			.withSubcommand(getGroupsSubcommand())
 			.withSubcommand(getRemoveSubcommand())
 			.withSubcommand(getRenameSubcommand())
 			.withSubcommand(getTravelSubcommand())
+			.withSubcommand(getForceLoadSubcommand())
+			.withSubcommand(getForceUnloadSubcommand())
 			.register();
 	}
 
@@ -173,6 +176,24 @@ public class TravelAnchorCommands {
 
 				new TravelUi(player, anchor)
 					.runTaskTimer(Plugin.getInstance(), 0L, 1L);
+			});
+	}
+
+	public static CommandAPICommand getForceLoadSubcommand() {
+		return new CommandAPICommand("forceload")
+			.withArguments(ANCHOR_ARG)
+			.executes((sender, args) -> {
+				Entity anchor = Objects.requireNonNull(args.getByArgument(ANCHOR_ARG));
+				TravelAnchorManager.getInstance().loadAnchor(anchor);
+			});
+	}
+
+	public static CommandAPICommand getForceUnloadSubcommand() {
+		return new CommandAPICommand("forceunload")
+			.withArguments(ANCHOR_ARG)
+			.executes((sender, args) -> {
+				Entity anchor = Objects.requireNonNull(args.getByArgument(ANCHOR_ARG));
+				TravelAnchorManager.getInstance().unloadAnchor(anchor);
 			});
 	}
 

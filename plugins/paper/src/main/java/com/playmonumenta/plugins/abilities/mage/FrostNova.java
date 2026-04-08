@@ -7,11 +7,13 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.FrostNovaCS;
 import com.playmonumenta.plugins.effects.CholericFlamesAntiHeal;
+import com.playmonumenta.plugins.effects.Frozen;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
@@ -24,6 +26,11 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class FrostNova extends Ability {
 
@@ -122,41 +129,63 @@ public class FrostNova extends Ability {
 	}
 
 	private static Description<FrostNova> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to unleash a frost nova, dealing ")
-			.add(a -> a.mBaseDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" ice magic damage to enemies within ")
-			.add(a -> a.mRadius, SIZE)
-			.add(" blocks around you, afflicting them with ")
-			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(" slowness for ")
-			.addDuration(a -> a.mDuration, DURATION_TICKS)
-			.add(" seconds, and extinguishing them if they're on fire. Slowness is reduced by ")
-			.addPercent(ELITE_SLOW_MULTIPLIER_REDUCTION)
-			.add(" on elites and bosses, and all players in the nova are also extinguished.")
-			.addCooldown(COOLDOWN_TICKS_1, a -> !a.isEnhanced());
+			.addDashedLine()
+			.addLine("Deal *Ice* damage and slow all nearby mobs.").styles(Mage.ICE_COLOR)
+			.addLine("Elites and Bosses receive -%p less slowness.")
+				.statValues(stat(ELITE_SLOW_MULTIPLIER_REDUCTION))
+			.addLine()
+			.addLine("Mobs and players on fire are extinguished.")
+			.addLine()
+			.addStat("Damage: %d1e (s)")
+				.statValues(stat(a -> a.mBaseDamage, DAMAGE_1))
+			.addStat("Normal Effect: %p1 Slowness for %t")
+				.statValues(stat(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_1), stat(a -> a.mDuration, DURATION_TICKS))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, SIZE))
+			.addStat("Cooldown: %t1e")
+				.statValues(cooldown(COOLDOWN_TICKS_1))
+			.addDashedLine();
 	}
 
 	private static Description<FrostNova> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mBaseDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" and base slowness is increased to ")
-			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(".")
-			.addCooldown(COOLDOWN_TICKS_2, a -> !a.isEnhanced());
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Frost Nova*'s damage and").styles(UNDERLINED)
+			.addLine("slowness, and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Damage: %d1e -> %d2e (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mBaseDamage, DAMAGE_2))
+			.addStatComparison("Effect: %p1 -> %p2 Slowness")
+				.statValues(stat(SLOW_MULTIPLIER_1), stat(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2))
+			.addStatComparison("Cooldown: %t1e -> %t2e")
+				.statValues(cooldown(COOLDOWN_TICKS_1), cooldown(COOLDOWN_TICKS_2))
+			.addDashedLine();
 	}
 
 	private static Description<FrostNova> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased by ")
-			.addPercent(ENHANCED_DAMAGE_MODIFIER - 1)
-			.add(". Non elites and bosses are frozen for ")
-			.addDuration(a -> a.mFrozenDuration, ENHANCED_FROZEN_DURATION)
-			.add(" seconds, having their AI and gravity removed and gain 100% Anti-Heal. Cooldown is further reduced by ")
-			.addDuration(ENHANCED_COOLDOWN_TICKS)
-			.add(" second.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Increase *Frost Nova*'s damage by").styles(UNDERLINED)
+			.addLine("an additional +%p and reduce its")
+				.statValues(stat(ENHANCED_DAMAGE_MODIFIER - 1))
+			.addLine("cooldown by %t.")
+				.statValues(stat(ENHANCED_COOLDOWN_TICKS))
+			.addLine()
+			.addLine("Mobs hit are temporarily *Frozen*").styles(Frozen.FROZEN_COLOR)
+			.addLine("and are afflicted with anti-heal.")
+			.addLine("(Elites/Bosses aren't frozen)")
+			.addLine()
+			.addStatComparison("Damage: %d1e -> %d3 (s)")
+				.statValues(perLevel(DAMAGE_1, DAMAGE_2), perLevel(a -> a.mLevelDamage, DAMAGE_1 * ENHANCED_DAMAGE_MODIFIER, DAMAGE_2 * ENHANCED_DAMAGE_MODIFIER))
+			.addStat("Effect: Frozen for %t")
+				.statValues(stat(a -> a.mFrozenDuration, ENHANCED_FROZEN_DURATION))
+			.addStat("Effect: -100% Healing for %t")
+				.statValues(stat(a -> a.mFrozenDuration, ENHANCED_FROZEN_DURATION))
+			.addStatComparison("Cooldown: %t1e -> %t3")
+				.statValues(perLevel(COOLDOWN_TICKS_1, COOLDOWN_TICKS_2), perLevel(a -> a.getCharmCooldown(a.isLevelOne() ? COOLDOWN_TICKS_1 - ENHANCED_COOLDOWN_TICKS : COOLDOWN_TICKS_2 - ENHANCED_COOLDOWN_TICKS), COOLDOWN_TICKS_1 - ENHANCED_COOLDOWN_TICKS, COOLDOWN_TICKS_2 - ENHANCED_COOLDOWN_TICKS))
+			.addDashedLine();
 	}
 
 }

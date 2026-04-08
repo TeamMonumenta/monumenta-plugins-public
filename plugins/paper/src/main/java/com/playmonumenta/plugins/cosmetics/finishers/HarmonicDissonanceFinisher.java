@@ -41,6 +41,7 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 		Player mPlayer;
 		int mTicks = 0;
 		LocalDateTime mExpiryTime = DateUtils.trueUtcDateTime().plusSeconds(EXPIRY_SECONDS);
+		List<Location> mTopLocations = new ArrayList<>();
 
 		public PlayingHarmonicDissonance(Player p, Entity killedMob, Location loc) {
 			mPlayer = p;
@@ -57,6 +58,7 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 		@Override
 		public void registerKill(Entity killedMob, Location loc) {
 			mExpiryTime = DateUtils.trueUtcDateTime().plusSeconds(EXPIRY_SECONDS);
+
 			List<String> recentlyKilled = mMobsKilled.computeIfAbsent(playerUuid(), k -> new ArrayList<>());
 			String entityId = killedMob.getType().key().toString();
 			StringBuilder killId = new StringBuilder(entityId);
@@ -70,6 +72,19 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 			while (recentlyKilled.size() > MAX_TRACKED_KILLS) {
 				recentlyKilled.remove(0);
 			}
+
+			World world = loc.getWorld();
+			mTopLocations.add(getEntityTopLocation(killedMob));
+			while (mTopLocations.size() > MAX_NOTES) {
+				mTopLocations.remove(0);
+			}
+			mTopLocations.removeIf(testLoc -> {
+				if (!world.equals(testLoc.getWorld())) {
+					return true;
+				}
+				return loc.distanceSquared(testLoc) >= 10000;
+			});
+
 			if (mTicks >= MAX_TRACKED_KILLS) {
 				mTicks = 0;
 			}
@@ -131,7 +146,8 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 			float volume = isDissonant ? 1.0f : 0.4f;
 			World world = mPlayer.getWorld();
 			Particle particle = isDissonant ? Particle.VILLAGER_ANGRY : Particle.VILLAGER_HAPPY;
-			Location particleLoc = mPlayer.getEyeLocation().add(0.0, isDissonant ? 0.4 : 0.6, 0.0);
+			List<Location> particleLocations = new ArrayList<>(mTopLocations);
+			particleLocations.add(getEntityTopLocation(mPlayer).add(0.0, isDissonant ? 0.2 : 0.4, 0.0));
 
 			float prevPitchBend = 1.0f;
 			int noteNum = 0;
@@ -154,12 +170,19 @@ public class HarmonicDissonanceFinisher implements EliteFinisher {
 				for (int playTimes = 0; playTimes < 3; playTimes++) {
 					world.playSound(sound, mPlayer);
 				}
-				world.spawnParticle(particle, particleLoc, 1);
+				for (Location particleLoc : particleLocations) {
+					world.spawnParticle(particle, particleLoc, 1);
+				}
 				noteNum++;
 				if (noteNum >= maxNotes) {
 					break;
 				}
 			}
+		}
+
+		public Location getEntityTopLocation(Entity entity) {
+			return entity.getLocation()
+				.clone().add(0, entity.getHeight(), 0);
 		}
 	}
 

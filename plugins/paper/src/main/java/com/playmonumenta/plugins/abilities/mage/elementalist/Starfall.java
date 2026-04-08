@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.StarfallCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -26,6 +27,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Starfall extends Ability {
 	public static final String NAME = "Starfall";
@@ -139,24 +144,31 @@ public class Starfall extends Ability {
 	}
 
 	private static Description<Starfall> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to mark where you're looking, up to ")
-			.add(a -> a.mDistance, DISTANCE)
-			.add(" blocks away. You summon a falling meteor above the mark that lands strongly, dealing ")
-			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" fire magic damage to all enemies within ")
-			.add(a -> a.mRadius, SIZE)
-			.add(" blocks around it, setting them on fire for ")
-			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
-			.add("s , and knocking them away.")
-			.addCooldown(COOLDOWN_TICKS);
+			.addDashedLine()
+			.addLine("Call down a falling meteor that explodes")
+			.addLine("upon landing, dealing *Fire* damage,").styles(Mage.FIRE_COLOR)
+			.addLine("igniting mobs, and knocking them away.")
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mLevelDamage, DAMAGE_1))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mFireDuration, FIRE_TICKS))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, SIZE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN_TICKS))
+			.addDashedLine();
 	}
 
 	private static Description<Starfall> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Starfall*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mLevelDamage, DAMAGE_2))
+			.addDashedLine();
 	}
 }

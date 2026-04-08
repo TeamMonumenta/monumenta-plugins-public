@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.tenebrist.HauntingShadesCS;
@@ -21,6 +21,8 @@ import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -31,6 +33,9 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class HauntingShades extends Ability implements AbilityWithDuration {
 
@@ -53,6 +58,8 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 	public static final String CHARM_DURATION = "Haunting Shades Duration";
 	public static final String CHARM_VULN = "Haunting Shades Vulnerability Modifier";
 	public static final String CHARM_DAMAGE = "Haunting Shades Damage Modifier";
+
+	public static final Style SHADE_COLOR = Style.style(TextColor.color(0x2DA7B3));
 
 	public static final AbilityInfo<HauntingShades> INFO =
 		new AbilityInfo<>(HauntingShades.class, "Haunting Shades", HauntingShades::new)
@@ -205,26 +212,33 @@ public class HauntingShades extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<HauntingShades> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to conjure a Shade which lasts ")
-			.addDuration(a -> a.mMaxDuration, SHADES_DURATION)
-			.add(" seconds at the target block or mob location. Mobs within ")
-			.add(a -> a.mRadius, AOE_RANGE)
-			.add(" blocks of a Shade are afflicted with ")
-			.addPercent(a -> a.mVuln, VULN)
-			.add(" vulnerability.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Summon a *Shade* that inflicts nearby").styles(SHADE_COLOR)
+			.addLine("mobs with vulnerability.")
+			.addLine()
+			.addStat("Effect: %p Vulnerability")
+				.statValues(stat(a -> a.mVuln, VULN))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, AOE_RANGE))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mMaxDuration, SHADES_DURATION))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<HauntingShades> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Players within ")
-			.add(a -> a.mRadius, AOE_RANGE)
-			.add(" blocks of the Shade are given ")
-			.addPercent(a -> a.mStrength, EFFECT_LEVEL)
-			.add(" strength and heal ")
-			.addPercent(a -> a.mHealing, HEAL_PERCENT)
-			.add(" of their max health each second.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Players near the *Shade* deal increased").styles(SHADE_COLOR)
+			.addLine("damage and are healed while nearby.")
+			.addLine()
+			.addStat("Effect: +%p Damage")
+				.statValues(stat(a -> a.mStrength, EFFECT_LEVEL))
+			.addStat("Healing: %p HP every 1s")
+				.statValues(stat(a -> a.mHealing, HEAL_PERCENT))
+			.addDashedLine();
 	}
 }

@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.utils.AbsorptionUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
 import com.playmonumenta.plugins.utils.PotionUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.StringUtils;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -71,8 +70,7 @@ public class BottledSunlight extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getEyeLocation();
 		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.BOTTLED_SUNLIGHT_BOTTLE_VELOCITY.mEffectName, BOTTLE_VELOCITY);
-		Item bottle = AbilityUtils.spawnAbilityItem(world, loc, Material.HONEY_BOTTLE, "Bottled Sunlight", false, velocity, true, true);
-		ScoreboardUtils.addEntityToTeam(bottle, "GlowingYellow", NamedTextColor.YELLOW);
+		Item bottle = AbilityUtils.spawnAbilityItem(world, loc, Material.HONEY_BOTTLE, "Bottled Sunlight", false, velocity, true, true, NamedTextColor.YELLOW);
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
 
 		putOnCooldown();

@@ -17,7 +17,6 @@ import com.playmonumenta.plugins.managers.GlowingManager;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
-import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.List;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -84,8 +83,7 @@ public class ChaosDagger extends DepthsAbility {
 		World world = mPlayer.getWorld();
 		Location loc = mPlayer.getEyeLocation();
 		double velocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CharmEffects.CHAOS_DAGGER_VELOCITY.mEffectName, VELOCITY);
-		Item dagger = AbilityUtils.spawnAbilityItem(world, loc, Material.NETHERITE_SWORD, "Chaos Dagger", false, velocity, true, true);
-		ScoreboardUtils.addEntityToTeam(dagger, "ChaosDagger", NamedTextColor.DARK_PURPLE);
+		Item dagger = AbilityUtils.spawnAbilityItem(world, loc, Material.NETHERITE_SWORD, "Chaos Dagger", false, velocity, true, true, NamedTextColor.DARK_PURPLE);
 
 		world.playSound(loc, Sound.ENTITY_WARDEN_HEARTBEAT, SoundCategory.PLAYERS, 2.0f, 2.0f);
 		world.playSound(loc, Sound.ENTITY_WITCH_THROW, SoundCategory.PLAYERS, 1.0f, 0.1f);

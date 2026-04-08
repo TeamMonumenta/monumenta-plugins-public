@@ -21,6 +21,8 @@ import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.depths.DepthsCommand;
 import com.playmonumenta.plugins.depths.DepthsListener;
 import com.playmonumenta.plugins.depths.DepthsManager;
+import com.playmonumenta.plugins.depths.DepthsSkillsAPI;
+import com.playmonumenta.plugins.depths.DepthsUtils;
 import com.playmonumenta.plugins.depths.charmfactory.CharmEffects;
 import com.playmonumenta.plugins.depths.guis.DepthsGUICommands;
 import com.playmonumenta.plugins.discoveries.DiscoveryManager;
@@ -212,7 +214,9 @@ public class Plugin extends JavaPlugin {
 	public PlayerListener mPlayerListener;
 	public GrapplingListener mGrapplingListener;
 	public @Nullable AuditListener mAuditListener = null;
-	public HuntsManager mHuntsManager;	private @Nullable CustomLogger mLogger = null;
+	public HuntsManager mHuntsManager;
+	public BalanceModeManager mBalanceModeManager;
+	private @Nullable CustomLogger mLogger = null;
 	public @Nullable ProtocolLibIntegration mProtocolLibIntegration = null;
 
 	// INSTANCE is set if the plugin is properly enabled
@@ -244,6 +248,7 @@ public class Plugin extends JavaPlugin {
 		AbsorptionCommand.register();
 		AdminNotify.register();
 		AttributeModifierCommand.register();
+		AuditLogCommand.register();
 		BlockCommand.register();
 		BlueStrikeDaggerCraftingBoss.register();
 		BoatUtilsCommand.register();
@@ -294,6 +299,7 @@ public class Plugin extends JavaPlugin {
 		NameMCVerify.register(this);
 		if (!IS_PLAY_SERVER) {
 			NodePlanner.registerCommands();
+			BalanceModeManager.register();
 		}
 		POICommands.register();
 		PointToLocCommand.register(this);
@@ -330,6 +336,7 @@ public class Plugin extends JavaPlugin {
 		SkillDescription.register(this);
 		SkillSummary.register(this);
 		ShardSorterCommand.register();
+		TargetedLightning.register();
 		SimulateLoot.register(this);
 		SpawnerCountCommand.register();
 		Spawn.register();
@@ -371,6 +378,7 @@ public class Plugin extends JavaPlugin {
 		CloseInventoryCommand.register();
 		HuntsCommand.register(this);
 		FunctionCooldownCommand.register();
+		RotateCommand.register();
 
 		try {
 			mHttpManager = new HttpManager(this);
@@ -470,6 +478,7 @@ public class Plugin extends JavaPlugin {
 		mPlayerListener = new PlayerListener(this);
 		mGrapplingListener = new GrapplingListener();
 		mHuntsManager = new HuntsManager(this);
+		mBalanceModeManager = new BalanceModeManager();
 
 		new ClientModHandler(this);
 		mCharmManager = CharmManager.getInstance();
@@ -609,7 +618,7 @@ public class Plugin extends JavaPlugin {
 		manager.registerEvents(MailMan.getInstance(), this);
 		manager.registerEvents(new GuiListener(), this);
 		manager.registerEvents(mHuntsManager, this);
-		PlayerTitleManager.start();
+		PlayerTitleManager.getInstance().onEnable(this, manager);
 
 		if (ServerProperties.getDepthsEnabled()) {
 			manager.registerEvents(new DepthsListener(), this);
@@ -638,8 +647,7 @@ public class Plugin extends JavaPlugin {
 			manager.registerEvents(new IndigoListener(), this);
 		}
 
-		if (ServerProperties.getShardName().contains("rush")
-			|| ServerProperties.getShardName().startsWith("dev")) {
+		if (ServerProperties.getShardName().contains("rush")) {
 			manager.registerEvents(new RushManager(), this);
 		}
 
@@ -804,6 +812,21 @@ public class Plugin extends JavaPlugin {
 			getLogger().warning("Failed to export zenith charm effects.");
 		}
 
+		if (ServerProperties.getShardName().contains("valley") || ServerProperties.getShardName().contains("dev")) {
+			try {
+				String skillExportPath = getDataFolder() + File.separator + "exported_depths_skills.json";
+				FileUtils.writeJson(skillExportPath, DepthsSkillsAPI.dumpFullJson());
+				getLogger().info("Depths skills API written successfully.");
+			} catch (Exception e) {
+				// Failed to export skills to json, non-critical error.
+				getLogger().warning("Failed to export depths skills.");
+			} finally {
+				// the API generator sets this override to generate descriptions for skills that differ between dd and cz
+				// regardless of whether it throws an exception, reset the override so it determines the type from shard name again
+				DepthsUtils.setDepthsContentOverride(null);
+			}
+		}
+
 		/* If this is the depths shard, enable depths manager */
 		if (ServerProperties.getDepthsEnabled()) {
 			new DepthsManager(this, getLogger(), getDataFolder() + File.separator + "depths");
@@ -851,6 +874,7 @@ public class Plugin extends JavaPlugin {
 		mBossManager.unloadAll(true);
 		MonumentaNetworkRelayIntegration.disable();
 		MetadataUtils.removeAllMetadata(this);
+		PlayerTitleManager.getInstance().onDisable();
 
 		// Log any async threads that haven't finished yet; these need to be handled before this point!
 		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {

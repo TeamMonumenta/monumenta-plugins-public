@@ -57,6 +57,10 @@ public class SpellProsecutorJudgementChain extends Spell {
 				this.cancel();
 			}
 
+			if (EntityUtils.shouldPauseSpells(mBoss)) {
+				return;
+			}
+
 			if (mT % mParams.PULL_FREQUENCY == 0) {
 				List.copyOf(mTargets).forEach(livingEntity -> {
 					final Location halfHeightLocBoss = LocationUtils.getHalfHeightLocation(mBoss);

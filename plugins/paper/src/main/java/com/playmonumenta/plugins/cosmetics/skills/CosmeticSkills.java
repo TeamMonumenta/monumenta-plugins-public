@@ -9,9 +9,9 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneAmalgamCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneArtilleryCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneBezoarCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneElixirCS;
-import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneOdorCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneTinctureCS;
+import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcaneVolatileReactionCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.GruesomeEchoesCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.LiferootTonicCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.SunriseBrewCS;
@@ -24,6 +24,7 @@ import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneEnha
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneScorchedEarthCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.ArcaneTabooCS;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger.PrestigiousEsotericCS;
+import com.playmonumenta.plugins.cosmetics.skills.cleric.AnathemaCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.AwakeningCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodbathCS;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.BloodyRetaliationCS;
@@ -156,11 +157,11 @@ public class CosmeticSkills {
 		ArcaneTransmutationCS::new,
 		ArcaneBezoarCS::new,
 		ArcaneAmalgamCS::new,
-		ArcaneOdorCS::new,
 		ArcaneTabooCS::new,
 		ArcaneArtilleryCS::new,
 		ArcaneElixirCS::new,
 		ArcaneEnhancementsCS::new,
+		ArcaneVolatileReactionCS::new,
 
 		//Cleric
 		DarkPunishmentCS::new,
@@ -179,6 +180,7 @@ public class CosmeticSkills {
 		PurgingPyreCS::new,
 		ContortingBoltCS::new,
 		ForceFieldCS::new,
+		AnathemaCS::new,
 		RipplingBeamCS::new,
 		HypnoticChantCS::new,
 		ImpalingDistortionCS::new,

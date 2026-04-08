@@ -11,7 +11,6 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.CosmicMoonblade;
 import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
-import com.playmonumenta.plugins.abilities.warrior.berserker.MeteorSlam;
 import org.jetbrains.annotations.Nullable;
 
 /*
@@ -77,6 +76,7 @@ public enum ClassAbility {
 	ILLUMINATE_DOT("Illuminate DoT"),
 	TOUCH_OF_RADIANCE("Touch of Radiance"),
 	HEAVENLY_BOON("Heavenly Boon"),
+	CRUSADE("Crusade"),
 
 	// Hierophant
 	ETHEREAL_ASCENSION("Ethereal Ascension"),
@@ -113,6 +113,7 @@ public enum ClassAbility {
 	AMPLIFYING("Amplifying Hex"),
 	CHOLERIC_FLAMES("Choleric Flames"),
 	CURSED_WOUND("Cursed Wound"),
+	CURSED_WOUND_DOT("Cursed Wound Damage Over Time"), // Separates the base DoT and enhancement burst
 	PHLEGMATIC_RESOLVE("Phlegmatic Resolve"),
 	GRASPING_CLAWS("Grasping Claws"),
 	MELANCHOLIC_LAMENT("Melancholic Lament"),
@@ -143,9 +144,10 @@ public enum ClassAbility {
 	TOUGHNESS("Toughness"),
 
 	// Berserker
-	METEOR_SLAM(MeteorSlam.NAME),
+	METEOR_SLAM("Meteor Slam"),
 	RAMPAGE("Rampage"),
 	GLORIOUS_BATTLE("Glorious Battle"),
+	BLOODLUST("Bloodlust"),
 
 	// Guardian
 	BODYGUARD("Bodyguard"),
@@ -155,7 +157,6 @@ public enum ClassAbility {
 	// [Alchemist]
 	ALCHEMIST_POTION("Alchemist Potion"),
 	ALCHEMICAL_ARTILLERY("Alchemical Artillery"),
-	ALCHEMICAL_ARTILLERY_AFTERSHOCK("Alchemical Artillery Aftershock"),
 	BEZOAR("Bezoar"),
 	BRUTAL_ALCHEMY("Brutal Alchemy"),
 	ENERGIZING_ELIXIR("Energizing Elixir"),
@@ -163,6 +164,8 @@ public enum ClassAbility {
 	IRON_TINCTURE("Iron Tincture"),
 	UNSTABLE_AMALGAM("Unstable Amalgam"),
 	EMPOWERING_ODOR("Empowering Odor"),
+	VOLATILE_REACTION("Volatile Reaction"),
+	VOLATILE_REACTION_DOT("Volatile Reaction DoT"),
 
 	// Apothecary
 	PANACEA("Panacea"),
@@ -181,17 +184,18 @@ public enum ClassAbility {
 	INTERCONNECTED_HAVOC("Interconnected Havoc"),
 	CHAIN_LIGHTNING("Chain Lightning"),
 	LIGHTNING_TOTEM("Lightning Totem"),
-	CRYSTALLINE_COMBOS("Crystalline Combos"),
+	IGNITION_DRIVE("Ignition Drive"),
+	SPIRITUALISM("Spiritualism"),
 	TOTEMIC_PROJECTION("Totemic Projection"),
 
 	// Soothsayer
-	CHAIN_HEALING_WAVE("Chain Healing Wave"),
-	SANCTUARY("Sanctuary"),
+	TOTEMIC_CONSECRATION("Totemic Consecration"),
+	SPIRITUAL_COMBOS("Spiritual Combos"),
 	WHIRLWIND_TOTEM("Whirlwind Totem"),
 
 	// Hexbreaker
 	DECAYED_TOTEM("Decayed Totem"),
-	DESECRATING_SHOT("Desecrating Shot"),
+	SPIRITCATCHER_ORBS("Spiritcatcher Orbs"),
 	DEVASTATION("Devastation"),
 
 	// [DEPTHS ABILITIES]
@@ -278,7 +282,8 @@ public enum ClassAbility {
 	// Fake class abilities for some enchantments
 	// Used to trigger other events
 	ERUPTION("Eruption", true),
-	QUAKE("Quake", true),
+	QUAKE_MELEE("Quake", true),
+	QUAKE_PROJ("Quake", true),
 	SWEEPING_EDGE("Sweeping Edge", true),
 	ARCANE_THRUST("Arcane Thrust", true),
 	EXPLOSIVE("Explosive", true),
@@ -286,7 +291,8 @@ public enum ClassAbility {
 	REVERB("Reverb", true),
 	TRIVIUM("Trivium", true),
 	REFLECTION("Reflection", true),
-	BLEEDING("Bleeding", true);
+	BLEEDING("Bleeding", true),
+	IMPACT("Impact", true);
 
 	private final String mName;
 	private final boolean mFake;

@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.WindBombCS;
@@ -47,6 +47,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class WindBomb extends Ability {
 	private static final int DURATION = Constants.TICKS_PER_SECOND * 4;
@@ -272,40 +276,65 @@ public class WindBomb extends Ability {
 	}
 
 	private static Description<WindBomb> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to throw a projectile that, upon recast, or contact with the ground or an enemy, deals ")
-			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_1, false, Ability::isLevelOne)
-			.add(" of your projectile damage to mobs within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks and launches them into the air, giving them ")
-			.addPercent(a -> a.mWeaknessPotency, WEAKEN_EFFECT)
-			.add(" weakness, ")
-			.addPercent(a -> a.mSlownessPotency, SLOW_EFFECT)
-			.add(" slowness, and Slow Falling for ")
-			.addDuration(a -> a.mEffectDuration, DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN_1, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Throw a projectile that deals damage")
+			.addLine("and launches mobs up into the air,")
+			.addLine("inflicting slow falling, slowness,")
+			.addLine("and weakness.")
+			.addLine()
+			.addLine("Recast to explode the projectile early.")
+			.addLine()
+			.addStat("Damage: %p1 (p) (of weapon damage)")
+				.statValues(stat(a -> a.mDamageFraction, DAMAGE_FRACTION_1))
+			.addStat("Effect: Slow Falling for %t")
+				.statValues(stat(a -> a.mEffectDuration, DURATION))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlownessPotency, SLOW_EFFECT), stat(a -> a.mEffectDuration, DURATION))
+			.addStat("Effect: %p Weakness for %t")
+				.statValues(stat(a -> a.mWeaknessPotency, WEAKEN_EFFECT), stat(a -> a.mEffectDuration, DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<WindBomb> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage is increased to ")
-			.addPercent(a -> a.mDamageFraction, DAMAGE_FRACTION_2, false, Ability::isLevelTwo)
-			.add(" of your projectile damage. Additionally, a hit dealt to an airborne enemy deals ")
-			.addPercent(a -> a.mMidairDamageMult, MIDAIR_DAMAGE_BONUS)
-			.add(" more damage but the bonus damage can only be applied to the same enemy again if it has been hit by a Wind Bomb.")
-			.addCooldown(COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Wind Bomb*'s damage and reduce").styles(UNDERLINED)
+			.addLine("its cooldown.")
+			.addLine()
+			.addStatComparison("Damage: %p1 -> %p2 (p) (of weapon damage)")
+				.statValues(stat(DAMAGE_FRACTION_1), stat(a -> a.mDamageFraction, DAMAGE_FRACTION_2))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(COOLDOWN_1), cooldown(COOLDOWN_2))
+			.addLine()
+			.addLine("You deal increased damage on your first hit")
+			.addLine("against airborne mobs. Hitting a mob with")
+			.addLine("*Wind Bomb* refreshes this effect.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Damage Boost: +%p (p)")
+				.statValues(stat(a -> a.mMidairDamageMult, MIDAIR_DAMAGE_BONUS))
+			.addDashedLine();
 	}
 
 	private static Description<WindBomb> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Your Wind Bomb no longer launches enemies, instead stunning them for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" second. On detonation, generate a vortex that pulls mobs within ")
-			.add(a -> a.mEnhancePullRadius, PULL_RADIUS)
-			.add(" blocks toward the center for ")
-			.addDuration(a -> a.mEnhancePullDuration, PULL_DURATION)
-			.add(" seconds. The vortex applies all the effects of the unenhanced Wind Bomb, including airborne damage.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Wind Bomb* now stuns mobs on impact").styles(UNDERLINED)
+			.addLine("instead of launching them upwards.")
+			.addLine()
+			.addLine("*Wind Bomb* creates a vortex that").styles(UNDERLINED)
+			.addLine("pulls mobs towards its center and")
+			.addLine("applies its effects.")
+			.addLine()
+			.addStat("Vortex Radius: %r")
+				.statValues(stat(a -> a.mEnhancePullRadius, PULL_RADIUS))
+			.addStat("Vortex Duration: %t")
+				.statValues(stat(a -> a.mEnhancePullDuration, PULL_DURATION))
+			.addDashedLine();
 	}
 }

@@ -133,6 +133,7 @@ public class SpellLingeringScar extends Spell {
 				if (EntityUtils.shouldCancelSpells(mBoss)) {
 					this.cancel();
 				}
+
 				PlayerUtils.playersInRange(loc, radius * 2, true, false).forEach(player -> {
 					if (blockLocations.stream().anyMatch(locTest -> locTest.distance(player.getLocation()) < 1)) {
 						DamageUtils.damage(mBoss, player, DamageEvent.DamageType.MAGIC, DAMAGE);

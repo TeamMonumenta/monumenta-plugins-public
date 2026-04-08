@@ -7,8 +7,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.elementalist.BlizzardCS;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -29,6 +30,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Blizzard extends Ability {
 	public static final String NAME = "Blizzard";
@@ -133,28 +137,41 @@ public class Blizzard extends Ability {
 	}
 
 	private static Description<Blizzard> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to create a storm of ice and snow that follows the player, dealing ")
-			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" ice magic damage every second to all enemies within ")
-			.add(a -> a.mLevelSize, SIZE_1, false, Ability::isLevelOne)
-			.add(" blocks of you. The blizzard lasts for ")
-			.addDuration(a -> a.mDuration, DURATION_TICKS)
-			.add(" seconds, and chills enemies within it, slowing them by ")
-			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_1, false, Ability::isLevelOne)
-			.add(". Players in the blizzard are extinguished if they are on fire. This ability does not interact with Spellshock.")
-			.addCooldown(COOLDOWN_TICKS);
+			.addDashedLine()
+			.addLine("Create a blizzard around you that deals")
+			.addLine("*Ice* damage to nearby mobs and slows them.").styles(Mage.ICE_COLOR)
+			.addLine()
+			.addLine("Players inside the blizzard are extinguished.")
+			.addLine()
+			.addLine("*Blizzard* does not interact with *Spellshock*.").styles(UNDERLINED, UNDERLINED)
+			.addLine()
+			.addStat("Damage: %d1 (s) every %t")
+				.statValues(stat(a -> a.mLevelDamage, DAMAGE_1), stat(a -> a.mTickDelay, DAMAGE_INTERVAL))
+			.addStat("Effect: %p1 Slowness for %t")
+				.statValues(stat(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_1), stat(SLOW_TICKS))
+			.addStat("Radius: %r1")
+				.statValues(stat(a -> a.mLevelSize, SIZE_1))
+			.addStat("Duration: %t")
+				.statValues(stat(a -> a.mDuration, DURATION_TICKS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN_TICKS))
+			.addDashedLine();
 	}
 
 	private static Description<Blizzard> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(", aura size is increased to ")
-			.add(a -> a.mLevelSize, SIZE_2, false, Ability::isLevelTwo)
-			.add(" blocks, and slowness is increased to ")
-			.addPercent(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Blizzard*'s damage,").styles(UNDERLINED)
+			.addLine("slowness, and radius.")
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mLevelDamage, DAMAGE_2))
+			.addStatComparison("Effect: %p1 -> %p2 Slowness")
+				.statValues(stat(SLOW_MULTIPLIER_1), stat(a -> a.mLevelSlowMultiplier, SLOW_MULTIPLIER_2))
+			.addStatComparison("Radius: %r1 -> %r2")
+				.statValues(stat(SIZE_1), stat(a -> a.mLevelSize, SIZE_2))
+			.addDashedLine();
 	}
 }

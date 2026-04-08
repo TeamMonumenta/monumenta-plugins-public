@@ -13,6 +13,8 @@ import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import dev.jorel.commandapi.arguments.StringArgument;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -113,6 +115,20 @@ public class HuntsCommand {
 					if (loc != null) {
 						player.teleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND);
 					}
+				}
+			}).register();
+
+		new CommandAPICommand(COMMAND)
+			.withPermission(PERM)
+			.withArguments(new LiteralArgument("telllasthunt"))
+			.withArguments(playerArg)
+			.executes((commandSender, args) -> {
+				Player player = args.getByArgument(playerArg);
+				if (player != null) {
+					player.sendMessage(Component.text("[Tiinah] ", NamedTextColor.GOLD)
+							.append(Component.text("The last time we hunted one of the beasts was ", NamedTextColor.WHITE))
+							.append(Component.text(plugin.mHuntsManager.getMinutesSinceLastHunt() + " minutes ", NamedTextColor.GREEN))
+							.append(Component.text("ago.", NamedTextColor.WHITE)));
 				}
 			}).register();
 	}

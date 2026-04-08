@@ -4,17 +4,20 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.Warlock;
 import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.utils.AbilityUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDeathEvent;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Culling extends Ability {
 	private static final int PASSIVE_DURATION = TICKS_PER_SECOND * 6;
@@ -27,7 +30,8 @@ public class Culling extends Ability {
 	public static final AbilityInfo<Culling> INFO =
 		new AbilityInfo<>(Culling.class, "Culling", Culling::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Warlock.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Warlock.CLASS_ID)
+			.displayItem(Material.ANCIENT_DEBRIS);
 
 	private final double mResistancePotency;
 	private final int mResistanceDuration;
@@ -46,12 +50,10 @@ public class Culling extends Ability {
 		}
 	}
 
-	private static Description<Culling> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Killing an enemy while holding a scythe grants ")
-			.addPercent(a -> a.mResistancePotency, WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT)
-			.add(" damage reduction for ")
-			.addDuration(a -> a.mResistanceDuration, PASSIVE_DURATION)
-			.add(" seconds.");
+	public static Description<Culling> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("Killing a mob while holding a scythe")
+			.addLine("grants you +%p *Resistance* for %t.").styles(WHITE)
+				.statValues(stat(a -> a.mResistancePotency, WARLOCK_PASSIVE_DAMAGE_REDUCTION_PERCENT), stat(a -> a.mResistanceDuration, PASSIVE_DURATION));
 	}
 }

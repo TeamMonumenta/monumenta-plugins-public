@@ -29,8 +29,6 @@ public class SpellActions {
 	public static SpellPlayerAction getTooHighAction(LivingEntity boss, Location center) {
 		double arenaSurfaceY = center.getY(); // This should be 52.0 based on the armour stand placement
 		return new SpellPlayerAction(boss, 50, (player, tick) -> {
-			double playerY = player.getLocation().getY();
-
 			// Assume player is standing on ground/cheese pillar or a climbable block
 			int yThreshold = 2;
 
@@ -40,7 +38,7 @@ public class SpellActions {
 				yThreshold = 5;
 			}
 
-			if (tick % 10 == 0 && playerY >= arenaSurfaceY + yThreshold) {
+			if (tick % 10 == 0 && BossUtils.isTooHigh(boss, player, arenaSurfaceY, yThreshold)) {
 				damagePlayer(boss, player);
 			}
 		});

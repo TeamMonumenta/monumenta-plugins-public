@@ -43,6 +43,10 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import static com.playmonumenta.plugins.bosses.BossManager.DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE;
+import static com.playmonumenta.plugins.bosses.BossManager.DEFAULT_MAXIMUM_ENTITY_HURT_RANGE;
+import static com.playmonumenta.plugins.bosses.BossManager.DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE;
+
 
 public abstract class BossAbilityGroup {
 	public static final int PASSIVE_RUN_INTERVAL_DEFAULT = Constants.QUARTER_TICKS_PER_SECOND;
@@ -72,13 +76,13 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void changePhase(SpellManager activeSpells,
-	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
+							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction) {
 
 		changePhase(activeSpells, passiveSpells, phaseAction, 0);
 	}
 
 	public void changePhase(SpellManager activeSpells,
-	                        List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction, int spellDelay) {
+							List<Spell> passiveSpells, @Nullable Consumer<LivingEntity> phaseAction, int spellDelay) {
 		if (phaseAction != null) {
 			phaseAction.accept(mBoss);
 		}
@@ -110,42 +114,42 @@ public abstract class BossAbilityGroup {
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
-	                          @Nullable BossBarManager bossBar) {
+							  @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpell, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this, Spell activeSpell, int detectionRange,
-	                          @Nullable BossBarManager bossBar, long spellDelay) {
+							  @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(List.of(activeSpell), Collections.emptyList(), detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this, List<Spell> activeSpells, List<Spell> passiveSpells,
-	                          int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
+							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(new SpellManager(activeSpells), passiveSpells, detectionRange, bossBar, spellDelay);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-	                          @Nullable BossBarManager bossBar) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+							  @Nullable BossBarManager bossBar) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, 100);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-	                          @Nullable BossBarManager bossBar, long spellDelay) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+							  @Nullable BossBarManager bossBar, long spellDelay) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, PASSIVE_RUN_INTERVAL_DEFAULT);
 	}
 
 	public void constructBoss(BossAbilityGroup this,
-	                          SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
-	                          @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
+							  SpellManager activeSpells, List<Spell> passiveSpells, int detectionRange,
+							  @Nullable BossBarManager bossBar, long spellDelay, long passiveIntervalTicks) {
 		constructBoss(activeSpells, passiveSpells, detectionRange, bossBar, spellDelay, passiveIntervalTicks, false);
 	}
 
 	/* If detectionRange <= 0, will always run regardless of whether players are nearby */
 	public void constructBoss(BossAbilityGroup this, SpellManager activeSpells, List<Spell> passiveSpells,
-	                          int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
-	                          long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
+							  int detectionRange, @Nullable BossBarManager bossBar, long spellDelay,
+							  long passiveIntervalTicks, boolean preventSameSpellTwiceInARow) {
 		mDetectionRange = detectionRange;
 		mBossBar = bossBar;
 		mActiveSpells = activeSpells;
@@ -205,6 +209,11 @@ public abstract class BossAbilityGroup {
 
 			@Override
 			public void run() {
+				// Don't advance the timer if the entity is staggered
+				if (EntityUtils.isStaggered(mBoss)) {
+					return;
+				}
+
 				mNextActiveTimer -= 2;
 				mMissingTicks += 2;
 
@@ -467,11 +476,44 @@ public abstract class BossAbilityGroup {
 	}
 
 	public double nearbyEntityDeathMaxRange() {
-		return 12;
+		return DEFAULT_MAXIMUM_ENTITY_DEATH_RANGE;
 	}
 
 	public boolean nearbyEntityDeathWithinRange(Location location) {
-		return location.distanceSquared(mBoss.getLocation()) <= nearbyEntityDeathMaxRange() * nearbyEntityDeathMaxRange();
+		try {
+			return location.distanceSquared(mBoss.getLocation()) <= nearbyEntityDeathMaxRange() * nearbyEntityDeathMaxRange();
+		} catch (IllegalArgumentException e) {
+			// The locations are on different worlds
+			return false;
+		}
+	}
+
+	/**
+	 * Called when nearby entity is damaged within range (default 16 blocks).
+	 * For performance reasons any boss that uses this <b>must</b> also override
+	 * <code>hasNearbyEntityHurtTrigger</code> to return true.
+	 * This method by default <bold>includes players</bold>!
+	 * If you don't want to include players, specify <code>!(event.getDamagee() instanceof Player)</code>
+	 */
+	public void nearbyEntityHurt(DamageEvent event) {
+
+	}
+
+	public boolean hasNearbyEntityHurtTrigger() {
+		return false;
+	}
+
+	public double nearbyEntityHurtMaxRange() {
+		return DEFAULT_MAXIMUM_ENTITY_HURT_RANGE;
+	}
+
+	public boolean nearbyEntityHurtWithinRange(Location location) {
+		try {
+			return location.distanceSquared(mBoss.getLocation()) <= nearbyEntityHurtMaxRange() * nearbyEntityHurtMaxRange();
+		} catch (IllegalArgumentException e) {
+			// The locations are on different worlds
+			return false;
+		}
 	}
 
 	/*
@@ -499,11 +541,16 @@ public abstract class BossAbilityGroup {
 	}
 
 	public double maxPlayerDeathRange() {
-		return 75.0;
+		return DEFAULT_MAXIMUM_PLAYER_DEATH_RANGE;
 	}
 
 	public boolean deadPlayerWithinRange(Location location) {
-		return location.distanceSquared(mBoss.getLocation()) <= maxPlayerDeathRange() * maxPlayerDeathRange();
+		try {
+			return location.distanceSquared(mBoss.getLocation()) <= maxPlayerDeathRange() * maxPlayerDeathRange();
+		} catch (IllegalArgumentException e) {
+			// The locations are on different worlds
+			return false;
+		}
 	}
 
 	/*

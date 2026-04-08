@@ -148,6 +148,11 @@ public class SpellSlashAttack extends Spell {
 						this.cancel();
 						return;
 					}
+
+					if (EntityUtils.shouldPauseSpells(mBoss)) {
+						return;
+					}
+
 					if (mTicks >= mTelegraphDuration) {
 						doSlash(selectedAngle);
 						this.cancel();

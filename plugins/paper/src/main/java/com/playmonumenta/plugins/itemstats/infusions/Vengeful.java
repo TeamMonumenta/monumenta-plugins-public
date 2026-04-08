@@ -8,6 +8,7 @@ import com.playmonumenta.plugins.itemstats.Infusion;
 import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
+import java.util.EnumSet;
 import java.util.NavigableSet;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class Vengeful implements Infusion {
 
+	private static final EnumSet<DamageEvent.DamageType> AFFECTED_DAMAGE_TYPES = DamageEvent.DamageType.getAllMeleeProjectileAndMagicTypes();
 	public static final double DAMAGE_MLT_PER_LVL = 0.02;
 	private static final int DURATION = 30 * 20;
 	private static final String EFFECT_NAME = "VengefulEffect";
@@ -41,7 +43,7 @@ public class Vengeful implements Infusion {
 
 	@Override
 	public void onDamage(Plugin plugin, Player player, double value, DamageEvent event, LivingEntity enemy) {
-		if (event.getType() == DamageEvent.DamageType.TRUE) {
+		if (!AFFECTED_DAMAGE_TYPES.contains(event.getType())) {
 			return;
 		}
 		if (checkLastDamage(player, enemy)) {

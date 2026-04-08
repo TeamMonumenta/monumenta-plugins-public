@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.alchemist.harbinger;
 
+import com.playmonumenta.plugins.abilities.alchemist.harbinger.ScorchedEarth;
 import com.playmonumenta.plugins.cosmetics.skills.alchemist.ArcanePotionsCS;
 import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPLine;
@@ -47,6 +48,11 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 	}
 
 	private List<ArcanePotionsCS.Symbol> mSideSymbols = List.of();
+
+	@Override
+	public Material getFragmentMaterial() {
+		return Material.AMETHYST_BLOCK;
+	}
 
 	@Override
 	public void landEffects(Player player, Location loc, double radius, int duration) {
@@ -190,6 +196,44 @@ public class ArcaneScorchedEarthCS extends ScorchedEarthCS {
 		new PartialParticle(Particle.FLAME, loc, 5).delta(boundingBox.getWidthX() / 2, boundingBox.getHeight() / 2, boundingBox.getWidthZ() / 2).extra(0.05).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.SMOKE_NORMAL, loc, 5).delta(boundingBox.getWidthX() / 2, boundingBox.getHeight() / 2, boundingBox.getWidthZ() / 2).spawnAsPlayerActive(alchemist);
 		new PartialParticle(Particle.LAVA, loc, 2).delta(boundingBox.getWidthX() / 2, boundingBox.getHeight() / 2, boundingBox.getWidthZ() / 2).spawnAsPlayerActive(alchemist);
+	}
+
+	@Override
+	public void potionLandInZoneEffect(Location loc, Player player) {
+		loc.getWorld().playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 1f);
+	}
+
+	@Override
+	public void shrapnelLandEffect(Location loc, double radius, boolean isGruesome, Player player) {
+		loc.getWorld().playSound(loc, Sound.ENTITY_ZOMBIE_INFECT, SoundCategory.PLAYERS, 1f, 1.5f);
+		new PPCircle(Particle.ELECTRIC_SPARK, loc, radius)
+			.ringMode(true)
+			.countPerMeter(1.5)
+			.spawnAsPlayerActive(player);
+		new PPCircle(isGruesome ? Particle.SOUL_FIRE_FLAME : Particle.FLAME, loc, radius)
+			.ringMode(true)
+			.countPerMeter(1.5)
+			.directionalMode(true)
+			.delta(1, 0, 0)
+			.rotateDelta(true)
+			.extra(0.2 * (radius / ScorchedEarth.SHRAPNEL_RADIUS))
+			.spawnAsPlayerActive(player);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 0.2, 0), radius)
+			.ringMode(true)
+			.countPerMeter(1)
+			.spawnAsPlayerActive(player);
+		new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, 0.4, 0), radius)
+			.ringMode(true)
+			.countPerMeter(0.5)
+			.spawnAsPlayerActive(player);
+	}
+
+	@Override
+	public void shrapnelFlyEffect(Location loc, boolean isGruesome, Player player) {
+		new PartialParticle(Particle.ELECTRIC_SPARK, loc, 1)
+			.spawnAsPlayerActive(player);
+		new PartialParticle(Particle.ENCHANTMENT_TABLE, loc, 1)
+			.spawnAsPlayerActive(player);
 	}
 
 }

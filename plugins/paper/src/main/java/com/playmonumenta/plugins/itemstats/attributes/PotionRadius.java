@@ -16,6 +16,6 @@ public class PotionRadius implements Attribute {
 
 	@Override
 	public double getPriorityAmount() {
-		return 2;
+		return 1999;
 	}
 }

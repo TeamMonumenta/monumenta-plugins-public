@@ -32,6 +32,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.FishHook;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -74,12 +75,13 @@ public class FishingManager implements Listener {
 	private static final String ABYSSAL_LOOT_TABLE_TIER_TWO = "epic:r3/world/fishing/custom_fishing/cache_abyssal2_v2";
 	private static final String WEIGHTED_FISH_TABLE = "epic:r3/items/fishing/fish/ring_fish_greater_weighted";
 	private static final String FISH_COMBAT_PERMISSION = "monumenta.fishingcombat";
+	private static final double LUCK_OF_THE_SEA_QUALITY_INCREASE = 0.05;
 
 	public FishingManager(FishingCombatManager combatManager) {
 		mCombatManager = combatManager;
 	}
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler
 	public void onFish(PlayerFishEvent event) {
 		Player player = event.getPlayer();
 		if (event.getState() == PlayerFishEvent.State.FISHING && mPlayerMinigameMap.containsKey(player)) {
@@ -137,7 +139,7 @@ public class FishingManager implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		Player player = event.getPlayer();
 		if (!mPlayerMinigameMap.containsKey(player) && !mPlayerPrepCombatList.contains(player)) {
@@ -413,19 +415,25 @@ public class FishingManager implements Listener {
 	private void modifyAndAssessFishQuality(Player player, ItemStack fishItem, @Nullable BaitInfo baitInfo) {
 		StatTrackFishCaught.fishCaught(player);
 		int quality = ItemStatUtils.getFishQuality(fishItem);
+		int luckofthesea = player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LUCK);
 		if (quality < 5) {
 			double increaseChance = Plugin.getInstance().mEffectManager.getFishQualityIncrease(player);
 			if (baitInfo != null) {
 				increaseChance *= 1 + baitInfo.mBait.mQualityIncreaseOdds;
 			}
-			if (increaseChance > 1 && FastUtils.randomDoubleInRange(0, 1) <= increaseChance - 1) {
-				quality++;
-				new PartialParticle(Particle.ELECTRIC_SPARK, player.getEyeLocation(), 20).delta(1, 0.5, 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
-				ItemStack nextFish = getNextFish(player, ItemUtils.getPlainName(fishItem), quality);
-				if (nextFish == null) {
-					return;
+			increaseChance *= 1 + (luckofthesea * LUCK_OF_THE_SEA_QUALITY_INCREASE);
+			while (increaseChance > 1 && quality < 5) {
+				if (FastUtils.randomDoubleInRange(0, 1) <= increaseChance - 1) {
+					quality++;
+					new PartialParticle(Particle.ELECTRIC_SPARK, player.getEyeLocation(), 20).delta(1, 0.5, 1).spawnForPlayer(ParticleCategory.OWN_ACTIVE, player);
+					player.playSound(player.getLocation(), Sound.BLOCK_ENCHANTMENT_TABLE_USE, 1.0f, 2.0f);
+					ItemStack nextFish = getNextFish(player, ItemUtils.getPlainName(fishItem), quality);
+					if (nextFish == null) {
+						return;
+					}
+					fishItem.setItemMeta(nextFish.getItemMeta());
 				}
-				fishItem.setItemMeta(nextFish.getItemMeta());
+				increaseChance--;
 			}
 		}
 
@@ -459,6 +467,6 @@ public class FishingManager implements Listener {
 		return Math.random() <= baitInfo.mBait.mReplacementChance;
 	}
 
-	private record BaitInfo(Bait mBait, ItemStack mItemStack) {
+	public record BaitInfo(Bait mBait, ItemStack mItemStack) {
 	}
 }

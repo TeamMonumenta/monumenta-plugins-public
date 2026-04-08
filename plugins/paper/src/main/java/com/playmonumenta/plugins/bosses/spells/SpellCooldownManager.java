@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * <li>Intended to allow spells to manage their own cooldowns</Li>
+ * Be VERY careful NOT to memory leak with this
  */
 public class SpellCooldownManager {
 	private final int mCooldown;

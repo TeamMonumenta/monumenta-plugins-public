@@ -1,5 +1,6 @@
 package com.playmonumenta.plugins.bosses.spells;
 
+import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.FastUtils;
@@ -144,7 +145,7 @@ public class SpellBullet extends Spell {
 					this.cancel();
 					return;
 				}
-				if (EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster)) {
+				if (EntityUtils.isStunned(mCaster) || EntityUtils.isSilenced(mCaster) || EntityUtils.isStaggered(mCaster)) {
 					// Do not cancel as the spell is only ran once until players are out of range
 					return;
 				}
@@ -535,7 +536,9 @@ public class SpellBullet extends Spell {
 	}
 
 	public BlockDisplay spawnBullet(Location loc, float width, float height) {
-		return EntityUtils.spawnBlockDisplay(loc.getWorld(), loc, mBulletMaterial, width, height, true);
+		BlockDisplay display = EntityUtils.spawnBlockDisplay(loc.getWorld(), loc, mBulletMaterial, width, height, true);
+		display.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		return display;
 	}
 
 	public void checkForCollisions(BoundingBox box, double velocity, Vector dir, BlockDisplay bullet, List<Player> players, BukkitRunnable runnable, int playerHitboxSize) {

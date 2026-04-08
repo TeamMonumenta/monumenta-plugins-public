@@ -137,6 +137,10 @@ public class StarfallBoss extends BossAbilityGroup {
 
 			@Override
 			public void run() {
+				if (EntityUtils.isStaggered(mBoss)) {
+					return;
+				}
+
 				if (EntityUtils.shouldCancelSpells(mBoss)) {
 					cancel();
 					return;

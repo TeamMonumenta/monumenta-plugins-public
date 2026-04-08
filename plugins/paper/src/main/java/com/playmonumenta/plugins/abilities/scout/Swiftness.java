@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.scout.SwiftnessCS;
@@ -25,6 +25,9 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Swiftness extends Ability {
 	private static final String SPEED_SRC = "SwiftnessSpeedModifier";
@@ -152,27 +155,38 @@ public class Swiftness extends Ability {
 	}
 
 	private static Description<Swiftness> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain ")
-			.addPercent(a -> a.mSpeed, SPEED_POTENCY)
-			.add(" movement speed when you are not inside a town and a passive ")
-			.addPercent(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_1, false, Ability::isLevelOne)
-			.add(" attack speed.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Gain increased speed and attack speed.")
+			.addLine()
+			.addStat("Effect: +%p Speed")
+				.statValues(stat(a -> a.mSpeed, SPEED_POTENCY))
+			.addStat("Effect: +%p1 Attack Speed")
+				.statValues(stat(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_1))
+			.addDashedLine();
 	}
 
 	private static Description<Swiftness> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The attack speed is increased to ")
-			.addPercent(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_2, false, Ability::isLevelTwo)
-			.add(" and gain Jump Boost ")
-			.addPotionAmplifier(a -> a.mJumpBoostLevel, JUMP_BOOST_POTENCY)
-			.add(" when you are not inside a town.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Swiftness*'s attack speed and").styles(UNDERLINED)
+			.addLine("additionally gain jump boost.")
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Attack Speed")
+				.statValues(stat(ATTACK_SPEED_POTENCY_1), stat(a -> a.mAttackSpeed, ATTACK_SPEED_POTENCY_2))
+			.addStat("Effect: Jump Boost %d")
+				.statValues(stat(a -> a.mJumpBoostLevel + 1, JUMP_BOOST_POTENCY + 1))
+			.addDashedLine();
 	}
 
 	private static Description<Swiftness> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Breaking a spawner reduces the cooldown of all your skills by ")
-			.addPercent(a -> a.mEnhancementCDR, ENHANCEMENT_CDR)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Breaking a spawner reduces all of")
+			.addLine("your ability cooldowns.")
+			.addLine()
+			.addStat("Cooldown Reduction: %p")
+				.statValues(stat(a -> a.mEnhancementCDR, ENHANCEMENT_CDR))
+			.addDashedLine();
 	}
 }

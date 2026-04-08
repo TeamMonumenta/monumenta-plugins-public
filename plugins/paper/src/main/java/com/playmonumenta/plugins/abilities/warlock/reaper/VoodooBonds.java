@@ -1,12 +1,11 @@
 package com.playmonumenta.plugins.abilities.warlock.reaper;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
@@ -22,12 +21,17 @@ import com.playmonumenta.plugins.utils.LocationUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class VoodooBonds extends MultipleChargeAbility {
 
@@ -61,6 +65,9 @@ public class VoodooBonds extends MultipleChargeAbility {
 	public static final String CHARM_CURSE_DURATION = "Voodoo Bonds Curse Duration";
 	public static final String CHARM_PROTECT_DURATION = "Voodoo Bonds Protection Duration";
 	public static final String CHARM_RECEIVED_DAMAGE = "Voodoo Bonds Received Damage";
+
+	private static final Style CURSE_COLOR = Style.style(TextColor.color(0x8B3FB1));
+	private static final Style PROTECTION_COLOR = Style.style(TextColor.color(0x71BEE7));
 
 	public static final AbilityInfo<VoodooBonds> INFO =
 		new AbilityInfo<>(VoodooBonds.class, "Voodoo Bonds", VoodooBonds::new)
@@ -147,40 +154,51 @@ public class VoodooBonds extends MultipleChargeAbility {
 	}
 
 	private static Description<VoodooBonds> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to slash in a small arc and fire a pin that travels ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks. Mobs hit take ")
-			.add(a -> a.mPinDamage, PIN_DAMAGE)
-			.add(" melee damage and are cursed for ")
-			.addDuration(a -> a.mCurseDuration, CURSE_DURATION)
-			.add(" seconds. When a cursed mob takes melee, projectile, or magic damage (except from this ability), all other cursed mobs within ")
-			.add(a -> a.mCurseRadius, CURSE_RADIUS)
-			.add(" blocks take ")
-			.addPercent(a -> a.mCurseDamage, CURSE_DAMAGE_1, false, Ability::isLevelOne)
-			.add(" of the suffered damage. Critical melee hits against cursed mobs will spread it to ")
-			.add(a -> a.mCurseSpreadCount, CURSE_SPREAD_COUNT_1, false, Ability::isLevelOne)
-			.add(" other un-cursed mob within ")
-			.add(a -> a.mCurseSpreadRadius, CURSE_SPREAD_RADIUS)
-			.add(" blocks. Players hit are bonded to you instead; the next hit they take within ")
-			.addDuration(a -> a.mProtectionDuration, PROTECTION_DURATION)
-			.add(" seconds will be redirected to you based on the percentage of health that player would have lost, but cannot reduce your health below 1. Charges: ")
-			.add(a -> a.mMaxCharges, MAX_CHARGES)
-			.add(".")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Throw a pin in front of you that *Curses* mobs").styles(CURSE_COLOR)
+			.addLine("and *Protects* players it hits for %t.").styles(PROTECTION_COLOR)
+				.statValues(stat(a -> a.mCurseDuration, CURSE_DURATION))
+			.addLine()
+			.addStat("Charges: %d")
+				.statValues(stat(a -> a.mMaxCharges, MAX_CHARGES))
+			.addStat("Cooldown: %t (per charge)")
+				.statValues(cooldown(COOLDOWN))
+			.addLine()
+			.addLine("*Cursed* mobs share the damage they take").styles(CURSE_COLOR)
+			.addLine("with other nearby *Cursed* mobs.").styles(CURSE_COLOR)
+			.addLine("Critical attacks on a *Cursed* mob will spread").styles(CURSE_COLOR)
+			.addLine("the curse to %d1 other nearby mob.")
+				.statValues(stat(a -> a.mCurseSpreadCount, CURSE_SPREAD_COUNT_1))
+			.addLine()
+			.addStat("Shared Damage: %p1 of original")
+				.statValues(stat(a -> a.mCurseDamage, CURSE_DAMAGE_1))
+			.addStat("Share Radius: %r")
+				.statValues(stat(a -> a.mCurseRadius, CURSE_RADIUS))
+			.addStat("Curse Spread Radius: %r")
+				.statValues(stat(a -> a.mCurseSpreadRadius, CURSE_SPREAD_RADIUS))
+			.addLine()
+			.addLine("*Protected* players will nullify the next attack").styles(PROTECTION_COLOR)
+			.addLine("they take and redirect the damage to you.")
+			.addLine("(Damage from this cannot kill you)")
+			.addDashedLine();
 	}
 
 	private static Description<VoodooBonds> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The curse now deals ")
-			.addPercent(a -> a.mCurseDamage, CURSE_DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" of taken damage, and it spreads to ")
-			.add(a -> a.mCurseSpreadCount, CURSE_SPREAD_COUNT_2, false, Ability::isLevelTwo)
-			.add(" other mobs on critical strikes. The slash and pin deal ")
-			.add(a -> a.mPinAdditionalDamage, PIN_ADDITIONAL_DAMAGE)
-			.add(" additional damage to already-cursed mobs. Take ")
-			.addPercent(a -> a.mProtectionResist, PROTECTION_RESIST)
-			.add(" less damage when redirecting damage from other players.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase the *Curse*'s damage sharing and").styles(CURSE_COLOR)
+			.addLine("the number of mobs the curse spreads to.")
+			.addLine()
+			.addStatComparison("Shared Damage: %p1 -> %p2 of original")
+				.statValues(stat(CURSE_DAMAGE_1), stat(a -> a.mCurseDamage, CURSE_DAMAGE_2))
+			.addStatComparison("Spread Count: %d -> %d mobs")
+				.statValues(stat(CURSE_SPREAD_COUNT_1), stat(a -> a.mCurseSpreadCount, CURSE_SPREAD_COUNT_2))
+			.addLine()
+			.addLine("Take %p less damage when redirecting")
+				.statValues(stat(a -> a.mProtectionResist, PROTECTION_RESIST))
+			.addLine("damage from *Protected* players.").styles(PROTECTION_COLOR)
+			.addDashedLine();
 	}
 }

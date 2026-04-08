@@ -92,7 +92,7 @@ public class AlocAcoc extends Quarry {
 
 		List<Spell> passives = List.of(
 			mAura,
-			new PassiveCryogenesis(mBoss),
+			new PassiveCryogenesis(mBoss, mAura),
 			new SpellBlockBreak(mBoss, true, true),
 			new SpellShieldStun(6 * 20)
 		);

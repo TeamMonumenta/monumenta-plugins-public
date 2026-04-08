@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.itemstats.enums.InfusionType;
 import com.playmonumenta.plugins.listeners.PotionBarrelListener;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.AdvancementUtils;
+import com.playmonumenta.plugins.utils.BlockUtils;
 import com.playmonumenta.plugins.utils.InventoryUtils;
 import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
@@ -111,7 +112,13 @@ public class PurpleTessOverride extends BaseOverride {
 			Material material = isChest ? Material.BARREL : Material.CHEST;
 			BlockData blockData = material.createBlockData(newData -> {
 				if (newData instanceof Directional directional) {
-					directional.setFacing(block.getBlockData() instanceof Directional oldData ? oldData.getFacing() : BlockFace.NORTH);
+					BlockFace blockFace = block.getBlockData() instanceof Directional oldData ? oldData.getFacing() : BlockFace.UP;
+					if (!BlockUtils.isCardinal(blockFace)) {
+						Location testLoc = player.getLocation();
+						testLoc.setPitch(0.0f);
+						blockFace = BlockUtils.getCardinalBlockFace(testLoc.getDirection().multiply(-1));
+					}
+					directional.setFacing(blockFace);
 				}
 			});
 

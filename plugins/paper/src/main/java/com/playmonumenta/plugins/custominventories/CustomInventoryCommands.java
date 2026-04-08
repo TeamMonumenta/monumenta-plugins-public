@@ -21,6 +21,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.BooleanArgument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import java.util.ArrayList;
@@ -419,6 +420,16 @@ public class CustomInventoryCommands {
 				new EnchantopediaGui(player).open();
 			})
 			.register();
+		new CommandAPICommand("openenchantexplanations")
+			.withAliases("enchantments", "enchants")
+			.withPermission("monumenta.command.openenchantexplanations.self")
+			.withArguments(
+				new GreedyStringArgument("query")
+			)
+			.executesPlayer((player, args) -> {
+				EnchantopediaGui.enchantmentSearchCommand(player, args.getUnchecked("query"));
+			})
+			.register();
 		new CommandAPICommand("openenchantexplanationsfor")
 			.withPermission("monumenta.command.openenchantexplanations.others")
 			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
@@ -467,6 +478,16 @@ public class CustomInventoryCommands {
 			.executes((sender, args) -> {
 				Player player = args.getUnchecked("player");
 				new SpiritArcheryGUI(player).open();
+			})
+			.register();
+		new CommandAPICommand("refunddelvearrows")
+			.withPermission("monumenta.command.refunddelvearrows")
+			.withArguments(new EntitySelectorArgument.OnePlayer("player"))
+			.withArguments(new BooleanArgument("refundStack"))
+			.executes((sender, args) -> {
+				QuiverListener.refundDelveMaterials(
+					args.getUnchecked("player"),
+					args.getOrDefaultUnchecked("refundStack", false));
 			})
 			.register();
 	}

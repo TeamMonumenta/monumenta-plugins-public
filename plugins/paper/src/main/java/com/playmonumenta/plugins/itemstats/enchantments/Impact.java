@@ -1,6 +1,7 @@
 package com.playmonumenta.plugins.itemstats.enchantments;
 
 import com.playmonumenta.plugins.Plugin;
+import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.effects.HitKnockbackVulnerability;
 import com.playmonumenta.plugins.effects.ImpactVulnerability;
@@ -209,7 +210,7 @@ public class Impact implements Enchantment {
 
 		double finalDamage = originalDamage * 0.1 * level;
 
-		DamageUtils.damage(player, target, DamageEvent.DamageType.TRUE, finalDamage, null, true);
+		DamageUtils.damage(player, target, DamageEvent.DamageType.TRUE, finalDamage, ClassAbility.IMPACT, true);
 
 		World world = target.getWorld();
 		world.playSound(target.getLocation(), Sound.ENTITY_BLAZE_HURT, SoundCategory.PLAYERS, 1.5f, 1.35f);

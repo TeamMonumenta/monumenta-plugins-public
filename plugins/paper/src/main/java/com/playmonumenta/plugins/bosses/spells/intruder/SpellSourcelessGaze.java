@@ -40,9 +40,7 @@ public class SpellSourcelessGaze extends Spell {
 				}
 
 				if (mTicks >= mParameters.GAZE_DURATION) {
-					if (target != null) {
-						LibraryOfSoulsIntegration.summon(mBoss.getEyeLocation(), mParameters.SUMMON_NAME);
-					}
+					LibraryOfSoulsIntegration.summon(mBoss.getEyeLocation(), mParameters.SUMMON_NAME);
 					new PartialParticle(Particle.FLASH, mBoss.getLocation()).minimumCount(1).spawnAsBoss();
 					mBoss.remove();
 					this.cancel();

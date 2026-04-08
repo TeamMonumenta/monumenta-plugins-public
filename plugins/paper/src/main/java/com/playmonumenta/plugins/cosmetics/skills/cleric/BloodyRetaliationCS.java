@@ -69,16 +69,13 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	public void sanctApply1(World world, Player player, Location loc, LivingEntity source) {
 		world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.5f, 1.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.25f, 1.75f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 5f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 6f, 2f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.5f);
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.65f, 1.5f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.45f, 1.75f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 6f, 0.75f);
-				world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 4f, 2f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.75f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 3);
 
@@ -118,16 +115,13 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 	public void sanctApply2(World world, Player player, Location loc, LivingEntity source) {
 		world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 2f, 1.5f);
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.65f, 1.75f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 7f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 7f, 2f);
+		world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.5f);
 
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.5f, 1.5f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.25f, 1.75f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 5f, 0.5f);
-				world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 6f, 2f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.5f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 3);
 
@@ -135,9 +129,7 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 			@Override
 			public void run() {
 				world.playSound(loc, Sound.ENTITY_SHULKER_SHOOT, SoundCategory.PLAYERS, 1.65f, 1.5f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.45f, 1.75f);
-				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 6f, 0.75f);
-				world.playSound(loc, Sound.BLOCK_BELL_USE, SoundCategory.PLAYERS, 4f, 2f);
+				world.playSound(loc, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 2f, 0.75f);
 			}
 		}.runTaskLater(Plugin.getInstance(), 5);
 
@@ -217,6 +209,5 @@ public class BloodyRetaliationCS extends SanctifiedArmorCS implements GalleryCS 
 				}
 			}.runTaskLater(Plugin.getInstance(), t / 2)
 		);
-
 	}
 }

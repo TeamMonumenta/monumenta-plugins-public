@@ -16,6 +16,6 @@ public class PotionDamage implements Attribute {
 
 	@Override
 	public double getPriorityAmount() {
-		return 2;
+		return 2000;
 	}
 }

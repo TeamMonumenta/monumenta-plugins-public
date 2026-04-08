@@ -6,6 +6,8 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.chunk.ChunkFullLoadEvent;
 import com.playmonumenta.plugins.chunk.ChunkPartialUnloadEvent;
 import com.playmonumenta.plugins.commands.GraveCommand;
+import com.playmonumenta.plugins.delves.DelvesModifier;
+import com.playmonumenta.plugins.delves.DelvesUtils;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.GearChanged;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -297,6 +299,13 @@ public class GraveListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void playerDeath(PlayerDeathEvent event) {
 		Player player = event.getEntity();
+
+		if (semiSafeDeath(player)) {
+			event.setKeepInventory(true);
+			event.getDrops().clear();
+			return;
+		}
+
 		PlayerInventory inv = player.getInventory();
 
 		if (player.getHealth() > 0) {
@@ -430,5 +439,10 @@ public class GraveListener implements Listener {
 	public static boolean gravesEnabled(Player player) {
 		return !player.getScoreboardTags().contains("DisableGraves")
 			&& !ZoneUtils.hasZoneProperty(player, ZoneUtils.ZoneProperty.DISABLE_GRAVES);
+	}
+
+	// can be expanded upon for deaths that don't grave, but don't drop items on the floor (and xp is lost)
+	private static boolean semiSafeDeath(Player player) {
+		return DelvesUtils.getModifierLevel(player, DelvesModifier.MORBID) > 0;
 	}
 }

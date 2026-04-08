@@ -1,10 +1,12 @@
 package com.playmonumenta.plugins.commands;
 
+import com.playmonumenta.networkrelay.NetworkRelayAPI;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.delves.DelvePreset;
 import com.playmonumenta.plugins.delves.DelvesManager;
 import com.playmonumenta.plugins.delves.DelvesModifier;
 import com.playmonumenta.plugins.delves.DelvesUtils;
+import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.network.ClientModHandler;
 import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.DateUtils;
@@ -60,7 +62,15 @@ public class DungeonAccessCommand extends GenericCommand {
 				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons))
 			)
 			.executes((sender, args) -> {
-				getMapping(args.getUnchecked("dungeon")).showHeadsUpMessage((Collection<Player>) args.get("players"));
+				try {
+					getMapping(args.getUnchecked("dungeon")).showHeadsUpMessage((Collection<Player>) args.get("players"));
+				} catch (WrapperCommandSyntaxException ex) {
+					throw ex;
+				} catch (Exception ex) {
+					MMLog.warning("An unexpected error occurred showing a heads up:", ex);
+					MonumentaNetworkRelayIntegration.sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> A dungeon access command failed (heads up)");
+					throw CommandAPI.failWithString("An unexpected error occurred showing a heads up; please report this bug");
+				}
 			})
 			.register();
 
@@ -80,7 +90,15 @@ public class DungeonAccessCommand extends GenericCommand {
 				new BooleanArgument("useDelvePreset")
 			)
 			.executes((sender, args) -> {
-				startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("useDelvePreset", false));
+				try {
+					startNew(args.getUnchecked("key player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"), args.getOrDefaultUnchecked("type", 0), args.getOrDefaultUnchecked("useDelvePreset", false));
+				} catch (WrapperCommandSyntaxException ex) {
+					throw ex;
+				} catch (Exception ex) {
+					MMLog.warning("An unexpected error occurred starting a new instance:", ex);
+					MonumentaNetworkRelayIntegration.sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> A dungeon access command failed (new)");
+					throw CommandAPI.failWithString("An unexpected error occurred starting a new instance; please report this bug");
+				}
 			})
 			.register();
 
@@ -96,7 +114,15 @@ public class DungeonAccessCommand extends GenericCommand {
 				new FloatArgument("return pitch")
 			)
 			.executes((sender, args) -> {
-				invite(args.getUnchecked("inviting player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
+				try {
+					invite(args.getUnchecked("inviting player"), (Collection<Player>) args.get("other players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
+				} catch (WrapperCommandSyntaxException ex) {
+					throw ex;
+				} catch (Exception ex) {
+					MMLog.warning("An unexpected error occurred inviting players to this instance:", ex);
+					MonumentaNetworkRelayIntegration.sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> A dungeon access command failed (invite)");
+					throw CommandAPI.failWithString("An unexpected error occurred inviting players to this instance; please report this bug");
+				}
 			})
 			.register();
 
@@ -111,7 +137,15 @@ public class DungeonAccessCommand extends GenericCommand {
 				new FloatArgument("return pitch")
 			)
 			.executes((sender, args) -> {
-				send((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
+				try {
+					send((Collection<Player>) args.get("players"), getMapping(args.getUnchecked("dungeon")), args.getUnchecked("return location"), args.getUnchecked("return yaw"), args.getUnchecked("return pitch"));
+				} catch (WrapperCommandSyntaxException ex) {
+					throw ex;
+				} catch (Exception ex) {
+					MMLog.warning("An unexpected error occurred sending you to that instance:", ex);
+					MonumentaNetworkRelayIntegration.sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> A dungeon access command failed (send)");
+					throw CommandAPI.failWithString("An unexpected error occurred sending you to that instance; please report this bug");
+				}
 			})
 			.register();
 
@@ -123,7 +157,15 @@ public class DungeonAccessCommand extends GenericCommand {
 				new StringArgument("dungeon").replaceSuggestions(ArgumentSuggestions.strings(dungeons))
 			)
 			.executes((sender, args) -> {
-				getMapping(args.getUnchecked("dungeon")).forceAbandon((Collection<Player>) args.get("players"));
+				try {
+					getMapping(args.getUnchecked("dungeon")).forceAbandon((Collection<Player>) args.get("players"));
+				} catch (WrapperCommandSyntaxException ex) {
+					throw ex;
+				} catch (Exception ex) {
+					MMLog.warning("An unexpected error abandoning that instance:", ex);
+					MonumentaNetworkRelayIntegration.sendAdminMessage("<" + NetworkRelayAPI.getShardName() + "> A dungeon access command failed (abandon)");
+					throw CommandAPI.failWithString("An unexpected error occurred abandoning that instance; please report this bug");
+				}
 			})
 			.register();
 	}
@@ -190,7 +232,7 @@ public class DungeonAccessCommand extends GenericCommand {
 		Set<Player> otherPlayers = new HashSet<>(otherPlayersRaw);
 		otherPlayers.remove(invitingPlayer);
 
-		int accessScore = ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getAccessName()).orElseThrow();
+		int accessScore = ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getAccessName()).orElse(0);
 		if (accessScore == 0) {
 			// This shouldn't happen, but handle it anyway
 			invitingPlayer.sendMessage(Component.text("You don't have an open " + mapping.getDisplayName() + " instance to invite other players to!", NamedTextColor.RED));
@@ -205,6 +247,9 @@ public class DungeonAccessCommand extends GenericCommand {
 				// Same instance: send directly without changing any scores on the player
 				iterator.remove();
 				send(List.of(otherPlayer), mapping, returnLocation, returnYaw, returnPitch);
+			} else if (otherAccessScore == -1) {
+				iterator.remove();
+				otherPlayer.sendMessage(Component.text("The unstable plane rejects you. You are locked out of this dungeon for this week!", NamedTextColor.RED));
 			} else if (otherAccessScore != 0) {
 				// Other instance: send error message and don't send the player anywhere
 				iterator.remove();
@@ -221,7 +266,7 @@ public class DungeonAccessCommand extends GenericCommand {
 		}
 
 		if (!otherPlayers.isEmpty()) {
-			int startDate = mapping.getStartDateName() == null ? 0 : ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getStartDateName()).orElseThrow();
+			int startDate = mapping.getStartDateName() == null ? 0 : ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getStartDateName()).orElse(0);
 			int type = mapping.getTypeName() == null ? 0 : ScoreboardUtils.getScoreboardValue(invitingPlayer, mapping.getTypeName()).orElse(0);
 
 			for (Player player : otherPlayers) {

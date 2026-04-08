@@ -184,6 +184,10 @@ public class SpellBaseSummon extends Spell {
 					return;
 				}
 
+				if (mCanBeStopped && EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
+
 				mBossAnimation.run(mBoss, mBoss.getLocation(), mTimer);
 
 				if (mTimer >= mSummoningDuration) {
@@ -249,6 +253,10 @@ public class SpellBaseSummon extends Spell {
 
 						if (mCanBeStopped && EntityUtils.shouldCancelSpells(mBoss)) {
 							this.cancel();
+							return;
+						}
+
+						if (mCanBeStopped && EntityUtils.shouldPauseSpells(mBoss)) {
 							return;
 						}
 

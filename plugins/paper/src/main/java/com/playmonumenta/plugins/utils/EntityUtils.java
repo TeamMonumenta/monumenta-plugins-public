@@ -207,6 +207,7 @@ public class EntityUtils {
 
 	private static final String COOLING_ATTR_NAME = "CoolingSlownessAttr";
 	private static final String STUN_ATTR_NAME = "StunSlownessAttr";
+	private static final String STAGGER_ATTR_NAME = "StaggerSlownessAttr";
 	private static final String IGNORE_TAUNT_TAG = "taunt_ignore";
 	private static final String SILENCE_IMMUNE_TAG = "boss_silenceimmune";
 	/**
@@ -218,9 +219,11 @@ public class EntityUtils {
 	private static final Map<LivingEntity, Integer> STUNNED_MOBS = new HashMap<>();
 	private static final Map<LivingEntity, Integer> FROZEN_MOBS = new HashMap<>(); // Frozen is just stun but without the visuals
 	private static final Map<LivingEntity, Integer> SILENCED_MOBS = new HashMap<>();
+	private static final Map<LivingEntity, Integer> STAGGERED_MOBS = new HashMap<>();
 	private static @Nullable BukkitRunnable mobsTracker = null;
 
 	private static final Particle.DustOptions STUN_COLOR = new Particle.DustOptions(Color.fromRGB(255, 255, 100), 1.0f);
+	private static final Particle.DustOptions STAGGER_COLOR = new Particle.DustOptions(Color.fromRGB(247, 77, 9), 1.0f);
 	private static final Particle.DustOptions SILENCE_COLOR = new Particle.DustOptions(Color.fromRGB(13, 13, 13), 1.0f);
 	private static final Particle.DustOptions TAUNT_COLOR = new Particle.DustOptions(Color.fromRGB(200, 0, 0), 1.0f);
 
@@ -236,6 +239,7 @@ public class EntityUtils {
 				Iterator<Map.Entry<LivingEntity, Integer>> stunnedIter = STUNNED_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> frozenIter = FROZEN_MOBS.entrySet().iterator();
 				Iterator<Map.Entry<LivingEntity, Integer>> silencedIter = SILENCED_MOBS.entrySet().iterator();
+				Iterator<Map.Entry<LivingEntity, Integer>> staggeredIter = STAGGERED_MOBS.entrySet().iterator();
 
 				while (coolingIter.hasNext()) {
 					Map.Entry<LivingEntity, Integer> cooling = coolingIter.next();
@@ -300,6 +304,26 @@ public class EntityUtils {
 
 					if (silenced.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
 						silencedIter.remove();
+					}
+				}
+
+				while (staggeredIter.hasNext()) {
+					Map.Entry<LivingEntity, Integer> staggered = staggeredIter.next();
+					LivingEntity mob = staggered.getKey();
+					staggered.setValue(staggered.getValue() - 1);
+
+					if (mob instanceof Vex || mob instanceof Flying) {
+						mob.setVelocity(new Vector(0, 0, 0));
+					}
+
+					double angle = Math.toRadians(mRotation);
+					Location l = mob.getLocation();
+					l.add(FastUtils.cos(angle) * 0.5, mob.getHeight(), FastUtils.sin(angle) * 0.5);
+					new PartialParticle(Particle.REDSTONE, l, 5, 0, 0, 0, STAGGER_COLOR).spawnAsEnemyBuff();
+
+					if (staggered.getValue() <= 0 || mob.isDead() || !mob.isValid()) {
+						removeAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, STAGGER_ATTR_NAME);
+						staggeredIter.remove();
 					}
 				}
 			}
@@ -771,7 +795,11 @@ public class EntityUtils {
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, double radius) {
-		return getNearestPlayer(loc, PlayerUtils.playersInRange(loc, radius, true));
+		return getNearestPlayer(loc, radius, true);
+	}
+
+	public static @Nullable Player getNearestPlayer(Location loc, double radius, boolean includeNonTargetable) {
+		return getNearestPlayer(loc, PlayerUtils.playersInRange(loc, radius, includeNonTargetable));
 	}
 
 	public static @Nullable Player getNearestPlayer(Location loc, List<Player> players) {
@@ -1173,6 +1201,43 @@ public class EntityUtils {
 		}
 	}
 
+	public static boolean isStaggered(Entity mob) {
+		if (mob instanceof LivingEntity livingEntity) {
+			return STAGGERED_MOBS.containsKey(livingEntity);
+		}
+		return false;
+	}
+
+	public static void applyStagger(Plugin plugin, int ticks, LivingEntity mob) {
+		if (isCCImmuneMob(mob)) {
+			return;
+		}
+
+		if (mobsTracker == null || mobsTracker.isCancelled()) {
+			startTracker(plugin);
+		}
+
+		if (mob instanceof Mob m) {
+			m.setTarget(null);
+		}
+
+		// Only reduce speed if mob is not already in map
+		Integer t = STAGGERED_MOBS.get(mob);
+		if (t == null) {
+			addAttribute(mob, Attribute.GENERIC_MOVEMENT_SPEED, new AttributeModifier(STAGGER_ATTR_NAME, -1, Operation.MULTIPLY_SCALAR_1));
+			if (mob instanceof Mob m) {
+				NmsUtils.getVersionAdapter().cancelStrafe(m);
+			}
+		}
+		if (t == null || t < ticks) {
+			STAGGERED_MOBS.put(mob, ticks);
+		}
+	}
+
+	public static void removeStagger(LivingEntity mob) {
+		STAGGERED_MOBS.put(mob, 0);
+	}
+
 	public static final String NO_RECOIL_EFFECT_NAME = "DisableRecoilMidair";
 
 	public static void applyRecoilDisable(Plugin plugin, int ticks, int amount, LivingEntity mob) {
@@ -1263,6 +1328,11 @@ public class EntityUtils {
 
 	public static void removeFreeze(Plugin plugin, LivingEntity mob) {
 		plugin.mEffectManager.clearEffects(mob, "Frozen");
+	}
+
+	@Contract("null -> true")
+	public static boolean shouldPauseSpells(@Nullable LivingEntity entity) {
+		return entity == null || isStaggered(entity);
 	}
 
 	@Contract("null -> true")
@@ -1654,6 +1724,23 @@ public class EntityUtils {
 		lineOfSight.rotateAroundY(Math.toRadians(-entity.getLocation().getYaw()));
 		Vector mobToPlayer = entityInSight.getLocation().toVector().subtract(entity.getLocation().toVector());
 		return !(lineOfSight.angle(mobToPlayer) > Math.toRadians(75.0));
+	}
+
+	// Checks feet, eyes, and 4 corners of the entity (corners calculated at the middle y value between feet and eyes).
+	public static boolean playerCantSeeEntity(Player player, LivingEntity entity) {
+		World world = player.getWorld();
+		Location eyeLocation = entity.getEyeLocation();
+		Location feetLocation = entity.getLocation();
+		double midHeight = (eyeLocation.getY() + feetLocation.getY()) / 2;
+		double xCoord = feetLocation.getX();
+		double zCoord = feetLocation.getZ();
+		double entityHalfWidth = entity.getWidth() / 2;
+
+		return !player.hasLineOfSight(eyeLocation) && !player.hasLineOfSight(feetLocation)
+			&& !player.hasLineOfSight(new Location(world, xCoord + entityHalfWidth, midHeight, zCoord + entityHalfWidth))
+			&& !player.hasLineOfSight(new Location(world, xCoord + entityHalfWidth, midHeight, zCoord - entityHalfWidth))
+			&& !player.hasLineOfSight(new Location(world, xCoord - entityHalfWidth, midHeight, zCoord + entityHalfWidth))
+			&& !player.hasLineOfSight(new Location(world, xCoord - entityHalfWidth, midHeight, zCoord - entityHalfWidth));
 	}
 
 	// returns change in mob's health

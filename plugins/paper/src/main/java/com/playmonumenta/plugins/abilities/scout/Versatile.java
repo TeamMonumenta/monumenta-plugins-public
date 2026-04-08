@@ -4,14 +4,17 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.Scout;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.utils.AbilityUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
 
 public class Versatile extends Ability {
 
@@ -21,7 +24,8 @@ public class Versatile extends Ability {
 	public static final AbilityInfo<Versatile> INFO =
 		new AbilityInfo<>(Versatile.class, "Versatile", Versatile::new)
 			.description(getDescription())
-			.canUse(player -> AbilityUtils.getClassNum(player) == Scout.CLASS_ID);
+			.canUse(player -> AbilityUtils.getClassNum(player) == Scout.CLASS_ID)
+			.displayItem(Material.LEATHER);
 
 	public Versatile(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -48,13 +52,14 @@ public class Versatile extends Ability {
 		return false; // no recursion possible as we only change the damage amount
 	}
 
-	private static Description<Versatile> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain ")
-			.addPercent(DAMAGE_MULTIPLY_MELEE)
-			.add(" of your % Projectile Damage as Class Attack Damage and ")
-			.addPercent(DAMAGE_MULTIPLY_PROJ)
-			.add(" of your % Attack Damage as Class Projectile Damage.");
+	public static Description<Versatile> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("Gain %p of your gear's % Projectile")
+				.statValues(stat(DAMAGE_MULTIPLY_MELEE))
+			.addLine("Damage as Attack Damage, and %p of")
+				.statValues(stat(DAMAGE_MULTIPLY_PROJ))
+			.addLine("your gear's % Attack Damage as")
+			.addLine("Projectile Damage.");
 	}
 
 }

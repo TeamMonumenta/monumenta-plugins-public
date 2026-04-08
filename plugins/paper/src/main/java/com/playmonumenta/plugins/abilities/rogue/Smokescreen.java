@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.SmokescreenCS;
@@ -26,6 +26,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ThrowableProjectile;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Smokescreen extends Ability implements AbilityWithDuration {
 
@@ -170,37 +174,47 @@ public class Smokescreen extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<Smokescreen> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to launch a projectile which releases a cloud of smoke, afflicting all mobs within ")
-			.add(a -> a.mRadius, SMOKESCREEN_RANGE, false, Ability::isLevelOne)
-			.add(" blocks with ")
-			.addDuration(SMOKESCREEN_EFFECT_DURATION)
-			.add(" seconds of ")
-			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT_1, false, Ability::isLevelOne)
-			.add(" weaken and ")
-			.addPercent(a -> a.mSlownessEffect, SMOKESCREEN_SLOWNESS_AMPLIFIER)
-			.add(" slowness.")
-			.addCooldown(SMOKESCREEN_COOLDOWN);
+			.addDashedLine()
+			.addLine("Launch a smoke bomb that afflicts")
+			.addLine("mobs with slowness and weakness.")
+			.addLine()
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlownessEffect, SMOKESCREEN_SLOWNESS_AMPLIFIER), stat(a -> a.mEffectDuration, SMOKESCREEN_EFFECT_DURATION))
+			.addStat("Effect: %p1 Weakness for %t")
+				.statValues(stat(a -> a.mWeakenEffect, WEAKEN_EFFECT_1), stat(a -> a.mEffectDuration, SMOKESCREEN_EFFECT_DURATION))
+			.addStat("Radius: %r1")
+				.statValues(stat(a -> a.mRadius, SMOKESCREEN_RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(SMOKESCREEN_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Smokescreen> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The weaken debuff is increased to ")
-			.addPercent(a -> a.mWeakenEffect, WEAKEN_EFFECT_2, false, Ability::isLevelTwo)
-			.add(" and the radius is increased to ")
-			.add(a -> a.mRadius, SMOKESCREEN_RANGE_2, false, Ability::isLevelTwo)
-			.add(" blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Smokescreen*'s weakness").styles(UNDERLINED)
+			.addLine("and increase its radius.")
+			.addLine()
+			.addStatComparison("Effect: %p1 -> %p2 Weakness")
+				.statValues(stat(WEAKEN_EFFECT_1), stat(a -> a.mWeakenEffect, WEAKEN_EFFECT_2))
+			.addStatComparison("Radius: %r1 -> %r2")
+				.statValues(stat(SMOKESCREEN_RANGE), stat(a -> a.mRadius, SMOKESCREEN_RANGE_2))
+			.addDashedLine();
 	}
 
 	private static Description<Smokescreen> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The smoke cloud will now deal ")
-			.add(a -> a.mDamage, ENHANCEMENT_DAMAGE)
-			.add(" melee damage on impact and additionally leave a persistent cloud on the ground for ")
-			.addDuration(a -> a.mPoolDuration, ENHANCEMENT_SMOKECLOUD_DURATION)
-			.add(" seconds after activating. Mobs in the cloud gain the debuffs for ")
-			.addDuration(SMOKESCREEN_EFFECT_DURATION)
-			.add(" seconds, pulsing every second.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Smokescreen* deals damage upon impact").styles(UNDERLINED)
+			.addLine("and leaves a lingering cloud that")
+			.addLine("continuously applies its effects.")
+			.addLine()
+			.addStat("Damage: %d (m)")
+				.statValues(stat(a -> a.mDamage, ENHANCEMENT_DAMAGE))
+			.addStat("Cloud Duration: %t")
+				.statValues(stat(ENHANCEMENT_SMOKECLOUD_DURATION))
+			.addDashedLine();
 	}
 }

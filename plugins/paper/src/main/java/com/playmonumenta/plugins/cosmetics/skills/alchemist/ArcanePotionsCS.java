@@ -27,6 +27,9 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 
 	public static final double ENCHANT_PARTICLE_PER_METER = 4;
 	public static final double SYMBOL_PARTICLES_PER_METER = 5;
+	// Used by VolatileReactionCS
+	public static final Color BRUTAL_COLOR = Color.fromRGB(229, 144, 34);
+	public static final Color GRUESOME_COLOR = Color.fromRGB(107, 191, 150);
 
 	public static final String NAME = "Arcane Potions";
 
@@ -47,6 +50,16 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 	@Override
 	public @Nullable String getName() {
 		return NAME;
+	}
+
+	@Override
+	public Color getBrutalColor() {
+		return BRUTAL_COLOR;
+	}
+
+	@Override
+	public Color getGruesomeColor() {
+		return GRUESOME_COLOR;
 	}
 
 	private Symbol mLastSymbol = PHLOGISTON;
@@ -85,9 +98,54 @@ public class ArcanePotionsCS extends GruesomeAlchemyCS {
 	}
 
 	@Override
-	public void damageOverTimeEffects(LivingEntity target) {
+	public void brutalDotTickEffects(LivingEntity target) {
 		new PartialParticle(Particle.ENCHANTMENT_TABLE, LocationUtils.getHalfHeightLocation(target), 16)
 			.delta(target.getBoundingBox().getWidthX() / 3, target.getBoundingBox().getHeight() / 3, target.getBoundingBox().getWidthZ() / 3)
+			.spawnAsEnemy();
+	}
+
+	@Override
+	public void brutalPeriodicEffects(LivingEntity target, int stacks, int maxStacks, int level) {
+		if (stacks > maxStacks) {
+			// Explosion will happen
+			return;
+		}
+
+		Location origin = target.getEyeLocation();
+		double size = target.getWidth() * 1.5;
+		Vector up = new Vector(0, 1, 0);
+		Vector front = origin.getDirection().setY(0).normalize();
+		Vector side = VectorUtils.crossProd(up, front).multiply(-1);
+
+		double angleStep = Math.PI / (maxStacks + 1);
+		for (int i = 0; i < stacks; i++) {
+			Location endPoint = origin.clone()
+				.add(side.clone().multiply(size * Math.cos(angleStep * (i + 1))))
+				.add(up.clone().multiply(size * Math.sin(angleStep * (i + 1))));
+			new PPLine(Particle.ELECTRIC_SPARK, origin, endPoint)
+				.count((int) (size * 12))
+				.spawnAsEnemy();
+		}
+	}
+
+	@Override
+	public void brutalDotExplosionEffects(LivingEntity target) {
+		target.getWorld().playSound(target.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.25f, 1.5f);
+		target.getWorld().playSound(target.getLocation(), Sound.BLOCK_GLASS_BREAK, SoundCategory.HOSTILE, 1.25f, 1.5f);
+		Location origin = target.getEyeLocation();
+		double size = target.getWidth() * 1.75;
+		Vector up = new Vector(0, 1, 0);
+		Vector front = origin.getDirection().setY(0).normalize();
+		Vector side = VectorUtils.crossProd(up, front).multiply(-1);
+		Location centerLeft = origin.clone().add(side.clone().multiply(size));
+		Location centerRight = origin.clone().add(side.clone().multiply(-size));
+		new PPLine(Particle.ELECTRIC_SPARK, centerLeft, centerRight)
+			.count(40)
+			.extra(1)
+			.spawnAsEnemy();
+		new PPLine(Particle.WAX_ON, centerLeft, centerRight)
+			.count(20)
+			.extra(2)
 			.spawnAsEnemy();
 	}
 

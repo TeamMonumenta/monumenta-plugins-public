@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.RiposteCS;
@@ -29,6 +29,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Riposte extends Ability implements AbilityWithDuration {
 	private static final int RIPOSTE_1_COOLDOWN = Constants.TICKS_PER_SECOND * 15;
@@ -175,31 +179,52 @@ public class Riposte extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<Riposte> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("While wielding a sword or axe, block an incoming melee attack.")
-			.addCooldown(RIPOSTE_1_COOLDOWN, Ability::isLevelOne);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("While holding a sword or axe, periodically")
+			.addLine("block an incoming melee attack.")
+			.addLine()
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(RIPOSTE_1_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<Riposte> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Blocking a melee attack with Riposte's effect while holding a sword grants ")
-			.addPercent(a -> a.mSwordDamage, RIPOSTE_SWORD_BONUS_DAMAGE)
-			.add(" extra damage on your next sword swing within ")
-			.addDuration(a -> a.mMaxSwordDuration, RIPOSTE_SWORD_DURATION)
-			.add(" seconds. Blocking with Riposte's effect while holding an axe stuns the attacking mob for ")
-			.addDuration(a -> a.mStunDuration, RIPOSTE_AXE_DURATION)
-			.add(" seconds.")
-			.addCooldown(RIPOSTE_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Reduce *Riposte*'s cooldown.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(RIPOSTE_1_COOLDOWN), cooldown(RIPOSTE_2_COOLDOWN))
+			.addLine()
+			.addLine("Activating *Riposte* while holding a sword").styles(UNDERLINED)
+			.addLine("makes your next sword attack within %t")
+				.statValues(stat(a -> a.mMaxSwordDuration, RIPOSTE_SWORD_DURATION))
+			.addLine("deal increased damage.")
+			.addLine()
+			.addStat("Damage Boost: +%p (m)")
+				.statValues(stat(a -> a.mSwordDamage, RIPOSTE_SWORD_BONUS_DAMAGE))
+			.addLine()
+			.addLine("Activating *Riposte* while holding an axe").styles(UNDERLINED)
+			.addLine("stuns the attacking mob.")
+			.addLine()
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, RIPOSTE_AXE_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<Riposte> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When Riposte activates, deal ")
-			.add(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE)
-			.add(" melee damage to all mobs within ")
-			.add(a -> a.mEnhancementRadius, ENHANCEMENT_RADIUS)
-			.add(" blocks and root them for ")
-			.addDuration(a -> a.mEnhancementRootDuration, ENHANCEMENT_ROOT_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When *Riposte* activates, deal damage").styles(UNDERLINED)
+			.addLine("to nearby mobs and root them.")
+			.addLine()
+			.addStat("Damage: %d (m)")
+				.statValues(stat(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE))
+			.addStat("Effect: Root for %t")
+				.statValues(stat(a -> a.mEnhancementRootDuration, ENHANCEMENT_ROOT_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mEnhancementRadius, ENHANCEMENT_RADIUS))
+			.addDashedLine();
 	}
 }

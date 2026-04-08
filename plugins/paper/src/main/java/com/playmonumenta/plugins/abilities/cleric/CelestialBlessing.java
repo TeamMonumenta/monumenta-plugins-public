@@ -6,8 +6,9 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.cleric.CelestialBlessingCS;
 import com.playmonumenta.plugins.effects.Aesthetics;
@@ -24,6 +25,9 @@ import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class CelestialBlessing extends Ability {
 	private static final int CELESTIAL_COOLDOWN = TICKS_PER_SECOND * 35;
@@ -116,31 +120,53 @@ public class CelestialBlessing extends Ability {
 	}
 
 	private static Description<CelestialBlessing> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to grant all players within ")
-			.add(a -> a.mRadius, CELESTIAL_RADIUS)
-			.add(" blocks ")
-			.addPercent(a -> a.mExtraDamage, CELESTIAL_1_EXTRA_DAMAGE, false, Ability::isLevelOne)
-			.add(" damage and ")
-			.addPercent(a -> a.mSpeedPotency, CELESTIAL_EXTRA_SPEED)
-			.add(" speed for ")
-			.addDuration(a -> a.mDuration, CELESTIAL_DURATION)
-			.add(" seconds. Dealing damage affected by this effect triggers Crusade's target marking.")
-			.addCooldown(CELESTIAL_COOLDOWN);
+			.addDashedLine()
+			.addLine("Grant yourself and other nearby players")
+			.addLine("a temporary damage and speed boost.")
+			.addLine()
+			.addLine("Damage dealt to mobs during this effect")
+			.addLine("marks them as *Heretics*.").styles(Cleric.HERETIC_COLOR)
+			.addLine()
+			.addStat("Effect: +%p1 Damage for %t")
+				.statValues(
+					stat(a -> a.mExtraDamage, CELESTIAL_1_EXTRA_DAMAGE),
+					stat(a -> a.mDuration, CELESTIAL_DURATION))
+			.addStat("Effect: +%p Speed for %t")
+				.statValues(
+					stat(a -> a.mSpeedPotency, CELESTIAL_EXTRA_SPEED),
+					stat(a -> a.mDuration, CELESTIAL_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, CELESTIAL_RADIUS))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(CELESTIAL_COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<CelestialBlessing> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The damage buff is increased to ")
-			.addPercent(a -> a.mExtraDamage, CELESTIAL_2_EXTRA_DAMAGE, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Celestial Blessing*'s").styles(UNDERLINED)
+			.addLine("damage boost.")
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Damage")
+				.statValues(
+					stat(CELESTIAL_1_EXTRA_DAMAGE),
+					stat(a -> a.mExtraDamage, CELESTIAL_2_EXTRA_DAMAGE))
+			.addDashedLine();
 	}
 
 	private static Description<CelestialBlessing> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Celestial Blessing can be extended by ")
-			.addDuration(CELESTIAL_BUFF_EXTENSION_DURATION_ENHANCED)
-			.add(" seconds by performing a fully-charged melee attack, critical projectile attack, and ability hit on any enemy during its duration.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Each player can extend their own")
+			.addLine("*Celestial Blessing* buff by hitting").styles(UNDERLINED)
+			.addLine("a mob with an attack, a projectile, and")
+			.addLine("casting an ability during its duration.")
+			.addLine()
+			.addStat("Duration Increase: +%t")
+				.statValues(stat(CELESTIAL_BUFF_EXTENSION_DURATION_ENHANCED))
+			.addDashedLine();
 	}
 }

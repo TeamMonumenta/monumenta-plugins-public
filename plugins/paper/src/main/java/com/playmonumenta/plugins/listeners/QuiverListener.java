@@ -298,6 +298,7 @@ public class QuiverListener implements Listener {
 		}
 	}
 
+	// TODO: fix this in 1.20.5 :3
 	@SuppressWarnings("deprecation")
 	public AbstractArrow arrowSetItemWrapper(AbstractArrow item, ItemStack projectileItem) {
 		item.setItem(projectileItem);
@@ -409,6 +410,8 @@ public class QuiverListener implements Listener {
 	}
 
 	// If an arrow is picked up, put it into a quiver if space is available
+	// Special handling is needed because `getItem` from PlayerPickupArrowEvent doesn't return the correct itemstack
+	// TODO: this entire thing breaks in 1.20.5 but it's the best we got for now - usb
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	public void playerPickupArrowEvent(PlayerPickupArrowEvent event) {
@@ -480,5 +483,135 @@ public class QuiverListener implements Listener {
 		ItemStack transformed = ItemUtils.clone(mode.mItemStack);
 		transformed.setAmount(arrows.getAmount());
 		return transformed;
+	}
+
+	// Delve Arrow Refund stuff below here
+	static Set<String> DELVE_ARROWS = Set.of(
+		// R1
+		"epic:items/arrows/beastblood_quarrel",
+		"epic:items/arrows/blackbearers_bolt",
+		// R2
+		"epic:items/arrows/star-tipped_arrow",
+		"epic:items/arrows/void-dipped_arrow",
+		"epic:items/arrows/timetorn_arrow",
+		"epic:items/arrows/keterborn_bolt",
+		"epic:items/arrows/stormsurge_quarrel",
+		// R3
+		"epic:items/arrows/sentrys_arrow",
+		"epic:items/arrows/silver_bolt",
+		"epic:items/arrows/ashkii_quarrel",
+		"epic:items/arrows/star_seekers_needle"
+	);
+
+	static Set<String> R1_WOOLS_ARROWS = Set.of(
+		"epic:items/arrows/beastblood_quarrel"
+	);
+
+	static boolean refundDebugMode = false;
+
+	/**
+	 * For use only in the Delve Arrow Refund. Intended to be temporary code. Player MUST be mainhanding the quiver.
+	 * If this breaks with version upgrade / any update, so be it... it's not critical to fix.
+	 *
+	 * @param player           The player to refund items to. If null, will return early.
+	 * @param refundWholeStack Whether to attempt to refund the maximum possible delve materials (capped at 1 stack) at once or not.
+	 */
+	public static void refundDelveMaterials(@Nullable Player player, boolean refundWholeStack) {
+		if (player == null) {
+			return;
+		}
+		ItemStack quiver = player.getInventory().getItemInMainHand();
+		if (!ItemStatUtils.isQuiver(quiver)) {
+			player.sendMessage(Component.text("This is not a quiver!", NamedTextColor.RED));
+			return;
+		}
+
+		// It's not very performant to regenerate the list every time the method is called, but trying to do it outside the method results in the shard corrupting.
+		List<ItemStack> validArrows = DELVE_ARROWS.stream().map(
+			key -> InventoryUtils.getItemFromLootTable(player.getLocation(), NamespacedKeyUtils.fromString(key))).toList();
+		List<ItemStack> halfPriceArrows = R1_WOOLS_ARROWS.stream().map(
+			key -> InventoryUtils.getItemFromLootTable(player.getLocation(), NamespacedKeyUtils.fromString(key))).toList();
+
+		// does not ACTUALLY remove the arrows, just checks for their presence
+		Pair<ItemStack, Boolean> removedArrows =
+			CustomContainerItemManager.removeFirstFromContainer(
+				quiver, Integer.MAX_VALUE, itemStack -> true, itemStack -> false);
+		if (refundDebugMode && removedArrows != null && removedArrows.getKey() != null) {
+			player.sendMessage(Component.text("Checking " + removedArrows.getKey().getAmount() + " " + ItemUtils.getPlainName(removedArrows.getKey()) + " arrows.", NamedTextColor.GREEN));
+		}
+		if (removedArrows != null && removedArrows.getKey() != null) {
+			if (refundDebugMode) {
+				player.sendMessage(Component.text("Your arrows are not null!", NamedTextColor.GREEN));
+			}
+			for (ItemStack validArrow : validArrows) {
+				if (refundDebugMode) {
+					player.sendMessage(Component.text("Attempting to match arrows of type " + ItemUtils.getPlainName(validArrow) + "...", NamedTextColor.DARK_BLUE));
+				}
+				if (Objects.equals(ItemUtils.getDisplayName(validArrow).toString(), ItemUtils.getDisplayName(removedArrows.getKey()).toString())
+					&& validArrow.getType() == removedArrows.getKey().getType()) {
+					boolean isR1WoolArrow = false;
+					for (ItemStack halfPriceArrow : halfPriceArrows) {
+						if (Objects.equals(ItemUtils.getDisplayName(halfPriceArrow).toString(), ItemUtils.getDisplayName(removedArrows.getKey()).toString())
+							&& validArrow.getType() == removedArrows.getKey().getType()) {
+							isR1WoolArrow = true;
+						}
+					}
+					int delveMats;
+					int arrowsPerDelveMat = isR1WoolArrow ? 8 * 64 : 4 * 64;
+					if (removedArrows.getKey().getAmount() < arrowsPerDelveMat) {
+						player.sendMessage(Component.text("No Delve Materials were refunded.", NamedTextColor.DARK_GRAY));
+						return;
+					} else if (refundWholeStack) {
+						delveMats = Math.min(64, removedArrows.getKey().getAmount() / arrowsPerDelveMat);
+					} else {
+						delveMats = 1;
+					}
+					if (refundDebugMode) {
+						player.sendMessage(Component.text("Attempting iteration over the delve infusions...", NamedTextColor.DARK_PURPLE));
+					}
+					// Iterate across the delve infusions, trying to find a location that matches the location of the arrows you're feeding in.
+					for (DelveInfusionUtils.DelveInfusionSelection delveInfusionSelection : DelveInfusionUtils.DelveInfusionSelection.values()) {
+						if (refundDebugMode) {
+							player.sendMessage(Component.text("Comparing against location " + delveInfusionSelection.getLocation(), NamedTextColor.LIGHT_PURPLE));
+						}
+						if (delveInfusionSelection.getLocation() != null && delveInfusionSelection.getLocation().equals(ItemStatUtils.getLocation(removedArrows.getKey()))) {
+							if (refundDebugMode) {
+								player.sendMessage(Component.text("Found location " + delveInfusionSelection.getLocation(), NamedTextColor.DARK_PURPLE));
+							}
+							if (delveMats > 0) {
+								try {
+									// does actually remove the arrows
+									Pair<ItemStack, Boolean> actuallyRemovedArrows =
+										CustomContainerItemManager.removeFirstFromContainer(
+											quiver,
+											delveMats * arrowsPerDelveMat,
+											itemStack -> true,
+											itemStack -> true);
+									if (actuallyRemovedArrows != null && actuallyRemovedArrows.getValue()) {
+										NamespacedKey delveMatLootTable = delveInfusionSelection.getLootTable();
+										if (delveMatLootTable != null) {
+											ItemStack refundedDelveMats = InventoryUtils.getItemFromLootTable(player.getLocation(), delveMatLootTable);
+											if (refundedDelveMats != null) {
+												InventoryUtils.giveItem(player, refundedDelveMats.asQuantity(delveMats));
+												player.sendMessage(Component.text("Refunded " + delveMats + " Delve Materials.", NamedTextColor.DARK_GRAY));
+												player.getWorld().playSound(player, Sound.ENTITY_VILLAGER_TRADE, 1, 1);
+												player.getWorld().playSound(player, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 0.7f, 1.3f);
+											}
+											return;
+										}
+									}
+									player.sendMessage(Component.text("Failed final check. Report this to a moderator via ModMail on our discord!", NamedTextColor.DARK_RED));
+								} catch (NullPointerException nullPointerException) {
+									MMLog.finer(nullPointerException + " thrown while trying to refund delve arrows.");
+								}
+							} else {
+								player.sendMessage(Component.text("No Delve Materials were refunded.", NamedTextColor.DARK_GRAY));
+							}
+						}
+					}
+				}
+			}
+		}
+		player.sendMessage(Component.text("No arrows were removed.", NamedTextColor.GRAY));
 	}
 }

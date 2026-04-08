@@ -92,8 +92,6 @@ public abstract class SpellBaseAoE extends Spell {
 
 			@Override
 			public void run() {
-				Location loc = mLauncher.getLocation();
-
 				if (EntityUtils.shouldCancelSpells(mLauncher)) {
 					this.cancel();
 					if (!mCanMoveWhileCasting) {
@@ -101,6 +99,13 @@ public abstract class SpellBaseAoE extends Spell {
 					}
 					return;
 				}
+
+				if (EntityUtils.shouldPauseSpells(mLauncher)) {
+					return;
+				}
+
+				Location loc = mLauncher.getLocation();
+
 				mTicks++;
 				chargeAuraAction(loc.clone().add(0, 1, 0));
 				if (mTicks <= (mDuration - 5) && mTicks % mSoundDensity == 0) {

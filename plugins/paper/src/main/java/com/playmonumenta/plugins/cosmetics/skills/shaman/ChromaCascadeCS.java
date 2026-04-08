@@ -1,8 +1,6 @@
 package com.playmonumenta.plugins.cosmetics.skills.shaman;
 
-import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.cosmetics.skills.DepthsCS;
-import com.playmonumenta.plugins.particle.PPCircle;
 import com.playmonumenta.plugins.particle.PPSpiral;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
@@ -17,7 +15,6 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class ChromaCascadeCS extends EarthenTremorCS implements DepthsCS {
@@ -56,9 +53,9 @@ public class ChromaCascadeCS extends EarthenTremorCS implements DepthsCS {
 	public static final Particle.DustOptions PRISMATIC = new Particle.DustOptions(Color.fromRGB(245, 200, 245), 1.25f);
 
 	@Override
-	public void earthenTremorEffect(Player player, double radius) {
+	public void earthenTremorEffect(Player player, Location location, double radius) {
 		World world = player.getWorld();
-		Location loc = player.getLocation().subtract(0, LocationUtils.distanceToGround(player.getLocation(), -64, PlayerUtils.getJumpHeight(player)) - 0.1, 0);
+		Location loc = location.subtract(0, LocationUtils.distanceToGround(player.getLocation(), -64, PlayerUtils.getJumpHeight(player)) - 0.1, 0);
 		world.playSound(loc, Sound.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 2.0f, 1.6f);
 		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.4f, 0.6f);
 		world.playSound(loc, Sound.BLOCK_CONDUIT_ATTACK_TARGET, SoundCategory.PLAYERS, 1.6f, 1.8f);
@@ -75,13 +72,18 @@ public class ChromaCascadeCS extends EarthenTremorCS implements DepthsCS {
 	}
 
 	@Override
-	public void earthenTremorEnhancement(Player player, Location shockwaveLoc, double enhancementRadius, int distance, double maxDistance) {
-		Location loc = shockwaveLoc.clone().subtract(0, LocationUtils.distanceToGround(player.getLocation(), -64, PlayerUtils.getJumpHeight(player)) - 0.1, 0);
-		Vector dir = LocationUtils.getDirectionTo(shockwaveLoc, player.getLocation());
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			new PPCircle(Particle.REDSTONE, loc, enhancementRadius).data(PRISMATIC).countPerMeter(2).spawnAsPlayerActive(player);
-			new PPCircle(Particle.WAX_OFF, loc, 0.5).countPerMeter(2).delta(dir.getX(), 0, dir.getZ()).extra(1).directionalMode(true).spawnAsPlayerActive(player);
-		}, (long) (5 / maxDistance * distance));
+	public void totemLandingEffect(Player player, Location location, double radius) {
+		Location loc = location.add(0, 0.2, 0);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, 50, radius * 0.75, 0.25, radius * 0.75, 0.1,
+			Bukkit.createBlockData(Material.OCHRE_FROGLIGHT)).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, 50, radius * 0.75, 0.25, radius * 0.75, 0.1,
+			Bukkit.createBlockData(Material.VERDANT_FROGLIGHT)).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.BLOCK_CRACK, loc, 50, radius * 0.75, 0.25, radius * 0.75, 0.1,
+			Bukkit.createBlockData(Material.PEARLESCENT_FROGLIGHT)).spawnAsPlayerActive(player);
 
+		World world = player.getWorld();
+		world.playSound(loc, Sound.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.0f, 1.6f);
+		world.playSound(loc, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1.0f, 0.6f);
+		world.playSound(loc, Sound.BLOCK_CONDUIT_ATTACK_TARGET, SoundCategory.PLAYERS, 1.0f, 1.8f);
 	}
 }

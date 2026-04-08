@@ -22,8 +22,8 @@ import org.bukkit.scoreboard.Team;
 
 public class EliteFinishers {
 
-	public static final String FINISHER_GLOW_TAG = "finisherGlow";
-	public static final String FINISHER_SHOW_TAG = "finisherShow";
+	public static final String FINISHER_NO_GLOW_TAG = "finisherGlow";
+	public static final String FINISHER_NO_SHOW_TAG = "finisherShow";
 	public static final String FINISHER_HIDE_OTHER_TAG = "finisherHideOthers";
 
 	private static final ImmutableMap<String, EliteFinisher> FINISHERS =
@@ -34,6 +34,7 @@ public class EliteFinishers {
 			.put(BuzzedFinisher.NAME, new BuzzedFinisher())
 			.put(CakeifyFinisher.NAME, new CakeifyFinisher())
 			.put(ChainedFinisher.NAME, new ChainedFinisher())
+			.put(CookiefyFinisher.NAME, new CookiefyFinisher())
 			.put(CoolFireworkFinisher.NAME, new CoolFireworkFinisher())
 			.put(CornucopiaFinisher.NAME, new CornucopiaFinisher())
 			.put(DefaultDanceFinisher.NAME, new DefaultDanceFinisher())
@@ -103,8 +104,8 @@ public class EliteFinishers {
 		killedMob.setInvulnerable(true);
 		ScoreboardUtils.addEntityToTeam(killedMob, "finisher", NamedTextColor.WHITE).setOption(Team.Option.COLLISION_RULE, Team.OptionStatus.NEVER);
 		killedMob.addScoreboardTag("SkillImmune");
-		boolean hasGlowTag = p.getScoreboardTags().contains(FINISHER_GLOW_TAG);
-		boolean hasShowTag = p.getScoreboardTags().contains(FINISHER_SHOW_TAG);
+		boolean hasNoGlowTag = p.getScoreboardTags().contains(FINISHER_NO_GLOW_TAG);
+		boolean hasNoShowTag = p.getScoreboardTags().contains(FINISHER_NO_SHOW_TAG);
 		List<Player> otherPlayers = PlayerUtils.playersInRange(killedMob.getLocation(), 8 * 16, true, true);
 		otherPlayers.remove(p);
 		otherPlayers.forEach(player -> {
@@ -112,10 +113,10 @@ public class EliteFinishers {
 				player.hideEntity(Plugin.getInstance(), killedMob);
 			}
 		});
-		if (hasGlowTag && hasShowTag) {
+		if (hasNoGlowTag && hasNoShowTag) {
 			// Both tags present: hide everything
 			killedMob.setVisibleByDefault(false);
-		} else if (hasGlowTag) {
+		} else if (hasNoGlowTag) {
 			// Only Glow Tag present: show glowing and hide mob
 			GlowingManager.startGlowing(killedMob, color, 200, GlowingManager.PLAYER_ABILITY_PRIORITY);
 			killedMob.setInvisible(true);
@@ -123,7 +124,7 @@ public class EliteFinishers {
 			if (equipment != null) {
 				equipment.clear();
 			}
-		} else if (hasShowTag) {
+		} else if (hasNoShowTag) {
 			// Only Show Tag present: remove glowing, show mob
 			GlowingManager.clearAll(killedMob);
 		} else {

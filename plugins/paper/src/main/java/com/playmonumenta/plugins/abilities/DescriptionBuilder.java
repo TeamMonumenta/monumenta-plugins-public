@@ -20,9 +20,13 @@ import org.jetbrains.annotations.Nullable;
 public class DescriptionBuilder<T extends Ability> implements Description<T> {
 	private static final TextColor TRIGGER_COLOR = NamedTextColor.YELLOW;
 
-	private final Supplier<AbilityInfo<T>> mInfo;
-	private final @Nullable TextColor mBaseColor;
-	private final List<Description<T>> mDescriptions;
+	protected final Supplier<AbilityInfo<T>> mInfo;
+	protected final @Nullable TextColor mBaseColor;
+	protected final List<Description<T>> mDescriptions;
+
+	public DescriptionBuilder() {
+		this(() -> null, null);
+	}
 
 	public DescriptionBuilder(Supplier<AbilityInfo<T>> info) {
 		this(info, null);

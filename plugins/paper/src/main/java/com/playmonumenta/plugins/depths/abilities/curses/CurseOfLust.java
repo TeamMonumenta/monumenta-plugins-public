@@ -18,7 +18,7 @@ import org.bukkit.entity.Player;
 public class CurseOfLust extends DepthsAbility {
 	public static final String ABILITY_NAME = "Curse of Lust";
 	public static final int MIN_BLOCKS = 7;
-	public static final int MAX_BLOCKS = 10;
+	public static final int MAX_BLOCKS = 17;
 	public static final double DAMAGE_REDUCTION_PER_BLOCK = 0.08;
 
 	public static final DepthsAbilityInfo<CurseOfLust> INFO =
@@ -44,7 +44,7 @@ public class CurseOfLust extends DepthsAbility {
 				.mapToDouble(p -> p.getLocation().distanceSquared(mPlayer.getLocation()))
 				.min().orElse(0);
 			if (closestSquared >= MIN_BLOCKS * MIN_BLOCKS) {
-				double mult = 1 - DAMAGE_REDUCTION_PER_BLOCK * (Math.min(Math.sqrt(closestSquared), MAX_BLOCKS) - MIN_BLOCKS);
+				double mult = 1 - DAMAGE_REDUCTION_PER_BLOCK * (Math.min(Math.sqrt(closestSquared), MIN_BLOCKS + MAX_BLOCKS) - MIN_BLOCKS);
 				event.updateDamageWithMultiplier(mult);
 			}
 		}
@@ -56,7 +56,7 @@ public class CurseOfLust extends DepthsAbility {
 			.add("Deal ")
 			.addPercent(DAMAGE_REDUCTION_PER_BLOCK)
 			.add(" less damage for each block above " + MIN_BLOCKS + " blocks away your closest teammate is, up to ")
-			.addPercent(MAX_BLOCKS * DAMAGE_REDUCTION_PER_BLOCK)
+			.addPercent((MAX_BLOCKS - MIN_BLOCKS) * DAMAGE_REDUCTION_PER_BLOCK)
 			.add(" reduced damage.");
 	}
 }

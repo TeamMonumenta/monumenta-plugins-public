@@ -1,19 +1,27 @@
 package com.playmonumenta.plugins.seasonalevents;
 
 import com.playmonumenta.plugins.commands.GenericCommand;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionManager;
+import com.playmonumenta.plugins.seasonalevents.community.CommunityMissionsGui;
 import com.playmonumenta.plugins.seasonalevents.gui.PassGui;
+import com.playmonumenta.plugins.utils.CommandUtils;
 import com.playmonumenta.plugins.utils.DateUtils;
+import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.CommandPermission;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.EntitySelectorArgument;
+import dev.jorel.commandapi.arguments.GreedyStringArgument;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.LiteralArgument;
+import dev.jorel.commandapi.arguments.LongArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +30,7 @@ public class SeasonalEventCommand extends GenericCommand {
 	public static void register() {
 
 		CommandPermission perms = CommandPermission.fromString("monumenta.command.battlepass");
+		CommandPermission permsCommunityMissions = CommandPermission.fromString("monumenta.command.communitymissions");
 
 		// Add battlepass reload command
 		List<Argument<?>> arguments = new ArrayList<>();
@@ -156,5 +165,74 @@ public class SeasonalEventCommand extends GenericCommand {
 				}
 				new PassGui(seasonalPass, player, otherPlayer, now, true).open();
 			}).register();
+
+
+		// new community mission commands
+
+		// default command for opening gui for player
+		CommandAPICommand communityGui = new CommandAPICommand("gui")
+			.executes((sender, args) -> {
+				CommandSender callee = CommandUtils.getCallee(sender);
+				if (!(callee instanceof Player player)) {
+					throw CommandAPI.failWithString("The community missions GUI can only be shown to players");
+				}
+				new CommunityMissionsGui(player).open();
+			});
+
+		// debug command to set total contributions for mission
+		CommandAPICommand communityDebugSetTotal = new CommandAPICommand("setTotal")
+			.withPermission(permsCommunityMissions)
+			.withArguments(new IntegerArgument("index", 1, 3))
+			.withArguments(new LongArgument("amount", 0))
+			.executes((sender, args) -> {
+				int index = (int) args.getUnchecked("index") - 1;
+				long amount = args.getUnchecked("amount");
+
+				boolean success = CommunityMissionManager.getInstance().setTotalContribution(index, amount);
+				if (success) {
+					sender.sendMessage(Component.text("Set Mission " + (index + 1) + " total to " + amount, NamedTextColor.GREEN));
+				} else {
+					sender.sendMessage(Component.text("Failed: No active community event found.", NamedTextColor.RED));
+				}
+			});
+
+		// debug command to set personal contributions for mission
+		CommandAPICommand communityDebugSetPersonal = new CommandAPICommand("setPersonal")
+			.withPermission(permsCommunityMissions)
+			.withArguments(new EntitySelectorArgument.OnePlayer("target"))
+			.withArguments(new IntegerArgument("index", 1, 3))
+			.withArguments(new LongArgument("amount", 0))
+			.executes((sender, args) -> {
+				Player target = args.getUnchecked("target");
+				int index = (int) args.getUnchecked("index") - 1;
+				long amount = args.getUnchecked("amount");
+
+				boolean success = CommunityMissionManager.getInstance().setPlayerContribution(index, target.getUniqueId(), amount);
+				if (success) {
+					sender.sendMessage(Component.text("Set " + target.getName() + "'s contribution for Mission " + (index + 1) + " to " + amount + " (and updated total)", NamedTextColor.GREEN));
+				} else {
+					sender.sendMessage(Component.text("Failed: No active community event found.", NamedTextColor.RED));
+				}
+			});
+
+		// internal command (similar to how the hunts warnings work i think)
+		CommandAPICommand communityDebugInternalBroadcast = new CommandAPICommand("internalbroadcast")
+			.withPermission(permsCommunityMissions)
+			.withArguments(new StringArgument("type"))
+			.withArguments(new GreedyStringArgument("data"))
+			.executes((sender, args) -> {
+				String type = args.getUnchecked("type");
+				String data = args.getUnchecked("data");
+				String[] parts = data.split(" ");
+
+				CommunityMissionManager.getInstance().handleIncomingAlert(type, parts);
+			});
+
+		new CommandAPICommand("communitymissions")
+			.withSubcommand(communityGui)
+			.withSubcommand(communityDebugSetPersonal)
+			.withSubcommand(communityDebugSetTotal)
+			.withSubcommand(communityDebugInternalBroadcast)
+			.register();
 	}
 }

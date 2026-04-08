@@ -71,6 +71,7 @@ public final class CShura extends SerializedLocationBossAbilityGroup {
 		mBoss.setInvulnerable(true);
 		mCutscene = true; // Assume the boss always begins in cutscene mode
 
+		// TODO: Simplify this via hardcoded loc
 		for (final Entity e : mBoss.getNearbyEntities(detectionRange, detectionRange, detectionRange)) {
 			if (e.getScoreboardTags().contains(START_TAG) && e instanceof LivingEntity) {
 				mStart = (LivingEntity) e;

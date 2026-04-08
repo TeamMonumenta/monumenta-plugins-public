@@ -96,28 +96,22 @@ public class HauntedScarecrowCS extends FlameTotemCS {
 	}
 
 	@Override
-	public void flameTotemBombEnhanced(Player player, List<LivingEntity> targets, Location standLocation, Plugin plugin, double mBombRadius) {
-		flameTotemBomb(player, targets, standLocation, plugin, mBombRadius);
-	}
-
-	@Override
-	public void flameTotemBomb(Player player, List<LivingEntity> targets, Location standLocation, Plugin plugin, double mBombRadius) {
+	public void flameTotemBomb(Player player, LivingEntity target, Location standLocation, Plugin plugin, double mBombRadius) {
 		World world = standLocation.getWorld();
 		Location standEyeLocation = standLocation.add(0, 0.8, 0);
+		Location targetEyeLoc = target.getEyeLocation();
 		world.playSound(standLocation, Sound.ENTITY_PHANTOM_HURT, SoundCategory.PLAYERS, 1.2f, 0.7f);
 		world.playSound(standLocation, Sound.ITEM_CROSSBOW_LOADING_START, SoundCategory.PLAYERS, 1.7f, 0.8f);
 		world.playSound(standLocation, Sound.ENTITY_ALLAY_AMBIENT_WITHOUT_ITEM, SoundCategory.PLAYERS, 0.65f, 1.7f);
 		world.playSound(standLocation, Sound.PARTICLE_SOUL_ESCAPE, SoundCategory.PLAYERS, 2.0f, 1.1f);
-		for (LivingEntity target : targets) {
-			Location targetLoc = LocationUtils.getHalfHeightLocation(target);
-			new PPLine(Particle.CRIT, standEyeLocation, targetLoc).countPerMeter(4).delta(0.05).extra(0.1).spawnAsPlayerActive(player);
-			new PPLine(Particle.SMOKE_NORMAL, standEyeLocation, targetLoc).countPerMeter(4).delta(0.12).spawnAsPlayerActive(player);
-			new PPLine(Particle.CRIT_MAGIC, standEyeLocation, targetLoc).countPerMeter(4).delta(0.05).extra(0.1).spawnAsPlayerActive(player);
-			new PPLine(Particle.SOUL_FIRE_FLAME, standEyeLocation, targetLoc).countPerMeter(1.5).delta(0.08).extra(0.015).spawnAsPlayerActive(player);
-			new PartialParticle(Particle.SMOKE_NORMAL, targetLoc, 10).delta(1).spawnAsPlayerActive(player);
-			world.playSound(targetLoc, Sound.ITEM_AXE_STRIP, SoundCategory.PLAYERS, 2.2f, 0.6f);
-			world.playSound(targetLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.5f, 0.9f);
-		}
+		Location targetLoc = LocationUtils.getHalfHeightLocation(target);
+		new PPLine(Particle.CRIT, standEyeLocation, targetEyeLoc).countPerMeter(4).delta(0.05).extra(0.1).spawnAsPlayerActive(player);
+		new PPLine(Particle.SMOKE_NORMAL, standEyeLocation, targetEyeLoc).countPerMeter(4).delta(0.12).spawnAsPlayerActive(player);
+		new PPLine(Particle.CRIT_MAGIC, standEyeLocation, targetEyeLoc).countPerMeter(4).delta(0.05).extra(0.1).spawnAsPlayerActive(player);
+		new PPLine(Particle.SOUL_FIRE_FLAME, standEyeLocation, targetEyeLoc).countPerMeter(1.5).delta(0.08).extra(0.015).spawnAsPlayerActive(player);
+		new PartialParticle(Particle.SMOKE_NORMAL, targetLoc, 10).delta(1).spawnAsPlayerActive(player);
+		world.playSound(targetLoc, Sound.ITEM_AXE_STRIP, SoundCategory.PLAYERS, 2.2f, 0.6f);
+		world.playSound(targetLoc, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.5f, 0.9f);
 	}
 
 	@Override

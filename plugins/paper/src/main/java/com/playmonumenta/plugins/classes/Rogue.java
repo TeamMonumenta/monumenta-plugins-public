@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.rogue.AdvancingShadows;
 import com.playmonumenta.plugins.abilities.rogue.ByMyBlade;
 import com.playmonumenta.plugins.abilities.rogue.DaggerThrow;
@@ -16,14 +18,21 @@ import com.playmonumenta.plugins.abilities.rogue.assassin.CoupDeGrace;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.BladeDance;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.DeadlyRonde;
 import com.playmonumenta.plugins.abilities.rogue.swordsage.WindWalk;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.ROGUE_LORE;
 
 public class Rogue extends PlayerClass {
 
 	public static final int CLASS_ID = 4;
 	public static final int SWORDSAGE_SPEC_ID = 7;
 	public static final int ASSASSIN_SPEC_ID = 8;
+
+	public static final Style STEALTH_COLOR = Style.style(TextColor.color(0x68388C));
 
 	public Rogue() {
 		mAbilities.add(AdvancingShadows.INFO);
@@ -73,5 +82,43 @@ public class Rogue extends PlayerClass {
 
 			BodkinBlitz.INFO // after smoke screen
 		);
+	}
+
+	@Override
+	public Component getDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> Dethroner.INFO)
+			.addDashedLine()
+			.addLine("*Rogues excel in one-on-one battles*").styles(ROGUE_LORE)
+			.addLine("*and can easily bring down Elites.*").styles(ROGUE_LORE)
+			.addLine()
+			.addLine("*Dethroner (Class Passive):*").styles(Style.style(mClassColor))
+			.add(Dethroner.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Dethroner.class), player);
+	}
+
+	@Override
+	public Component getSpecOneDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Swordsages dance gracefully in the*").styles(ROGUE_LORE)
+			.addLine("*heart of battle, using dextrous movement*").styles(ROGUE_LORE)
+			.addLine("*and slashing strikes to duel large*").styles(ROGUE_LORE)
+			.addLine("*crowds of enemies at once.*").styles(ROGUE_LORE)
+			.addLine("(Area Damage, Crowd Control, Mobility)")
+			.addDashedLine()
+			.get();
+	}
+
+	@Override
+	public Component getSpecTwoDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Assassins stay hidden in the shadows,*").styles(ROGUE_LORE)
+			.addLine("*evading enemies and dealing fatal burst*").styles(ROGUE_LORE)
+			.addLine("*damage with their precise strikes.*").styles(ROGUE_LORE)
+			.addLine("(Burst Damage, Stealth)")
+			.addDashedLine()
+			.get();
 	}
 }

@@ -7,10 +7,11 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.SanguineHarvestCS;
+import com.playmonumenta.plugins.effects.Bleed;
 import com.playmonumenta.plugins.effects.SanguineHarvestBlight;
 import com.playmonumenta.plugins.effects.SanguineMark;
 import com.playmonumenta.plugins.events.DamageEvent;
@@ -24,6 +25,7 @@ import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.ArrayList;
 import java.util.List;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -36,6 +38,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class SanguineHarvest extends Ability implements AbilityWithDuration {
 
@@ -66,6 +73,8 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	public static final String CHARM_BLIGHT_VULN_PER_DEBUFF = "Sanguine Harvest Blight Vulnerability Per Debuff";
 	public static final String CHARM_MARKS = "Sanguine Harvest Marks";
 
+	public static final Style MARK_COLOR = Style.style(TextColor.color(0xB30947));
+
 	public static final AbilityInfo<SanguineHarvest> INFO =
 		new AbilityInfo<>(SanguineHarvest.class, "Sanguine Harvest", SanguineHarvest::new)
 			.linkedSpell(ClassAbility.SANGUINE_HARVEST)
@@ -93,6 +102,7 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private final List<Location> mMarkedLocations = new ArrayList<>(); // To mark locations (Even if block is not replaced)
 
 	private final SanguineHarvestCS mCosmetic;
+	private BukkitRunnable mActiveMarkerRunnable;
 
 	public SanguineHarvest(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
@@ -208,7 +218,11 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	private void runMarkerRunnable() {
 		if (!mMarkedLocations.isEmpty() &&
 			isEnhanced()) {
-			new BukkitRunnable() {
+			if (mActiveMarkerRunnable != null && !mActiveMarkerRunnable.isCancelled()) {
+				mActiveMarkerRunnable.cancel();
+			}
+
+			mActiveMarkerRunnable = new BukkitRunnable() {
 				int mTicks = 0;
 
 				@Override
@@ -243,7 +257,8 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 					mCurrDuration = -1;
 					ClientModHandler.updateAbility(mPlayer, SanguineHarvest.this);
 				}
-			}.runTaskTimer(mPlugin, 0, 10);
+			};
+			mActiveMarkerRunnable.runTaskTimer(mPlugin, 0, 10);
 			mCurrDuration = 0;
 			ClientModHandler.updateAbility(mPlayer, this);
 		}
@@ -260,40 +275,59 @@ public class SanguineHarvest extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<SanguineHarvest> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Mobs you damage with a non-DoT ability are afflicted with ")
-			.add(a -> BLEED_LEVEL, BLEED_LEVEL)
-			.add(" stack of Bleed. ")
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to fire a burst of darkness which travels up to ")
-			.add(a -> a.mRange, RANGE)
-			.add(" blocks. Upon reaching max range or contacting a block or mob, it explodes, knocking back all mobs within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks and applying a blood mark to them for ")
-			.addDuration(MARK_DURATION)
-			.add(" seconds. Any player that kills a marked mob is healed for ")
-			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_1, false, Ability::isLevelOne)
-			.add(" max health.")
-			.addCooldown(COOLDOWN);
+			.addDashedLine()
+			.addLine("Passively, damage from your active abilities")
+			.addLine("inflicts mobs with *1* stack of *Bleed*.").styles(WHITE, Bleed.BLEED_COLOR)
+			.addLine("(Excludes Cursed Wound and Withering Gaze)")
+			.addLine()
+			.addLine("Activate to fire a burst of magic that")
+			.addLine("explodes on impact, knocking back mobs")
+			.addLine("and *Marking* them for %t.").styles(MARK_COLOR)
+				.statValues(stat(MARK_DURATION))
+			.addLine()
+			.addLine("*Marked* mobs heal the player who kills them.").styles(MARK_COLOR)
+			.addLine()
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Healing: %p1 HP per *Mark*").styles(MARK_COLOR)
+				.statValues(stat(a -> a.mHealPercent, HEAL_PERCENT_1))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<SanguineHarvest> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Healing from marked mobs is increased to ")
-			.addPercent(a -> a.mHealPercent, HEAL_PERCENT_2, false, Ability::isLevelTwo)
-			.add(" max health. Additionally, melee attacks against marked mobs heal the player for the full amount, deal ")
-			.addPercent(a -> a.mDamageBoost, DAMAGE_BOOST)
-			.add(" more damage, and consume the mark.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Sanguine Harvest*'s healing.").styles(UNDERLINED)
+			.addLine()
+			.addLine("Attacks against *Marked* mobs deal").styles(MARK_COLOR)
+			.addLine("increased damage, heal the player,")
+			.addLine("and remove the *Mark*.").styles(MARK_COLOR)
+			.addLine()
+			.addStatComparison("Healing: %p1 -> %p2 HP per *Mark*").styles(MARK_COLOR)
+				.statValues(stat(HEAL_PERCENT_1), stat(a -> a.mHealPercent, HEAL_PERCENT_2))
+			.addStat("Damage Boost: +%p (m)")
+				.statValues(stat(a -> a.mDamageBoost, DAMAGE_BOOST))
+			.addDashedLine();
 	}
 
 	private static Description<SanguineHarvest> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When cast, a ")
-			.add(a -> a.mRange, RANGE)
-			.add(" block cone of blight is created on the ground which lasts for ")
-			.addDuration(a -> a.mBlightDuration, ENHANCEMENT_BLIGHT_DURATION)
-			.add(" seconds. Mobs in the blighted area take ")
-			.addPercent(a -> a.mBlightVulnPerDebuff, ENHANCEMENT_DMG_INCREASE)
-			.add(" extra damage per debuff they currently have. Blight is not counted as a debuff.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Sanguine Harvest* creates a blighted area").styles(UNDERLINED)
+			.addLine("in front of you that lasts for %t.")
+				.statValues(stat(ENHANCEMENT_BLIGHT_DURATION))
+			.addLine()
+			.addLine("Mobs in the area take increased damage")
+			.addLine("for each debuff they have.")
+			.addLine()
+			.addStat("Damage Boost: +%p per debuff")
+				.statValues(stat(a -> a.mBlightVulnPerDebuff, ENHANCEMENT_DMG_INCREASE))
+			.addStat("Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRange, RANGE))
+			.addDashedLine();
 	}
 }

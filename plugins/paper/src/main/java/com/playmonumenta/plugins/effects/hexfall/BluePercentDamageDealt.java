@@ -19,7 +19,8 @@ public final class BluePercentDamageDealt extends PercentDamageDealt {
 	@Override
 	public Component getSpecificDisplay() {
 		return StringUtils.doubleToColoredAndSignedPercentage(mAmount)
-			.append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + " Damage Dealt to Harrakfar"));
+			.appendSpace()
+			.append(Component.text(StringUtils.getDamageTypeString(mAffectedDamageTypes) + "Damage Dealt to Harrakfar"));
 	}
 
 	@Override

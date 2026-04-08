@@ -9,6 +9,8 @@ import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.itemstats.enums.Slot;
 import java.util.EnumSet;
 import java.util.NavigableSet;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -16,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class Inferno implements Enchantment {
 
 	public static final String INFERNO_EFFECT_NAME = "Inferno";
-
+	public static final Style INFERNO_COLOR = Style.style(TextColor.color(0xE63C22));
 	@Override
 	public String getName() {
 		return "Inferno";

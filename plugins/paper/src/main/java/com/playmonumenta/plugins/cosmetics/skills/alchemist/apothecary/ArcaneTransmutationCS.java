@@ -58,7 +58,7 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 	}
 
 	@Override
-	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks) {
+	public void periodicEffect(Player player, Location center, double radius, int tick, int maxTicks, int maximumPotentialTicks, int killCount, int maxKills) {
 
 		if (tick % 40 == 0) {
 			AbilityUtils.playPassiveAbilitySound(center, Sound.BLOCK_BEACON_POWER_SELECT, 0.5f, 0.75f);
@@ -73,7 +73,8 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 
 		float initialRotation = center.getYaw() + 180;
 
-		double centerSymbolSize = radius * 0.45;
+		double sizeCoefficient = 0.5 + (double) killCount / (double) maxKills / 2;
+		double centerSymbolSize = radius * 0.45 * sizeCoefficient;
 		double smallRadius = 0.2 * radius;
 		double arcCut = Math.toDegrees(2 * Math.asin(smallRadius / radius / 2));
 
@@ -159,8 +160,31 @@ public class ArcaneTransmutationCS extends TransmutationRingCS {
 	}
 
 	@Override
-	public void effectOnKill(Player player, Location loc) {
+	public void effectOnKill(Player player, Location loc, Location centerLoc, int killCount, int maxKills, boolean isElite) {
+		if (isElite) {
+			ArcanePotionsCS.Symbol randomSymbol = FastUtils.getRandomElement(ArcanePotionsCS.LARGE_SYMBOLS);
+			randomSymbol.draw(new ArcanePotionsCS.Transform(loc, 2.625, loc.getYaw() + 180), Particle.FLAME, player);
+		} else {
+			ArcanePotionsCS.Symbol randomSymbol = FastUtils.getRandomElement(ArcanePotionsCS.SMALL_SYMBOLS);
+			randomSymbol.draw(new ArcanePotionsCS.Transform(loc, 1.5, loc.getYaw() + 180), Particle.FLAME, player);
+		}
+	}
 
+	@Override
+	public void explode(Player player, Location centerLoc, double radius) {
+		centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1f);
+		centerLoc.getWorld().playSound(centerLoc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 1f);
+		PPCircle circle = new PPCircle(Particle.WAX_OFF, centerLoc, radius)
+			.ringMode(true)
+			.delta(0, 1, 0)
+			.directionalMode(true)
+			.countPerMeter(1.5);
+		circle.extra(30).location(centerLoc.clone().add(0, 0.5, 0)).spawnAsPlayerActive(player);
+		circle.extra(30).location(centerLoc.clone().add(0, 1, 0)).spawnAsPlayerActive(player);
+		circle.extra(30).location(centerLoc.clone().add(0, 1.5, 0)).spawnAsPlayerActive(player);
+		circle.extra(-30).location(centerLoc.clone().add(0, -0.5, 0)).spawnAsPlayerActive(player);
+		circle.extra(-30).location(centerLoc.clone().add(0, -1, 0)).spawnAsPlayerActive(player);
+		circle.extra(-30).location(centerLoc.clone().add(0, -1.5, 0)).spawnAsPlayerActive(player);
 	}
 
 }

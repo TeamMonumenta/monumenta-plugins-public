@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.effects.Cryogenesis;
 import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.hunts.bosses.AlocAcoc;
+import com.playmonumenta.plugins.utils.BossUtils;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import net.kyori.adventure.text.Component;
@@ -18,10 +19,12 @@ public class PassiveCryogenesis extends Spell {
 	private static final int ABOVE_Y = 3;
 
 	private final LivingEntity mBoss;
+	private final PassivePolarAura mAura;
 	private int mT;
 
-	public PassiveCryogenesis(LivingEntity boss) {
+	public PassiveCryogenesis(LivingEntity boss, PassivePolarAura aura) {
 		mBoss = boss;
+		mAura = aura;
 		mT = 0;
 	}
 
@@ -31,16 +34,16 @@ public class PassiveCryogenesis extends Spell {
 		if (mT++ % 20 == 0) {
 			Location bossLoc = mBoss.getLocation();
 			for (Player p : PlayerUtils.playersInXZRange(bossLoc, AlocAcoc.OUTER_RADIUS, true)) {
-				Location playerLoc = p.getLocation();
 				double amount = getCryogenesis(p);
-				if (playerLoc.getY() > bossLoc.getY() + ABOVE_Y) {
-					amount += 0.1;
+				if (BossUtils.isTooHigh(mBoss, p, bossLoc, 3)) {
+					amount += 0.2;
 					p.playSound(p, Sound.BLOCK_GLASS_BREAK, 1f, 2f);
 				} else {
 					amount -= 0.025;
 				}
 				if (amount > 1) {
 					amount = 1;
+					mAura.addFrostbite(p, 0.02f);
 					DamageUtils.damage(mBoss, p, DamageEvent.DamageType.AILMENT, 2, null, true, false, Cryogenesis.GENERIC_NAME);
 					p.playSound(p, Sound.ENTITY_PLAYER_HURT_FREEZE, 1f, 0.6f);
 				}

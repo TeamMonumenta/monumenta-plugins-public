@@ -45,7 +45,7 @@ public class DodgeBoss extends BossAbilityGroup {
 
 	@Override
 	public void onHurtByEntityWithSource(DamageEvent event, Entity damager, LivingEntity source) {
-		if (mDodgeCount > 0 && !EntityUtils.isStunned(mBoss) && !EntityUtils.isSilenced(mBoss)) {
+		if (mDodgeCount > 0 && !EntityUtils.isStunned(mBoss) && !EntityUtils.isSilenced(mBoss) && !EntityUtils.isStaggered(mBoss)) {
 			dodge(event);
 			mDodgeCount--;
 			Bukkit.getScheduler().runTaskLater(mPlugin, () -> {

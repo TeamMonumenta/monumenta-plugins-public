@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.cleric.Crusade;
 import com.playmonumenta.plugins.classes.Cleric;
 import com.playmonumenta.plugins.effects.PercentKnockbackResist;
@@ -13,6 +13,10 @@ import com.playmonumenta.plugins.utils.EntityUtils;
 import java.util.List;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class Unwavering extends Ability {
 	public static final double DJ_MULTIPLIER = 0.1;
@@ -53,16 +57,17 @@ public class Unwavering extends Ability {
 		return mPercentDamage;
 	}
 
-	private static Description<Unwavering> getDescription() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Divine Justice's % multiplier is increased by ")
-			.addPercent(a -> a.mPercentDamage, DJ_MULTIPLIER)
-			.add(", and you gain ")
-			.addPercent(a -> a.mKBRIncrement, KBR_INCREMENT)
-			.add(" Knockback Resistance (up to ")
-			.addPercent(a -> a.mMaxKBR, MAX_KBR)
-			.add(") for every Heretic within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks of you.");
+	public static Description<Unwavering> getDescription() {
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addLine("You gain +%p *Knockback Resistance* per").styles(WHITE)
+				.statValues(stat(a -> a.mKBRIncrement, KBR_INCREMENT))
+			.addLine("*Heretic* within %d blocks, up to +%p.").styles(Cleric.HERETIC_COLOR)
+				.statValues(
+					stat(a -> a.mRadius, RADIUS),
+					stat(a -> a.mMaxKBR, MAX_KBR))
+			.addLine()
+			.addLine("Increase *Divine Justice*'s bonus").styles(UNDERLINED)
+			.addLine("damage multiplier by +%p.")
+				.statValues(stat(a -> a.mPercentDamage, DJ_MULTIPLIER));
 	}
 }

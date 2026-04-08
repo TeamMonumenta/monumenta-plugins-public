@@ -146,12 +146,6 @@ public class PassGui extends Gui {
 				.decoration(TextDecoration.ITALIC, false));
 		}
 		lore.add(Component.text(
-				String.format("Missions end in %dd %dh",
-					mPass.getDaysUntilMissionEnd(),
-					mPass.getHoursUntilMissionEnd()),
-				NamedTextColor.YELLOW)
-			.decoration(TextDecoration.ITALIC, false));
-		lore.add(Component.text(
 				String.format("Pass ends in %dd %dh",
 					mPass.getDaysUntilPassEnd(),
 					mPass.getHoursUntilPassEnd()),

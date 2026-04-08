@@ -84,7 +84,6 @@ public class GayTotemCS extends CleansingTotemCS {
 			}
 		}.runTaskTimer(Plugin.getInstance(), 0, 2);
 
-		player.playSound(standLocation, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.8f, 0.4f);
 		player.playSound(standLocation, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, SoundCategory.PLAYERS, 0.2f, 1.5f);
 	}
 
@@ -96,10 +95,9 @@ public class GayTotemCS extends CleansingTotemCS {
 			.spawnAsPlayerActive(player);
 
 		ParticleUtils.drawFlag(player, standLocation.clone().add(0, 3, 0), GAY_COLORS, 1.6f);
-		player.playSound(standLocation, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 1.2f, 1.3f);
-		player.playSound(standLocation, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.5f, 1.6f);
-		player.playSound(standLocation, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 1.4f, 1.4f);
-		player.playSound(standLocation, Sound.ITEM_TRIDENT_RIPTIDE_1, SoundCategory.PLAYERS, 1.4f, 0.1f);
+		player.playSound(standLocation, Sound.BLOCK_RESPAWN_ANCHOR_SET_SPAWN, SoundCategory.PLAYERS, 0.8f, 1.3f);
+		player.playSound(standLocation, Sound.ENTITY_PLAYER_LEVELUP, SoundCategory.PLAYERS, 0.4f, 1.6f);
+		player.playSound(standLocation, Sound.BLOCK_BEACON_DEACTIVATE, SoundCategory.PLAYERS, 1.1f, 1.4f);
 	}
 
 	@Override
@@ -131,10 +129,7 @@ public class GayTotemCS extends CleansingTotemCS {
 			.spawnAsPlayerActive(player);
 
 		mTicks++;
-		player.playSound(standLocation, Sound.ENTITY_WARDEN_HEARTBEAT, SoundCategory.PLAYERS, 1.4f, 1.2f);
-		player.playSound(standLocation, Sound.ENTITY_ZOMBIE_INFECT, SoundCategory.PLAYERS, 0.6f, 2.0f);
-		player.playSound(standLocation, Sound.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 0.4f, 0.1f);
-		player.playSound(standLocation, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.3f, 0.8f);
+		player.playSound(standLocation, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.3f, 0.9f);
 		player.playSound(standLocation, Sound.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 0.3f, 1.5f);
 	}
 }

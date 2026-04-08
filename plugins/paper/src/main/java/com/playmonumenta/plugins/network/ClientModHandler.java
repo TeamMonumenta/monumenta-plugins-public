@@ -10,7 +10,10 @@ import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemicalArtillery;
 import com.playmonumenta.plugins.abilities.alchemist.AlchemistPotions;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritIce;
+import com.playmonumenta.plugins.abilities.rogue.MagicDodging;
 import com.playmonumenta.plugins.abilities.scout.Swiftness;
+import com.playmonumenta.plugins.abilities.shaman.TotemicProjection;
+import com.playmonumenta.plugins.abilities.warrior.berserker.Bloodlust;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.classes.MonumentaClasses;
 import com.playmonumenta.plugins.classes.PlayerClass;
@@ -266,9 +269,14 @@ public class ClientModHandler {
 		}
 		if (ability instanceof AlchemistPotions) {
 			return "Alchemist";
-		}
-		if (ability instanceof ElementalSpiritIce) {
+		} else if (ability instanceof ElementalSpiritIce) {
 			return "Mage";
+		} else if (ability instanceof MagicDodging) {
+			return "Rogue";
+		} else if (ability instanceof TotemicProjection) {
+			return "Shaman";
+		} else if (ability instanceof Bloodlust) {
+			return "Warrior";
 		}
 		for (PlayerClass playerClass : INSTANCE.mClasses.mClasses) {
 			Predicate<AbilityInfo<?>> sameClass = abi -> abi.getAbilityClass() == ability.getClass();
@@ -301,8 +309,10 @@ public class ClientModHandler {
 
 		public static class ClientModAbilityInfo {
 
-			@Nullable String name;
-			@Nullable String className;
+			@Nullable
+			String name;
+			@Nullable
+			String className;
 
 			int remainingCooldown;
 			int initialCooldown;
@@ -310,10 +320,13 @@ public class ClientModHandler {
 			int remainingCharges;
 			int maxCharges;
 
-			@Nullable String mode;
+			@Nullable
+			String mode;
 
-			@Nullable Integer remainingDuration;
-			@Nullable Integer initialDuration;
+			@Nullable
+			Integer remainingDuration;
+			@Nullable
+			Integer initialDuration;
 
 		}
 
@@ -326,7 +339,8 @@ public class ClientModHandler {
 
 		final String _type = "AbilityUpdatePacket";
 
-		@Nullable String name;
+		@Nullable
+		String name;
 
 		// className is not required, as a player should never have multiple abilities with the same name
 
@@ -334,10 +348,13 @@ public class ClientModHandler {
 
 		int remainingCharges;
 
-		@Nullable String mode;
+		@Nullable
+		String mode;
 
-		@Nullable Integer remainingDuration;
-		@Nullable Integer initialDuration;
+		@Nullable
+		Integer remainingDuration;
+		@Nullable
+		Integer initialDuration;
 
 	}
 
@@ -362,7 +379,8 @@ public class ClientModHandler {
 
 		int newLimit;
 
-		@Nullable Integer count;
+		@Nullable
+		Integer count;
 
 	}
 
@@ -380,7 +398,7 @@ public class ClientModHandler {
 	}
 
 	public record EffectInfo(String UUID, int displayPriority, String name, int duration, double power,
-	                         boolean positive, boolean percentage) {
+							 boolean positive, boolean percentage) {
 	}
 
 

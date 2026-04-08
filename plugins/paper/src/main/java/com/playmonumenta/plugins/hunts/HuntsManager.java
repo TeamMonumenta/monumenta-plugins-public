@@ -74,6 +74,7 @@ import org.jetbrains.annotations.NotNull;
 public class HuntsManager implements Listener {
 	private static final String HUNTS_SCOREHOLDER = "$Hunts";
 	private static final String TIME_OBJECTIVE = "HuntsSpawnTime";
+	private static final String LAST_TIME_OBJECTIVE = "HuntsLastSpawnTime";
 	private static final String BAITED_OBJECTIVE = "HuntsBaited";
 	private static final String QUARRY_OBJECTIVE = "HuntsNextQuarry";
 	private static final String IN_RANGE_CHANNEL = "com.playmonumenta.plugins.hunts.HuntsManager.playersInRange";
@@ -227,6 +228,7 @@ public class HuntsManager implements Listener {
 	private @Nullable QuarryType mNextQuarry = null;
 	private boolean mIsBaited;
 	private long mSpawnTime;
+	private long mLastSpawnTime;
 
 	private boolean mTriggeredThirty = false;
 	private boolean mTriggeredFifteen = false;
@@ -343,6 +345,7 @@ public class HuntsManager implements Listener {
 			BroadcastedEvents.clearEvent(mNextQuarry.name(), "ring");
 		}
 		CompletableFuture.allOf(
+				setLastHuntTime(),
 				setRandomTime(),
 				setBaited(false),
 				setRandomQuarry()
@@ -397,6 +400,15 @@ public class HuntsManager implements Listener {
 					mSpawnTime = val;
 					MMLog.finer("[Hunts] Next spawn time is " + mSpawnTime);
 				}
+			}),
+
+			RBoardAPI.getAsLong(HUNTS_SCOREHOLDER, LAST_TIME_OBJECTIVE, 0).whenComplete((val, ex) -> {
+				if (ex != null) {
+					MMLog.warning("[Hunts] Encountered exception when refreshing last spawn time", ex);
+				} else {
+					mLastSpawnTime = val;
+					MMLog.finer("[Hunts] Last spawn time is " + mLastSpawnTime);
+				}
 			})
 		);
 	}
@@ -417,6 +429,11 @@ public class HuntsManager implements Listener {
 		// Always within 2 standard deviations to avoid extreme edge cases
 		seconds = Math.max(MEAN_SECONDS - 3 * SD_SECONDS, Math.min(MEAN_SECONDS + 3 * SD_SECONDS, seconds));
 		return setTime(seconds);
+	}
+
+	private CompletableFuture<Long> setLastHuntTime() {
+		MMLog.finer("[Hunts] Set last spawn time to " + mSpawnTime);
+		return RBoardAPI.set(HUNTS_SCOREHOLDER, LAST_TIME_OBJECTIVE, mSpawnTime);
 	}
 
 	public CompletableFuture<Long> setTime(long seconds) {
@@ -945,5 +962,9 @@ public class HuntsManager implements Listener {
 			default -> {
 			}
 		}
+	}
+
+	protected int getMinutesSinceLastHunt() {
+		return (int) ((DateUtils.getSecondsSinceEpoch() - mLastSpawnTime) / 60);
 	}
 }

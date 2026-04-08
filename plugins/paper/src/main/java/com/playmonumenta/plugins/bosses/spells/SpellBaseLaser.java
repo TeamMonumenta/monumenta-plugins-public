@@ -208,6 +208,16 @@ public class SpellBaseLaser extends Spell {
 
 			@Override
 			public void run() {
+				if (EntityUtils.shouldCancelSpells(mBoss)) {
+					this.cancel();
+					mActiveRunnables.remove(this);
+					return;
+				}
+
+				if (EntityUtils.shouldPauseSpells(mBoss)) {
+					return;
+				}
+
 				Location startLocation = mBoss.getEyeLocation();
 				Location targetedLocation = target.getLocation().add(0, target.getEyeHeight() * 3 / 5, 0);
 				if (startLocation.getWorld() != targetedLocation.getWorld() || (target instanceof Player && AbilityUtils.isStealthed((Player) target))) {
@@ -238,7 +248,7 @@ public class SpellBaseLaser extends Spell {
 
 				boolean outOfRange = mMaxRange != 0 && startLocation.distance(targetedLocation) > mMaxRange;
 
-				if ((mStopWhenBlocked && blocked) || EntityUtils.shouldCancelSpells(mBoss) || outOfRange) {
+				if ((mStopWhenBlocked && blocked) || outOfRange) {
 					this.cancel();
 					mActiveRunnables.remove(this);
 					return;

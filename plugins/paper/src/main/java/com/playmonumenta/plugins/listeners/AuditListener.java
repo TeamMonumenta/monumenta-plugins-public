@@ -3,6 +3,7 @@ package com.playmonumenta.plugins.listeners;
 import com.playmonumenta.plugins.integrations.MonumentaNetworkRelayIntegration;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,90 +39,100 @@ import org.bukkit.loot.Lootable;
 import org.jetbrains.annotations.Nullable;
 
 public class AuditListener implements Listener {
-	private static final List<Pattern> IGNORED_COMMAND_REGEX = Arrays.asList(
-		// ScriptedQuests
-		exactOptionalArguments("(scriptedquests:)?questtrigger"),
-		exactOptionalArguments("(minecraft:)?clickable"),
-		exactOptionalArguments("(minecraft:)?leaderboard(?! update)"),
-		exactOptionalArguments("(minecraft:)?waypoint"),
+	private static final List<Pattern> IGNORED_COMMAND_REGEX;
+	private static final List<Pattern> NEVER_IGNORED_COMMAND_REGEX;
 
-		// MonumentaNetworkChat
-		exactOptionalArguments("help"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) help"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) listplayers"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) join"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) leave"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) pause"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) unpause"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) player"),
-		exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) say"),
-		exactOptionalArguments("(minecraft:)?(global|g)"),
-		exactOptionalArguments("(minecraft:)?(guildchat|gc)"),
-		exactOptionalArguments("(minecraft:)?(local|l)"),
-		exactOptionalArguments("(minecraft:)?(worldchat|wc)"),
-		exactOptionalArguments("(minecraft:)?(party|p)"),
-		exactOptionalArguments("(minecraft:)?(pausechat|pc)"),
-		exactOptionalArguments("(minecraft:)?me"),
-		exactOptionalArguments("(minecraft:)?(msg|tell|w)"),
-		exactOptionalArguments("(minecraft:)?r"),
-		exactOptionalArguments("(minecraft:)?(teammsg|tm)"),
-		exactOptionalArguments("lfg"),
-		exactOptionalArguments("m"),
-		exactOptionalArguments("mh"),
-		exactOptionalArguments("tr"),
-		exactOptionalArguments("join"),
-		exactOptionalArguments("leave"),
-		exactOptionalArguments("ignore"),
-		exactOptionalArguments("unignore"),
+	static {
+		List<Pattern> ignoredCommandRegex = new ArrayList<>(List.of(
+			// ScriptedQuests
+			exactOptionalArguments("(scriptedquests:)?questtrigger"),
+			exactOptionalArguments("(minecraft:)?clickable"),
+			exactOptionalArguments("(minecraft:)?leaderboard(?! update)"),
+			exactOptionalArguments("(minecraft:)?waypoint"),
 
-		// CoreProtect
-		exactOptionalArguments("(coreprotect:)?co i(nspect)?"),
-		exactOptionalArguments("(coreprotect:)?co l(ookup)?"),
-		exactOptionalArguments("(coreprotect:)?co near"),
+			// MonumentaNetworkChat
+			exactOptionalArguments("(minecraft:)?help"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) help"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) listplayers"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) join"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) leave"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) pause"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) unpause"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) player"),
+			exactOptionalArguments("(minecraft:)?(ch|chat|networkchat) say"),
+			exactOptionalArguments("(minecraft:)?(global|g)"),
+			exactOptionalArguments("(minecraft:)?(guildchat|gc)"),
+			exactOptionalArguments("(minecraft:)?(local|l)"),
+			exactOptionalArguments("(minecraft:)?(worldchat|wc)"),
+			exactOptionalArguments("(minecraft:)?(party|p)"),
+			exactOptionalArguments("(minecraft:)?(pausechat|pc)"),
+			exactOptionalArguments("(minecraft:)?me"),
+			exactOptionalArguments("(minecraft:)?(msg|tell|w)"),
+			exactOptionalArguments("(minecraft:)?r"),
+			exactOptionalArguments("(minecraft:)?(teammsg|tm)"),
+			exactOptionalArguments("lfg"),
+			exactOptionalArguments("m"),
+			exactOptionalArguments("mh"),
+			exactOptionalArguments("tmc"),
+			exactOptionalArguments("tr"),
+			exactOptionalArguments("join"),
+			exactOptionalArguments("leave"),
+			exactOptionalArguments("ignore"),
+			exactOptionalArguments("unignore"),
 
-		// FAWE
-		exactOptionalArguments("/calc"), // "//calc"
+			// CoreProtect
+			exactOptionalArguments("(coreprotect:)?co i(nspect)?"),
+			exactOptionalArguments("(coreprotect:)?co l(ookup)?"),
+			exactOptionalArguments("(coreprotect:)?co near"),
 
-		// Common commands
-		exactOptionalArguments(String.format(
-			"(%s|%s)",
-			JunkItemListener.COMMAND,
-			JunkItemListener.ALIAS
-		)),
-		exactOptionalArguments("(minecraft:)?block (add|remove|list|list_raw)"),
-		exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
-		exactOptionalArguments("(minecraft:)?claimraffle"),
-		exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
-		exactOptionalArguments("(minecraft:)?(friend|f) (add|remove|list|list_raw)"),
-		exactNoArguments("(minecraft:)?gg"),
-		exactOptionalArguments("(minecraft:)?glowing"),
-		exactNoArguments("(minecraft:)?grave list"),
-		exactOptionalArguments("(minecraft:)?guild"),
-		exactOptionalArguments("(minecraft:)?mail"),
-		exactOptionalArguments("(minecraft:)?particles"),
-		exactOptionalArguments("peb"),
-		exactOptionalArguments("(minecraft:)?player"),
-		exactOptionalArguments("(playerstats|ps)"),
-		exactOptionalArguments("(minecraft:)?plot (help|add|remove|info|info_raw|region)"),
-		exactOptionalArguments("(minecraft:)?race leaderboard"),
-		exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
-		exactNoArguments("(minecraft:)?rushpause"),
-		exactOptionalArguments("(minecraft:)?toggleswap"),
-		exactOptionalArguments("(minecraft:)?toggleworldnames"),
-		exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
-		exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
-		exactOptionalArguments("(minecraft:)?wallet withdraw"),
-		exactOptionalArguments("(minecraft:)?punch"),
-		exactOptionalArguments("(spark:)?tps")
-	);
+			// FAWE
+			exactOptionalArguments("/calc"), // "//calc"
 
-	private static final List<Pattern> NEVER_IGNORED_COMMAND_REGEX = Arrays.asList(
-		exactOptionalArguments("(minecraft:)?block [^ ]+_other"),
-		exactOptionalArguments("(minecraft:)?(friend|f) [^ ]+_other"),
-		exactOptionalArguments("(minecraft:)?guild mod"),
-		exactOptionalArguments("(minecraft:)?mail mod"),
-		exactOptionalArguments("(minecraft:)?plot [^ ]+_other")
-	);
+			// Common commands
+			exactOptionalArguments(String.format(
+				"(%s|%s)",
+				JunkItemListener.COMMAND,
+				JunkItemListener.ALIAS
+			)),
+			exactOptionalArguments("(minecraft:)?block (add|remove|list|list_raw)"),
+			exactOptionalArguments("(minecraft:)?(blockinteractions|bi)"),
+			exactOptionalArguments("(minecraft:)?claimraffle"),
+			exactOptionalArguments("(minecraft:)?(disabledrop|dd)"),
+			exactOptionalArguments("(minecraft:)?(friend|f) (add|remove|list|list_raw)"),
+			exactNoArguments("(minecraft:)?gg"),
+			exactOptionalArguments("(minecraft:)?glowing"),
+			exactNoArguments("(minecraft:)?grave list"),
+			exactOptionalArguments("(minecraft:)?guild"),
+			exactOptionalArguments("(minecraft:)?mail"),
+			exactOptionalArguments("(minecraft:)?particles"),
+			exactOptionalArguments("peb"),
+			exactOptionalArguments("(minecraft:)?player"),
+			exactOptionalArguments("(playerstats|ps)"),
+			exactOptionalArguments("(minecraft:)?plot (help|add|remove|info|info_raw|region)"),
+			exactOptionalArguments("(minecraft:)?race leaderboard"),
+			exactOptionalArguments("(minecraft:)?(rocketjump|rj)"),
+			exactNoArguments("(minecraft:)?rushpause"),
+			exactOptionalArguments("(minecraft:)?toggleswap"),
+			exactOptionalArguments("(minecraft:)?toggleworldnames"),
+			exactOptionalArguments("(minecraft:)?(virtualfirmament|vf)"),
+			exactOptionalArguments("(minecraft:)?(viewcharms|vc|viewzenithcharms|vzc)"),
+			exactOptionalArguments("(minecraft:)?wallet withdraw"),
+			exactOptionalArguments("(minecraft:)?punch"),
+			exactOptionalArguments("(spark:)?tps")
+		));
+		for (int i = 0; i <= 9; i++) {
+			ignoredCommandRegex.add(exactOptionalArguments("(minecraft:)?c" + i));
+		}
+		IGNORED_COMMAND_REGEX = List.copyOf(ignoredCommandRegex);
+
+		NEVER_IGNORED_COMMAND_REGEX = Arrays.asList(
+			exactOptionalArguments("(minecraft:)?block [^ ]+_other"),
+			exactOptionalArguments("(minecraft:)?(friend|f) [^ ]+_other"),
+			exactOptionalArguments("(minecraft:)?guild mod"),
+			exactOptionalArguments("(minecraft:)?mail mod"),
+			exactOptionalArguments("(minecraft:)?plot [^ ]+_other")
+		);
+	}
 
 	private final Map<HumanEntity, ItemStack> mLastCreativeDestroy = new HashMap<>();
 	private final Logger mLogger;

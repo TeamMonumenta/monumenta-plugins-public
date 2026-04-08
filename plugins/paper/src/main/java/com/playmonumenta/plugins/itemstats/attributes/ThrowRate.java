@@ -130,7 +130,9 @@ public class ThrowRate implements Attribute {
 				AbilityManager.getManager().playerShotProjectileEvent(player, snowball);
 
 				player.setCooldown(Material.SNOWBALL, cooldown);
-				event.setCancelled(true);
+				if (!ItemStatUtils.hasEnchantment(oldSnowball.getItem(), EnchantmentType.CONSUMPTION)) {
+					event.setCancelled(true);
+				}
 				// For clearing weapon snowballs after 10s (to prevent being stuck in bubble columns):
 				EntityListener.clearSnowballProjectile(snowball);
 			} else {

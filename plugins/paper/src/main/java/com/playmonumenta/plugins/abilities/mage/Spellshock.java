@@ -5,8 +5,9 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.SpellshockCS;
 import com.playmonumenta.plugins.effects.CustomDamageOverTime;
@@ -26,12 +27,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Spellshock extends Ability {
 	public static final String NAME = "Spellshock";
@@ -95,6 +101,8 @@ public class Spellshock extends Ability {
 	public static final String CHARM_ENHANCE_LIGHTNING_DAMAGE = "Spellshock Enhancement Lightning Damage";
 	public static final String CHARM_ENHANCE_LIGHTNING_RANGE = "Spellshock Enhancement Lightning Range";
 	public static final String CHARM_RADIUS = "Spellshock Radius";
+
+	public static final Style STATIC_COLOR = Style.style(TextColor.color(0xC883E3));
 
 	public static final AbilityInfo<Spellshock> INFO =
 		new AbilityInfo<>(Spellshock.class, NAME, Spellshock::new)
@@ -276,54 +284,76 @@ public class Spellshock extends Ability {
 	}
 
 	private static Description<Spellshock> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Hitting an enemy with a spell inflicts Static for ")
-			.addDuration(STATIC_DURATION)
-			.add(" seconds. Hitting an enemy inflicted with Static triggers a spellshock centered on the enemy that deals ")
-			.addPercent(a -> a.mSpellDamageMult, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" of the triggering spell's damage to all enemies within ")
-			.add(a -> a.mRadius, SPELLSHOCK_RADIUS)
-			.add(" blocks. Spellshocks can cause chain reactions on enemies with Static, but an enemy can only be hit by a spellshock once per tick. If a Static enemy is hit by a Melee attack, the hit gains ")
-			.addPercent(a -> a.mMeleeBonusMult, MELEE_BONUS_1, false, Ability::isLevelOne)
-			.add(" melee damage, the enemy receives ")
-			.addPercent(a -> a.mSlowPotency, SLOW_POTENCY)
-			.add(" slowness for ")
-			.addDuration(SLOW_DURATION)
-			.add(" seconds, and the Static dissipates.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Hitting a mob with a non-Spellshock ability inflicts")
+			.addLine("them with *Static* for %t.").styles(STATIC_COLOR)
+				.statValues(stat(STATIC_DURATION))
+			.addLine()
+			.addLine("When one of your abilities hits a mob with *Static*,").styles(STATIC_COLOR)
+			.addLine("trigger a *Spellshock* that deals a portion of that").styles(STATIC_COLOR)
+			.addLine("ability's damage to that mob and nearby mobs, which")
+			.addLine("can trigger other mobs' *Static* in a chain reaction.").styles(STATIC_COLOR)
+			.addLine()
+			.addStat("Damage: %p1 (s) (of the ability's damage)")
+				.statValues(stat(a -> a.mSpellDamageMult, DAMAGE_1))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, SPELLSHOCK_RADIUS))
+			.addLine()
+			.addLine("Attacks against mobs with *Static* clear it").styles(STATIC_COLOR)
+			.addLine("to deal increased damage and inflict slowness.")
+			.addLine()
+			.addStat("Damage Boost: +%p1 (m)")
+				.statValues(stat(a -> a.mMeleeBonusMult, MELEE_BONUS_1))
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mSlowPotency, SLOW_POTENCY), stat(SLOW_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<Spellshock> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Spellshocks deal ")
-			.addPercent(a -> a.mSpellDamageMult, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(" of the triggering spell's damage and melee attacks gain ")
-			.addPercent(a -> a.mMeleeBonusMult, MELEE_BONUS_2, false, Ability::isLevelTwo)
-			.add(" melee damage. Additionally, gain ")
-			.addPercent(a -> a.mSpeedPotency, SPEED_POTENCY)
-			.add(" speed for ")
-			.addDuration(SPEED_DURATION)
-			.add(" seconds whenever a spellshock is triggered.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Spellshock*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %p1 -> %p2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mSpellDamageMult, DAMAGE_2))
+			.addStatComparison("Damage Boost: +%p1 -> +%p2 (m)")
+				.statValues(stat(MELEE_BONUS_1), stat(a -> a.mMeleeBonusMult, MELEE_BONUS_2))
+			.addLine()
+			.addLine("Triggering a *Spellshock* grants you speed.").styles(STATIC_COLOR)
+			.addLine()
+			.addStat("Effect: +%p Speed for %t")
+				.statValues(stat(a -> a.mSpeedPotency, SPEED_POTENCY), stat(SPEED_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<Spellshock> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Hitting an enemy inflicted with Static with certain spell types grants additional effects or applies additional debuffs. Arcane spells apply a magic DoT, dealing ")
-			.add(a -> a.mEnhanceDoTDamage, ENHANCE_DOT_DAMAGE)
-			.add(" damage per second for ")
-			.addDuration(ENHANCE_DOT_DURATION)
-			.add(" seconds. Fire spells gain ")
-			.addPercent(a -> a.mEnhanceDamageMult, ENHANCE_DAMAGE_MULT)
-			.add(" magic damage, enemies hit by Ice spells receive ")
-			.addPercent(a -> a.mEnhanceSlowPotency, ENHANCE_SLOW_POTENCY)
-			.add(" slowness and ")
-			.addPercent(a -> a.mEnhanceVulnPotency, ENHANCE_VULN_POTENCY)
-			.add(" vulnerability for ")
-			.addDuration(ENHANCEMENT_EFFECT_DURATION)
-			.add(" seconds, and enemies hit by Lightning spells deal ")
-			.add(a -> a.mEnhanceLightningDamage, ENHANCE_LIGHTNING_DAMAGE)
-			.add(" damage to a random mob within ")
-			.add(a -> a.mEnhanceLightningRange, ENHANCE_LIGHTNING_RANGE)
-			.add(" blocks, prioritizing Elites and Bosses.")
-			.add(" All damage dealt by this Enhancement will not trigger nor apply Static, and is scaled by Spell Power");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("Triggering a *Spellshock* performs additional").styles(STATIC_COLOR)
+			.addLine("effects based on the ability's element.")
+			.addLine()
+			.addLine("*Arcane* abilities inflict damage over time.").styles(Mage.ARCANE_COLOR)
+			.addStat("Effect: %d (s) every %t for %t")
+				.statValues(stat(a -> a.mEnhanceDoTDamage, ENHANCE_DOT_DAMAGE), stat(20), stat(a -> a.mEnhanceDoTDuration, ENHANCE_DOT_DURATION))
+			.addLine()
+			.addLine("*Fire* abilities deal increased damage.").styles(Mage.FIRE_COLOR)
+			.addStat("Damage Boost: +%p (s)")
+				.statValues(stat(a -> a.mEnhanceDamageMult, ENHANCE_DAMAGE_MULT))
+			.addLine()
+			.addLine("*Ice* abilities inflict slowness and vulnerability.").styles(Mage.ICE_COLOR)
+			.addStat("Effect: %p Slowness for %t")
+				.statValues(stat(a -> a.mEnhanceSlowPotency, ENHANCE_SLOW_POTENCY), stat(ENHANCEMENT_EFFECT_DURATION))
+			.addStat("Effect: %p Vulnerability for %t")
+				.statValues(stat(a -> a.mEnhanceVulnPotency, ENHANCE_VULN_POTENCY), stat(ENHANCEMENT_EFFECT_DURATION))
+			.addLine()
+			.addLine("*Thunder* abilities deal extra damage to a").styles(Mage.THUNDER_COLOR)
+			.addLine("random nearby mob.")
+			.addLine("(Prioritizes Elites and Bosses)")
+			.addStat("Damage: %d (s)")
+				.statValues(stat(a -> a.mEnhanceLightningDamage, ENHANCE_LIGHTNING_DAMAGE))
+			.addStat("Range: %r")
+				.statValues(stat(a -> a.mEnhanceLightningRange, ENHANCE_LIGHTNING_RANGE))
+			.addDashedLine();
 	}
 }

@@ -11,6 +11,7 @@ import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import java.util.UUID;
 import java.util.function.Consumer;
+import org.bukkit.Color;
 import org.bukkit.Particle;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -30,7 +31,10 @@ public class CustomDamageOverTime extends Effect {
 	private final DamageType mDamageType;
 
 	// This is not serialized
-	private Consumer<LivingEntity> mVisuals = entity -> new PartialParticle(Particle.SQUID_INK, entity.getEyeLocation(), 8, 0.4, 0.4, 0.4, 0.1).spawnAsEnemy();
+	private Consumer<LivingEntity> mVisuals = entity ->
+		new PartialParticle(Particle.REDSTONE, entity.getEyeLocation(), 12, 0.4, 0.4, 0.4, 0.1)
+			.data(new Particle.DustOptions(Color.fromRGB(245, 255, 245), 0.9f))
+			.spawnAsEnemyBuff();
 
 	public CustomDamageOverTime(int duration, double damage, int period, @Nullable Player player, @Nullable ItemStatManager.PlayerItemStats playerItemStats, @Nullable ClassAbility spell, DamageType damageType) {
 		super(duration, effectID);
@@ -50,8 +54,9 @@ public class CustomDamageOverTime extends Effect {
 		this(duration, damage, period, player, spell, DamageType.AILMENT);
 	}
 
-	public void setVisuals(Consumer<LivingEntity> visuals) {
+	public CustomDamageOverTime setVisuals(Consumer<LivingEntity> visuals) {
 		mVisuals = visuals;
+		return this;
 	}
 
 	//Magnitude is equal to the level of wither that it is equivalent to, at low levels of wither

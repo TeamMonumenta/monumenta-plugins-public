@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warlock.PhlegmaticResolveCS;
@@ -26,6 +26,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.WHITE;
 
 public class PhlegmaticResolve extends Ability {
 
@@ -224,33 +228,51 @@ public class PhlegmaticResolve extends Ability {
 	}
 
 	private static Description<PhlegmaticResolve> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("For each ability on cooldown, gain ")
-			.addPercent(a -> a.mPercentDamageResist, PERCENT_DAMAGE_RESIST_1, false, Ability::isLevelOne)
-			.add(" resistance and ")
-			.addPercent(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST)
-			.add(" knockback resistance, capped at ")
-			.add(a -> a.mAbilityCap, ABILITY_CAP)
-			.add(" abilities.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Gain resistance and knockback resistance")
+			.addLine("for each ability you have on cooldown.")
+			.addLine()
+			.addStat("Effect: +%p1 Resistance per ability")
+				.statValues(stat(a -> a.mPercentDamageResist, PERCENT_DAMAGE_RESIST_1), stat(a -> a.mAbilityCap, ABILITY_CAP))
+			.addStat("Effect: +%p Knockback Resistance per ability")
+				.statValues(stat(a -> a.mKBR, PERCENT_KNOCKBACK_RESIST))
+			.addStat("Max Abilities: %d")
+				.statValues(stat(a -> a.mAbilityCap, ABILITY_CAP))
+			.addDashedLine();
 	}
 
 	private static Description<PhlegmaticResolve> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Resistance is increased to ")
-			.addPercent(a -> a.mPercentDamageResist, PERCENT_DAMAGE_RESIST_2, false, Ability::isLevelTwo)
-			.add(" per ability on cooldown, and other players within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks are given ")
-			.addPercent(a -> a.mAllyModifier, ALLY_MODIFIER)
-			.add(" of your buffs from this ability.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Phlegmatic Resolve*'s resistance.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Effect: +%p1 -> +%p2 Resistance")
+				.statValues(stat(PERCENT_DAMAGE_RESIST_1), stat(a -> a.mPercentDamageResist, PERCENT_DAMAGE_RESIST_2))
+			.addLine()
+			.addLine("Nearby players gain %p of your buffs")
+				.statValues(stat(a -> a.mAllyModifier, ALLY_MODIFIER))
+			.addLine("from *Phlegmatic Resolve*.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Sharing Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addDashedLine();
 	}
 
 	private static Description<PhlegmaticResolve> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("All non-ailment damage taken is instead converted into a short Damage-over-Time effect. A third of the damage stored is dealt every second for 3 seconds. Each time this stored damage is dealt, deal ")
-			.addPercent(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE)
-			.add(" of the initial damage to all mobs within ")
-			.add(a -> a.mEnhanceRadius, ENHANCE_RADIUS)
-			.add(" blocks.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("All damage you take will instead be spread out")
+			.addLine("over a short damage over time effect.")
+			.addLine("You take *33%* of the damage every *1s*, for *3s*.").styles(WHITE, WHITE, WHITE)
+			.addLine()
+			.addLine("Each time you take damage from this effect, deal")
+			.addLine("a portion of that damage to nearby mobs.")
+			.addLine()
+			.addStat("Damage: %p of damage taken")
+				.statValues(stat(a -> a.mEnhancementDamage, ENHANCEMENT_DAMAGE))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mEnhanceRadius, ENHANCE_RADIUS))
+			.addDashedLine();
 	}
 }

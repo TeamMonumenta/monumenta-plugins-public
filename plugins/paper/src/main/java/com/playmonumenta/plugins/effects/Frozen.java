@@ -5,7 +5,8 @@ import com.playmonumenta.plugins.Constants;
 import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import java.util.ArrayList;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -14,22 +15,25 @@ import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4f;
+import org.joml.Vector3f;
 
 public class Frozen extends ZeroArgumentEffect {
 	public static final String effectID = "Frozen";
-
 	public static final Particle.DustOptions COLOR = new Particle.DustOptions(Color.fromRGB(127, 209, 255), 1f);
+	public static final Style FROZEN_COLOR = Style.style(TextColor.color(0xC7FDFF));
 	private boolean mStartedWithAI = false;
 	private boolean mStartedWithGravity = false;
-	final ArrayList<ArmorStand> mArmorStands = new ArrayList<>();
+	private @Nullable BlockDisplay mDisplay;
 
 	public Frozen(int duration) {
 		super(duration, effectID);
@@ -56,32 +60,27 @@ public class Frozen extends ZeroArgumentEffect {
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.85f);
 		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1f, 0.85f);
 
-		// I very much stole this code from the frozen solid finisher, thanks!!
 		BoundingBox box = entity.getBoundingBox();
-		for (double x = box.getMinX(); x <= box.getMaxX(); x += 0.6) {
-			for (double y = box.getMinY(); y <= box.getMaxY(); y += 0.6) {
-				for (double z = box.getMinZ(); z <= box.getMaxZ(); z += 0.6) {
-					if (!(x > box.getMinX() && x <= box.getMaxX() - 1 && y > box.getMinY() && y <= box.getMaxY() - 1 && z > box.getMinZ() && z <= box.getMaxZ() - 1)) {
-						ArmorStand ice = world.spawn(new Location(world, x, y - 1.5, z), ArmorStand.class);
-						ice.setVisible(false);
-						ice.setGravity(false);
-						ice.setVelocity(new Vector());
-						ice.setMarker(true);
-						ice.setCollidable(false);
-						ice.getEquipment().setHelmet(new ItemStack(Material.ICE));
-						ice.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
-						mArmorStands.add(ice);
-					}
-				}
-			}
-		}
+		Location lowerCorner = new Location(world, box.getMinX(), box.getMinY(), box.getMinZ());
+		Vector3f size = new Vector3f((float) entity.getWidth(), (float) entity.getHeight(), (float) entity.getWidth());
+		BlockDisplay display = world.spawn(lowerCorner, BlockDisplay.class);
+		Transformation transformation = new Transformation(
+			new Vector3f(),
+			new AxisAngle4f(),
+			size,
+			new AxisAngle4f()
+		);
+		display.setTransformation(transformation);
+		display.setBlock(Bukkit.createBlockData(Material.ICE));
+		display.addScoreboardTag(Constants.Tags.REMOVE_ON_UNLOAD);
+		mDisplay = display;
 
 		// Sometimes the ice can remain after a mob dies after being instantly killed, this is a failsafe.
 		new BukkitRunnable() {
 			@Override
 			public void run() {
 				if (entity.isDead() || !entity.isValid()) {
-					removeStands();
+					removeDisplay();
 				}
 			}
 		}.runTask(Plugin.getInstance());
@@ -104,18 +103,17 @@ public class Frozen extends ZeroArgumentEffect {
 		world.playSound(loc, Sound.BLOCK_GLASS_BREAK, SoundCategory.PLAYERS, 0.3f, 0.8f);
 		new PartialParticle(Particle.BLOCK_CRACK, LocationUtils.getEntityCenter(entity), 75).delta(0.5).data(Material.ICE.createBlockData()).spawnAsEnemyBuff();
 
-		removeStands();
+		removeDisplay();
 	}
 
 	@Override
 	public void onDeath(EntityDeathEvent event) {
-		removeStands();
+		removeDisplay();
 	}
 
-	private void removeStands() {
-		for (ArmorStand ice : mArmorStands) {
-			ice.remove();
-			new PartialParticle(Particle.BLOCK_CRACK, ice.getLocation().add(0, 1.5, 0), 5, Bukkit.createBlockData(Material.ICE)).spawnAsEnemyBuff();
+	private void removeDisplay() {
+		if (mDisplay != null) {
+			mDisplay.remove();
 		}
 	}
 

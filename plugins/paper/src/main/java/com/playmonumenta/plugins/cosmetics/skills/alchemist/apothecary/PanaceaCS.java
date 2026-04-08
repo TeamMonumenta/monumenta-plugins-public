@@ -49,7 +49,7 @@ public class PanaceaCS implements CosmeticSkill {
 	public void projectileEffects(Player player, Location loc, double radius, int totalTicks, double moveSpeed, Vector increment) {
 		double degrees = totalTicks * 12;
 		Vector vec;
-		double ratio = radius / Panacea.PANACEA_RADIUS;
+		double ratio = radius / Panacea.RADIUS;
 		for (int i = 0; i < 2; i++) {
 			double radian1 = Math.toRadians(degrees + (i * 180));
 			vec = new Vector(FastUtils.cos(radian1), 0, FastUtils.sin(radian1)).multiply(radius / 2);
@@ -72,7 +72,7 @@ public class PanaceaCS implements CosmeticSkill {
 	}
 
 	public void projectileEndEffects(Player player, Location loc, double radius) {
-		double ratio = radius / Panacea.PANACEA_RADIUS;
+		double ratio = radius / Panacea.RADIUS;
 		player.getWorld().playSound(loc, Sound.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS, 1.2f, 2.4f);
 		new PartialParticle(Particle.SPELL_INSTANT, player.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.25 * ratio, 0.5, 0.25 * ratio, 0.5).spawnAsPlayerActive(player);
 		new PartialParticle(Particle.SPELL, player.getLocation().add(0, 1, 0), (int) (8 * ratio * ratio), 0.35 * ratio, 0.5, 0.35 * ratio).spawnAsPlayerActive(player);

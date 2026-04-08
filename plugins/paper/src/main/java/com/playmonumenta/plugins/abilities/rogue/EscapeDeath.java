@@ -6,7 +6,7 @@ import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.EscapeDeathCS;
@@ -32,6 +32,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class EscapeDeath extends Ability {
 
@@ -189,42 +193,60 @@ public class EscapeDeath extends Ability {
 	}
 
 	private static Description<EscapeDeath> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When taking damage leaves you below ")
-			.add(a -> TRIGGER_THRESHOLD_HEALTH, TRIGGER_THRESHOLD_HEALTH)
-			.add(" health, throw a paralyzing grenade that stuns all mobs within ")
-			.add(a -> a.mRadius, RANGE)
-			.add(" blocks for ")
-			.addDuration(a -> a.mStunDuration, STUN_DURATION)
-			.add(" seconds.")
-			.addCooldown(COOLDOWN);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("When your health drops below %d HP,")
+				.statValues(stat(TRIGGER_THRESHOLD_HEALTH))
+			.addLine("stun all nearby mobs.")
+			.addLine()
+			.addStat("Effect: Stun for %t")
+				.statValues(stat(a -> a.mStunDuration, STUN_DURATION))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, RANGE))
+			.addStat("Cooldown: %t")
+				.statValues(cooldown(COOLDOWN))
+			.addDashedLine();
 	}
 
 	private static Description<EscapeDeath> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When this ability is triggered, you gain ")
-			.add(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH)
-			.add(" absorption health, ")
-			.addPercent(a -> a.mSpeed, SPEED_PERCENT)
-			.add(" speed, and Jump Boost ")
-			.addPotionAmplifier(a -> a.mJumpBoost, JUMP_BOOST_AMPLIFIER)
-			.add(" for ")
-			.addDuration(a -> a.mDuration, BUFF_DURATION)
-			.add(" seconds. If damage taken would kill you but could have been prevented by this skill it will instead do so.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("When *Escape Death* is triggered,").styles(UNDERLINED)
+			.addLine("gain absorption, speed, and jump boost.")
+			.addLine()
+			.addLine("If having this absorption could have")
+			.addLine("saved you from death, it will do so.")
+			.addLine()
+			.addStat("Effect: +%d Absorption for %t")
+				.statValues(stat(a -> a.mAbsorptionHealth, ABSORPTION_HEALTH), stat(a -> a.mDuration, BUFF_DURATION))
+			.addStat("Effect: +%p Speed for %t")
+				.statValues(stat(a -> a.mSpeed, SPEED_PERCENT), stat(a -> a.mDuration, BUFF_DURATION))
+			.addStat("Effect: Jump Boost %d for %t")
+				.statValues(stat(a -> a.mJumpBoost + 1, JUMP_BOOST_AMPLIFIER + 1), stat(a -> a.mDuration, BUFF_DURATION))
+			.addDashedLine();
 	}
 
 	private static Description<EscapeDeath> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When this ability is triggered, an Elite mob within ")
-			.add(a -> a.mHuntRadius, ELITE_HUNT_RANGE)
-			.add(" blocks will glow for ")
-			.addDuration(a -> a.mHuntDuration, ENHANCEMENT_HUNT_DURATION)
-			.add(" seconds. Killing this glowing Elite will heal for ")
-			.addPercent(a -> a.mHuntHealing, ENHANCEMENT_HUNT_HEAL_PERCENT)
-			.add(" of your max health and cleanse any debuffs. If there are no Elite mobs then instead gain a regenerating effect that heals for ")
-			.addPercent(a -> a.mHealing, ENHANCEMENT_REGEN_HEAL_PERCENT)
-			.add(" max health every second for ")
-			.addDuration(a -> a.mRegenDuration, ENHANCEMENT_HEAL_DURATION)
-			.add(" seconds.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("When *Escape Death* is triggered,").styles(UNDERLINED)
+			.addLine("a nearby Elite will begin glowing.")
+			.addLine()
+			.addLine("Killing this Elite heals you and")
+			.addLine("cleanses your debuffs.")
+			.addLine()
+			.addStat("Hunt Range: %r")
+				.statValues(stat(a -> a.mHuntRadius, ELITE_HUNT_RANGE))
+			.addStat("Hunt Duration: %t")
+				.statValues(stat(a -> a.mHuntDuration, ENHANCEMENT_HUNT_DURATION))
+			.addStat("Hunt Healing: %p HP")
+				.statValues(stat(a -> a.mHuntHealing, ENHANCEMENT_HUNT_HEAL_PERCENT))
+			.addLine()
+			.addLine("If there are no nearby Elites,")
+			.addLine("heal yourself over time instead.")
+			.addLine()
+			.addStat("Healing: %p HP every 1s for %t")
+				.statValues(stat(a -> a.mHealing, ENHANCEMENT_REGEN_HEAL_PERCENT), stat(a -> a.mRegenDuration, ENHANCEMENT_HEAL_DURATION))
+			.addDashedLine();
 	}
 }

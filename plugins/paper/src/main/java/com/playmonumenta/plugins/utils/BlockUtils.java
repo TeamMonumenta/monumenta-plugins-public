@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -471,6 +470,8 @@ public class BlockUtils {
 
 	public static final Set<BlockFace> CARTESIAN_BLOCK_FACES = Arrays.stream(BlockFace.values()).filter(BlockFace::isCartesian).collect(Collectors.toSet());
 
+	public static final EnumSet<BlockFace> CARDINAL_BLOCK_FACES = EnumSet.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
+
 	public static boolean isLosBlockingBlock(Block block) {
 		return isLosBlockingBlock(block.getType());
 	}
@@ -590,6 +591,10 @@ public class BlockUtils {
 		return !blockLoc.clone().subtract(0, 1, 0).getBlock().getType().equals(Material.BEDROCK);
 	}
 
+	public static boolean isCardinal(BlockFace blockFace) {
+		return CARDINAL_BLOCK_FACES.contains(blockFace);
+	}
+
 	public static BlockFace getCardinalBlockFace(Entity entity) {
 		return getCardinalBlockFace(entity.getLocation().getDirection());
 	}
@@ -597,8 +602,8 @@ public class BlockUtils {
 	// Returns NORTH, EAST, SOUTH, or WEST closest to the direction given
 	public static BlockFace getCardinalBlockFace(Vector direction) {
 		Vector dir = direction.clone().setY(0).normalize();
-		return Stream.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST)
-			.min(Comparator.comparingDouble(bf -> bf.getDirection().distance(dir))).orElse(BlockFace.NORTH);
+		return CARDINAL_BLOCK_FACES.stream()
+			.min(Comparator.comparingDouble(bf -> bf.getDirection().distanceSquared(dir))).orElse(BlockFace.NORTH);
 	}
 
 	public static Location getCenterBlockLocation(Block block) {

@@ -6,6 +6,7 @@ import com.playmonumenta.plugins.bosses.bosses.BossAbilityGroup;
 import com.playmonumenta.plugins.bosses.parameters.EntityTargets;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.bosses.spells.SpellBlockBreak;
+import com.playmonumenta.plugins.server.properties.ServerProperties;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class RushDownMobBoss extends BossAbilityGroup {
 
 	public RushDownMobBoss(Plugin plugin, LivingEntity boss) {
 		super(plugin, identityTag, boss);
-		if (!(boss instanceof Mob mob)) {
+		if (!(boss instanceof Mob mob) || !ServerProperties.getShardName().equals("rush")) {
 			return;
 		}
 
@@ -43,7 +44,7 @@ public class RushDownMobBoss extends BossAbilityGroup {
 		if (ScoreboardUtils.checkTag(boss, SCALING_TAG)) {
 			List<Player> players = (List<Player>) boss.getLocation().getNearbyPlayers(90);
 			if (!players.isEmpty()) {
-				RushArena arena = RushManager.mPlayerArenaMap.get(players.get(0));
+				RushArena arena = RushManager.mPlayerArenaMap.get(players.getFirst());
 				if (arena != null) {
 					RushManager.scaleMobHealthMultiplayer(boss, arena.mRound);
 					RushManager.scaleMobPastRound(boss, arena.mRound);
@@ -83,7 +84,7 @@ public class RushDownMobBoss extends BossAbilityGroup {
 				super.cancel();
 				List<? extends LivingEntity> targetsList = TARGETS.getTargetsList(mob);
 				if (!targetsList.isEmpty()) {
-					mob.setTarget(targetsList.get(0));
+					mob.setTarget(targetsList.getFirst());
 				}
 				if (boss instanceof Vindicator) {
 					passiveSpells.add(new SpellBlockBreak(boss));

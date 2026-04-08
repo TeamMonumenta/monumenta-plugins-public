@@ -5,9 +5,9 @@ import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
-import com.playmonumenta.plugins.abilities.AbilityWithChargesOrStacks;
 import com.playmonumenta.plugins.abilities.Description;
 import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.berserker.GloriousBattleCS;
@@ -15,25 +15,23 @@ import com.playmonumenta.plugins.effects.PercentKnockbackResist;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
-import com.playmonumenta.plugins.network.ClientModHandler;
-import com.playmonumenta.plugins.utils.AbilityUtils;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
+import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
+import com.playmonumenta.plugins.itemstats.enums.Operation;
+import com.playmonumenta.plugins.itemstats.enums.Slot;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
+import com.playmonumenta.plugins.utils.ItemStatUtils;
 import com.playmonumenta.plugins.utils.ItemUtils;
 import com.playmonumenta.plugins.utils.LocationUtils;
-import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -43,39 +41,37 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static com.playmonumenta.plugins.Constants.TICKS_PER_SECOND;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 
-public class GloriousBattle extends Ability implements AbilityWithChargesOrStacks {
-	private static final int DAMAGE_1 = 20;
-	private static final int DAMAGE_2 = 25;
-	private static final int CHARGE_DAMAGE_BONUS = 5;
-	private static final int CHARGE_MOB_CAP = 3;
-	private static final double VELOCITY_1 = 1.3;
-	private static final double VELOCITY_2 = 1.6;
+public class GloriousBattle extends Ability {
+	private static final int BLOODLUST_COST = 2;
+	private static final int PIERCE_DAMAGE_1 = 5;
+	private static final int PIERCE_DAMAGE_2 = 8;
+	private static final double AOE_DAMAGE_1 = 0.5;
+	private static final double AOE_DAMAGE_2 = 0.6;
+	private static final double CRITICAL_DAMAGE_1 = 0.75;
+	private static final double CRITICAL_DAMAGE_2 = 0.9;
+	private static final double VELOCITY = 1.5;
 	private static final double VERTICAL_SPEED_CAP = 0.3;
-	private static final double RADIUS = 3;
+	private static final double RADIUS = 2.5;
+	private static final int DURATION = 30;
 	private static final float KNOCK_AWAY_SPEED = 0.4f;
 	private static final String KBR_EFFECT = "GloriousBattleKnockbackResistanceEffect";
 
-	private static final EnumSet<ClassAbility> AFFECTED_ABILITIES = EnumSet.of(
-		ClassAbility.BRUTE_FORCE_AOE,
-		ClassAbility.RIPOSTE,
-		ClassAbility.SHIELD_BASH_AOE,
-		ClassAbility.METEOR_SLAM,
-		ClassAbility.RAMPAGE
-	);
-
-	public static final String CHARM_CHARGES = "Glorious Battle Charges";
 	public static final String CHARM_DAMAGE = "Glorious Battle Damage";
-	public static final String CHARM_BONUS_DAMAGE = "Glorious Battle Bonus Damage";
-	public static final String CHARM_MOB_CAP = "Glorious Battle Mob Cap";
-	public static final String CHARM_RADIUS = "Glorious Battle Radius";
+	public static final String CHARM_PIERCE_DAMAGE = "Glorious Battle Pierce Damage";
+	public static final String CHARM_RADIUS = "Glorious Battle Attack Radius";
 	public static final String CHARM_VELOCITY = "Glorious Battle Velocity";
 	public static final String CHARM_KNOCKBACK = "Glorious Battle Knockback";
-	public static final String CHARM_DAMAGE_MODIFIER = "Glorious Battle Damage Modifier";
+	public static final String CHARM_BLOODLUST_COST = "Glorious Battle Bloodlust Cost";
+	public static final String CHARM_DURATION = "Glorious Battle Duration";
+	public static final String CHARM_CRITICAL_DAMAGE = "Glorious Battle Critical Damage Multiplier";
 
 	public static final AbilityInfo<GloriousBattle> INFO =
 		new AbilityInfo<>(GloriousBattle.class, "Glorious Battle", GloriousBattle::new)
@@ -83,45 +79,120 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 			.scoreboardId("GloriousBattle")
 			.shorthandName("GB")
 			.descriptions(getDescription1(), getDescription2())
-			.simpleDescription("Lunge forward, dealing damage upon landing.")
-			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(true),
-				new AbilityTriggerInfo.TriggerRestriction("holding a sword or axe", p -> {
-					ItemStack mainhand = p.getInventory().getItemInMainHand();
-					return ItemUtils.isSword(mainhand) || ItemUtils.isAxe(mainhand);
-				})))
+			.simpleDescription("Lunge forwards, dealing damage and empowering your next critical attack.")
+			.addTrigger(new AbilityTriggerInfo<>("cast", "cast", GloriousBattle::cast, new AbilityTrigger(AbilityTrigger.Key.SWAP).sneaking(false)))
 			.displayItem(Material.IRON_SWORD);
 
-	private int mStacks;
 	private final List<LivingEntity> mCharged = new ArrayList<>();
-	private final int mChargeMobCap;
-	private final int mStackLimit;
-	private final int mSpellDelay = 10;
-	private final double mDamage;
-	private final double mDamageBonus;
+	private final int mBloodlustCost;
+	private final int mDuration;
+	private final double mPierceDamage;
+	private final double mAoeDamage;
 	private final double mVelocity;
 	private final double mRadius;
+	private final double mKnockback;
+	private final double mCriticalDamage;
+	private final double mCriticalMultiplier;
 
+	private boolean mCanCritAttack = false;
+	private @Nullable Bloodlust mBloodlust;
 	private @Nullable BukkitRunnable mRunnable;
 	private final GloriousBattleCS mCosmetic;
 
 	public GloriousBattle(Plugin plugin, Player player) {
 		super(plugin, player, INFO);
-		mDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? DAMAGE_1 : DAMAGE_2);
-		mDamageBonus = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_BONUS_DAMAGE, CHARGE_DAMAGE_BONUS);
-		mVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, isLevelOne() ? VELOCITY_1 : VELOCITY_2);
-		mStacks = 0;
-		mStackLimit = 1 + (int) CharmManager.getLevel(mPlayer, CHARM_CHARGES);
+
+		mAoeDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? AOE_DAMAGE_1 : AOE_DAMAGE_2);
+		mCriticalDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_DAMAGE, isLevelOne() ? CRITICAL_DAMAGE_1 : CRITICAL_DAMAGE_2);
+		mCriticalMultiplier = CharmManager.getLevelPercentDecimal(mPlayer, CHARM_CRITICAL_DAMAGE);
+		mPierceDamage = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_PIERCE_DAMAGE, isLevelOne() ? PIERCE_DAMAGE_1 : PIERCE_DAMAGE_2);
+		mVelocity = CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_VELOCITY, VELOCITY);
 		mRadius = CharmManager.getRadius(mPlayer, CHARM_RADIUS, RADIUS);
-		mChargeMobCap = CHARGE_MOB_CAP + (int) CharmManager.getLevel(mPlayer, CHARM_BONUS_DAMAGE);
+		mBloodlustCost = BLOODLUST_COST + (int) CharmManager.getLevel(mPlayer, CHARM_BLOODLUST_COST);
+		mKnockback = CharmManager.getExtraPercent(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
+		mDuration = CharmManager.getDuration(mPlayer, CHARM_DURATION, DURATION);
+
 		mCosmetic = CosmeticSkills.getPlayerCosmeticSkill(player, new GloriousBattleCS());
+
+		Bukkit.getScheduler().runTask(mPlugin, () ->
+			mBloodlust = mPlugin.mAbilityManager.getPlayerAbilityIgnoringSilence(mPlayer, Bloodlust.class));
 	}
 
 	public boolean cast() {
-		if (mStacks < 1 || ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)) {
+		if (ZoneUtils.hasZoneProperty(mPlayer.getLocation(), ZoneUtils.ZoneProperty.NO_MOBILITY_ABILITIES)
+			|| isInapplicableMainhand()) {
 			return false;
 		}
 
-		mStacks--;
+		if (mBloodlust == null || !mBloodlust.useStacks(mBloodlustCost)) {
+			return false;
+		}
+
+		Vector dir = getLungeVector();
+		mPlayer.setVelocity(dir);
+		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT,
+			new PercentKnockbackResist(TICKS_PER_SECOND * 10, 1, KBR_EFFECT)
+				.displaysTime(false).deleteOnAbilityUpdate(true));
+		mCanCritAttack = true;
+
+		Location location = mPlayer.getLocation();
+		World world = mPlayer.getWorld();
+		int mSpellDelay = 10;
+		mCosmetic.gloryStart(world, mPlayer, location, mSpellDelay);
+		mCharged.clear();
+
+		if (mRunnable != null) {
+			mRunnable.cancel();
+		}
+
+		mRunnable = new BukkitRunnable() {
+			int mT = 0;
+			boolean mHasLanded = false;
+
+			@Override
+			public void run() {
+				mT++;
+
+				if (!mHasLanded) {
+
+					mCosmetic.gloryTick(mPlayer, mT);
+					if (PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer) && mT >= mSpellDelay) {
+						mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
+						mHasLanded = true;
+						mT = 0;
+					}
+
+					// piercing
+					List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), 4).getHitMobs();
+					BoundingBox mBox = BoundingBox.of(mPlayer.getLocation().add(0, 1, 0), 2, 2, 2);
+					mobs.removeAll(mCharged);
+					mobs.sort(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(mPlayer.getLocation())));
+					for (LivingEntity mob : mobs) {
+						if (mob.getBoundingBox().overlaps(mBox)) {
+							mCharged.add(mob);
+							DamageUtils.damage(mPlayer, mob, DamageType.MELEE_SKILL, mPierceDamage, ClassAbility.GLORIOUS_BATTLE, true);
+							mCosmetic.gloryOnDamage(world, mPlayer, mob);
+						}
+					}
+
+				} else if (mT > mDuration) {
+					mCosmetic.onGloryDurationExpire(world, mPlayer.getLocation());
+					mCanCritAttack = false;
+					this.cancel();
+				}
+
+				//Logged off or something probably
+				if (mT > 200) {
+					this.cancel();
+				}
+			}
+		};
+		cancelOnDeath(mRunnable.runTaskTimer(mPlugin, 0, 1));
+		return true;
+	}
+
+	@NotNull
+	private Vector getLungeVector() {
 		Vector dir = mPlayer.getLocation().getDirection();
 		dir.multiply(mVelocity);
 		// vertical speed cap for level 1
@@ -140,164 +211,87 @@ public class GloriousBattle extends Ability implements AbilityWithChargesOrStack
 				dir.setY(dir.getY() * 0.4);
 			}
 		}
-		mPlayer.setVelocity(dir);
-		mPlugin.mEffectManager.addEffect(mPlayer, KBR_EFFECT,
-			new PercentKnockbackResist(TICKS_PER_SECOND * 10, 1, KBR_EFFECT)
-				.displaysTime(false).deleteOnAbilityUpdate(true));
-		ClientModHandler.updateAbility(mPlayer, this);
-		Location location = mPlayer.getLocation();
-		World world = mPlayer.getWorld();
-		mCosmetic.gloryStart(world, mPlayer, location, mSpellDelay);
-		mCharged.clear();
-
-		if (mRunnable != null) {
-			mRunnable.cancel();
-		}
-
-		mRunnable = new BukkitRunnable() {
-			int mT = 0;
-			boolean mPierced = false;
-
-			@Override
-			public void run() {
-				mT++;
-				mCosmetic.gloryTick(mPlayer, mT);
-				List<LivingEntity> mobs = new Hitbox.SphereHitbox(LocationUtils.getHalfHeightLocation(mPlayer), mRadius).getHitMobs();
-				if (PlayerUtils.isOnGroundOrMountIsOnGround(mPlayer)) {
-					if (!mPierced) {
-						mPlugin.mEffectManager.clearEffects(mPlayer, KBR_EFFECT);
-						Location location = mPlayer.getLocation();
-						World world = mPlayer.getWorld();
-						mCosmetic.gloryOnLand(world, mPlayer, location, mRadius);
-						mobs.removeIf(mob -> mob.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG));
-
-						LivingEntity nearest = EntityUtils.getNearestMob(location, mobs);
-						if (nearest == null) {
-							this.cancel();
-							return;
-						}
-
-						DamageUtils.damage(mPlayer, nearest, DamageType.MELEE_SKILL, mDamage, ClassAbility.GLORIOUS_BATTLE, true);
-						mCosmetic.gloryOnDamage(world, mPlayer, nearest);
-
-						float knockback = (float) CharmManager.calculateFlatAndPercentValue(mPlayer, CHARM_KNOCKBACK, KNOCK_AWAY_SPEED);
-						for (LivingEntity mob : mobs) {
-							MovementUtils.knockAway(mPlayer, mob, knockback, true);
-						}
-					}
-					this.cancel();
-				}
-
-				// piercing change
-				BoundingBox mBox = BoundingBox.of(mPlayer.getLocation().add(0, 1, 0), 2, 2, 2);
-				mobs.removeAll(mCharged);
-				mobs.sort(Comparator.comparingDouble(e -> e.getLocation().distanceSquared(mPlayer.getLocation())));
-				for (LivingEntity le : mobs) {
-					if (le.getBoundingBox().overlaps(mBox) && mCharged.size() <= mChargeMobCap) {
-						mPierced = true;
-						mCharged.add(le);
-						double damage = mDamage + mDamageBonus;
-						DamageUtils.damage(mPlayer, le, DamageType.MELEE_SKILL, damage, ClassAbility.GLORIOUS_BATTLE, true);
-						mCosmetic.gloryOnDamage(world, mPlayer, le);
-					}
-				}
-
-				//Logged off or something probably
-				if (mT > 200) {
-					this.cancel();
-				}
-			}
-		};
-		cancelOnDeath(mRunnable.runTaskTimer(mPlugin, mSpellDelay, 1));
-		return true;
+		return dir;
 	}
 
 	@Override
 	public boolean onDamage(DamageEvent event, LivingEntity enemy) {
-		if (AFFECTED_ABILITIES.contains(event.getAbility()) && !enemy.getScoreboardTags().contains(AbilityUtils.IGNORE_TAG) && MetadataUtils.checkOnceThisTick(mPlugin, mPlayer, "GloriousBattleStackIncrease")) {
-			int previousStacks = mStacks;
-			if (mStacks < mStackLimit) {
-				mStacks++;
-				if (mStackLimit > 1) {
-					showChargesMessage();
-				} else {
-					sendActionBarMessage("Glorious Battle is ready!");
-				}
-			}
-			if (mStacks != previousStacks) {
-				ClientModHandler.updateAbility(mPlayer, this);
-			}
+		if (!(event.getType() == DamageType.MELEE && PlayerUtils.isFallingAttack(mPlayer))) {
+			return false;
 		}
-
-		return false;
-	}
-
-	@Override
-	public int getCharges() {
-		return mStacks;
-	}
-
-	@Override
-	public int getMaxCharges() {
-		return mStackLimit;
-	}
-
-	@Override
-	public @Nullable Component getHotbarMessage() {
-		TextColor color = INFO.getActionBarColor();
-		String name = INFO.getHotbarName();
-
-		int charges = getCharges();
-		int maxCharges = getMaxCharges();
-
-		// String output.
-		Component output = Component.text("[", NamedTextColor.YELLOW)
-			.append(Component.text(name != null ? name : "Error", color))
-			.append(Component.text("]", NamedTextColor.YELLOW))
-			.append(Component.text(": ", NamedTextColor.WHITE));
-
-		if (charges >= 1 && maxCharges > 1) {
-			output = output.append(Component.text(charges + "/" + maxCharges, charges >= maxCharges ? NamedTextColor.GREEN : NamedTextColor.YELLOW));
-		} else {
-			if (charges >= 1) {
-				output = output.append(Component.text("✓", NamedTextColor.GREEN, TextDecoration.BOLD));
-			} else {
-				output = output.append(Component.text("✘", NamedTextColor.RED, TextDecoration.BOLD));
-			}
+		if (!mCanCritAttack) {
+			return true;
 		}
+		mCanCritAttack = false;
 
-		return output;
+		final boolean weaponHasCumbersome = ItemStatUtils.hasEnchantment(mPlayer.getInventory().getItemInMainHand(), EnchantmentType.CUMBERSOME);
+		double baseDamage = event.getFlatDamage() / (weaponHasCumbersome ? 1.5 : 1);
+
+		mCosmetic.gloryOnLand(mPlayer.getWorld(), mPlayer, enemy, mRadius);
+
+		List<LivingEntity> targets = EntityUtils.getNearbyMobs(enemy.getLocation(), mRadius);
+
+		hitMob(enemy, baseDamage * (mCriticalDamage + mCriticalMultiplier));
+		targets.remove(enemy);
+
+		targets.forEach(e -> hitMob(e, baseDamage * mAoeDamage));
+
+		return true;
+	}
+
+	private void hitMob(LivingEntity entity, double damage) {
+		DamageUtils.damage(mPlayer, entity, DamageType.MELEE_SKILL, damage, ClassAbility.GLORIOUS_BATTLE, true);
+		MovementUtils.knockAway(mPlayer, entity, (float) mKnockback, true);
+		mCosmetic.gloryOnDamage(mPlayer.getWorld(), mPlayer, entity);
+	}
+
+	private boolean isInapplicableMainhand() {
+		ItemStack mainhand = mPlayer.getInventory().getItemInMainHand();
+		// Not an applicable weapon (not a sword/axe, and it doesn't have any dmg stats)
+		return (ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_DAMAGE_ADD, Operation.ADD, Slot.MAINHAND) <= 0
+			|| ItemStatUtils.getAttributeAmount(mainhand, AttributeType.ATTACK_SPEED, Operation.ADD, Slot.MAINHAND) == 0)
+			&& !(ItemUtils.isAxe(mainhand) || ItemUtils.isSword(mainhand));
 	}
 
 	private static Description<GloriousBattle> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Dealing indirect damage with an ability grants you a Glorious Battle stack. ")
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to consume a stack and charge forward at ")
-			.add(a -> a.mVelocity, VELOCITY_1, false, Ability::isLevelOne)
-			.add(" blocks per second, gaining full knockback resistance until landing. Vertical movement speed is capped at ")
-			.add(a -> VERTICAL_SPEED_CAP, VERTICAL_SPEED_CAP)
-			.add(" blocks per second upwards. Colliding with enemies while charging deals ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" damage and ")
-			.add(a -> a.mDamageBonus, CHARGE_DAMAGE_BONUS)
-			.add(" extra damage, capped at ")
-			.add(a -> a.mChargeMobCap, CHARGE_MOB_CAP)
-			.add(" mobs. When you land without dealing damage, deal ")
-			.add(a -> a.mDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" damage to the nearest mob within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks. Additionally, knock back all mobs within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks.");
+			.addDashedLine()
+			.addLine("Spend %d stacks of *Bloodlust* to lunge horizontally,").styles(Bloodlust.BLOODLUST_COLOR)
+				.statValues(stat(a -> a.mBloodlustCost, BLOODLUST_COST))
+			.addLine("gain knockback immunity, and deal damage to mobs")
+			.addLine("while airborne.")
+			.addLine()
+			.addStat("Collision Damage: %d1 (m)")
+				.statValues(stat(a -> a.mPierceDamage, PIERCE_DAMAGE_1))
+			.addLine()
+			.addLine("Your next critical attack while airborne or for %t")
+				.statValues(stat(a -> a.mDuration, DURATION))
+			.addLine("after landing causes a large swing that deals")
+			.addLine("bonus damage to the target and nearby mobs.")
+			.addLine()
+			.addStat("Direct Damage: %p1 (m) (of the attack's damage)")
+				.statValues(stat(a -> a.mCriticalDamage, CRITICAL_DAMAGE_1))
+			.addStat("Area Damage: %p1 (m) (of the attack's damage)")
+				.statValues(stat(a -> a.mAoeDamage, AOE_DAMAGE_1))
+			.addStat("Area Radius: %r")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addDashedLine();
 	}
 
 	private static DescriptionBuilder<GloriousBattle> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Base damage is increased to ")
-			.add(a -> a.mDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(". Velocity is increased to ")
-			.add(a -> a.mVelocity, VELOCITY_2, false, Ability::isLevelTwo)
-			.add(". Vertical speed cap is removed.");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Glorious Battle*'s damage, and").styles(UNDERLINED)
+			.addLine("you can now lunge in any direction.")
+			.addLine()
+			.addStatComparison("Collision Damage: %d1 -> %d2 (m)")
+				.statValues(stat(PIERCE_DAMAGE_1), stat(a -> a.mPierceDamage, PIERCE_DAMAGE_2))
+			.addStatComparison("Direct Damage: %p1 -> %p2 (m)")
+				.statValues(stat(CRITICAL_DAMAGE_1), stat(a -> a.mCriticalDamage, CRITICAL_DAMAGE_2))
+			.addStatComparison("Area Damage: %p1 -> %p2 (m) ")
+			.statValues(stat(AOE_DAMAGE_1), stat(a -> a.mAoeDamage, AOE_DAMAGE_2))
+			.addDashedLine();
 	}
+
 }

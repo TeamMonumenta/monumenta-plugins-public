@@ -64,6 +64,9 @@ public class SpellFlare extends Spell {
 					this.cancel();
 					return;
 				}
+				if (EntityUtils.shouldPauseSpells(mLauncher)) {
+					return;
+				}
 				if (mTicks <= 0) {
 					performDirectionalTel(mTargetLocation, mLauncherLocation, mParameters.RANGE);
 				}
@@ -179,6 +182,9 @@ public class SpellFlare extends Spell {
 
 			@Override
 			public void run() {
+				if (EntityUtils.shouldPauseSpells(mLauncher)) {
+					return;
+				}
 
 				if (mStep == 0) {
 					mLoc.setDirection(targetDirection);

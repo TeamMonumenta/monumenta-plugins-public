@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.particle.PPLine;
 import com.playmonumenta.plugins.particle.PartialParticle;
 import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.ParticleUtils;
+import com.playmonumenta.plugins.utils.VectorUtils;
 import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -14,10 +15,10 @@ import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.MagmaCube;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 public class AceArtilleryCS extends AlchemicalArtilleryCS {
@@ -66,6 +67,37 @@ public class AceArtilleryCS extends AlchemicalArtilleryCS {
 	}
 
 	@Override
+	public void bounceEffect(Player caster, Location loc, int bounceCount, Vector actualBouncePosition, Vector hitFaceDirection) {
+		loc.getWorld().playSound(loc, Sound.ENTITY_BREEZE_SHOOT, SoundCategory.PLAYERS, 1.5f, 0.8f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_NETHERITE_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 0.5f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_SLIME_BLOCK_BREAK, SoundCategory.PLAYERS, 1.5f, 2f);
+		loc.getWorld().playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 1f, 1.1f + 0.3f * bounceCount);
+
+		new PartialParticle(Particle.REDSTONE, loc)
+			.count(15)
+			.delta(0.2)
+			.data(new Particle.DustOptions(ACE_PURPLE, 1.2f))
+			.spawnAsPlayerActive(caster);
+		new PartialParticle(Particle.SMOKE_NORMAL, loc)
+			.count(10)
+			.extra(0.15)
+			.spawnAsPlayerActive(caster);
+		new PartialParticle(Particle.DUST_PLUME, loc)
+			.count(10)
+			.extra(0.2)
+			.spawnAsPlayerActive(caster);
+
+		for (int i = 0; i < 10; i++) {
+			Vector offsetDir = hitFaceDirection.clone().add(VectorUtils.randomUnitVector());
+			new PartialParticle(Particle.FIREWORKS_SPARK, loc)
+				.delta(offsetDir.getX(), offsetDir.getY(), offsetDir.getZ())
+				.directionalMode(true)
+				.extra(0.2).spawnAsPlayerActive(caster);
+		}
+	}
+
+
+	@Override
 	public void explosionEffect(Player caster, Location loc, double radius) {
 		World world = loc.getWorld();
 		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.8f, 0.1f);
@@ -105,40 +137,5 @@ public class AceArtilleryCS extends AlchemicalArtilleryCS {
 		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 
 		ParticleUtils.drawFlag(caster, loc.clone().add(0, 3, 0), ACE_COLORS, 2.0f);
-	}
-
-	@Override
-	public void aftershockEffect(Player caster, Location loc, double radius, List<LivingEntity> hitMobs) {
-		World world = loc.getWorld();
-		world.playSound(loc, Sound.ENTITY_BREEZE_HURT, SoundCategory.PLAYERS, 1.2f, 0.8f);
-		world.playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, SoundCategory.PLAYERS, 1.2f, 1.6f);
-
-		if (hitMobs.isEmpty()) {
-			return;
-		}
-		new BukkitRunnable() {
-			int mTicks = 0;
-
-			@Override
-			public void run() {
-				int sides = mTicks + 3;
-				double circleRadius = 1.5 + mTicks * 0.5;
-
-				double degStep = 360.0 / sides;
-				for (double deg = 0; deg < 360; deg += degStep) {
-					new PPLine(Particle.REDSTONE,
-						loc.clone().add(circleRadius * FastUtils.cosDeg(deg), 0, circleRadius * FastUtils.sinDeg(deg)),
-						loc.clone().add(circleRadius * FastUtils.cosDeg(deg + degStep), 0, circleRadius * FastUtils.sinDeg(deg + degStep)))
-						.data(new Particle.DustOptions(ACE_COLORS.get(mTicks % ACE_COLORS.size()), 1f))
-						.delta(0.06)
-						.countPerMeter(3)
-						.spawnAsPlayerActive(caster);
-				}
-				mTicks++;
-				if (circleRadius > radius) {
-					this.cancel();
-				}
-			}
-		}.runTaskTimer(Plugin.getInstance(), 0, 1);
 	}
 }

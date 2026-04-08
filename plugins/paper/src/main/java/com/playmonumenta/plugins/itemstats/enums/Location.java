@@ -90,6 +90,7 @@ public enum Location {
 	DEPTHS("depths", "Darkest Depths", TextColor.fromHexString("#5D2D87")),
 	DEPTHS_SKIN("abyssalskin", "Abyssal Skin", TextColor.fromHexString("#5D2D87")),
 	RUSH("rush", "Rush of Dissonance", TextColor.fromHexString("#C21E56")),
+	RUSH_SKIN("rushskin", "Dissonant Skin", TextColor.fromHexString("#C21E56"), true),
 	// bosses
 	HORSEMAN("horseman", "The Headless Horseman", TextColor.fromHexString("#8E3418")),
 	HALLOWEENSKIN("halloweenskin", "Halloween Skin", TextColor.fromHexString("#FFAA00")),
@@ -119,6 +120,11 @@ public enum Location {
 	GALLERYOFFEAR("gallerybase", "Gallery of Fear", TextColor.fromHexString("#39B14E")),
 	SANGUINEHALLS("gallery1", "Sanguine Halls", TextColor.fromHexString("#AB0000")),
 	MARINANOIR("gallery2", "Marina Noir", TextColor.fromHexString("#324150")),
+	FALLENSTAR("fallenstar", "Shadow of a Fallen Star", TextColor.fromHexString("#00C0A3")),
+	PERIWINKLE("periwinkle", "Voidrun Warrens", TextColor.fromHexString("#BE93E4")),
+	CHARTREUSE("chartreuse", "Investigator's Gambade", TextColor.fromHexString("#60B476")),
+	SOLARIUM("solarium", "Solarium of the Silent", TextColor.fromHexString("#E6CC25")),
+	PROMENADE("promenade", "Mecha-Pelias' Mecha-Promenade", TextColor.fromHexString("#B87333")),
 	AMBER("amber", "item name color", TextColor.fromHexString("#FFBF00")),
 	GOLD("gold", "item name color", TextColor.fromHexString("#FFD700")),
 	DARKBLUE("darkblue", "itemnamecolor", TextColor.fromHexString("#FFFFAA")),
@@ -126,10 +132,12 @@ public enum Location {
 	ZENITH("zenith", "The Celestial Zenith", TextColor.fromHexString("#FF9CF0")),
 	FISHING("fishing", "Architect's Ring Fishing", TextColor.fromHexString("#A9D1D0")),
 	SKR("skr", "Silver Knight's Remnants", TextColor.fromHexString("#E8C392")),
+	REKKENGULCH("rekkengulch", "Rekkengulch", TextColor.fromHexString("#8E432D"), true),
 	// bosses
 	SIRIUS("sirius", "The Final Blight", TextColor.fromHexString("#34CFBC")),
 	HUNTS("hunts", "Diamenean Hunts", TextColor.fromHexString("#414e18")),
 	TWISTED_INTRUDER("twisted", Component.text("Twisted ", TextColor.fromHexString("#6b0000")).decoration(TextDecoration.ITALIC, false).append(Component.text("lxxxxxxx", TextColor.fromHexString("#6b0000")).decoration(TextDecoration.ITALIC, false).decoration(TextDecoration.OBFUSCATED, true))),
+	AURORA("aurora", "Aurora's Endgame", TextColor.fromHexString("#A6CFE3"), true),
 	// events, legacy
 	VALENTINE("valentine", "Valentine Event", TextColor.fromHexString("#FF7F7F")),
 	VALENTINESKIN("valentineskin", "Valentine Skin", TextColor.fromHexString("#FF7F7F")),
@@ -140,6 +148,7 @@ public enum Location {
 	HALLOWEEN("halloween", "Halloween Event", TextColor.fromHexString("#FFAA00")),
 	TRICKSTER("trickster", "Trickster Challenge", TextColor.fromHexString("#FFAA00")),
 	WINTER("winter", "Winter Event", TextColor.fromHexString("#AFC2E3")),
+	KOAL("koal", "Coalrupted Sierhaven", TextColor.fromHexString("#A1C4E0")),
 	HOLIDAYSKIN("holidayskin", "Holiday Skin", TextColor.fromHexString("#B00C2F")),
 	UGANDA("uganda", "Uganda 2018", TextColor.fromHexString("#D02E28")),
 
@@ -169,22 +178,31 @@ public enum Location {
 	final String mDisplayName;
 	final Component mDisplay;
 	final TextColor mColor;
+	final boolean mBuildHidden;
 
 	Location(String name, String display, TextColor color) {
+		this(name, display, color, false);
+	}
+
+	Location(String name, String display, TextColor color, boolean buildHidden) {
 		mName = name;
 		mDisplayName = display;
 		mDisplay = Component.text(display, color).decoration(TextDecoration.ITALIC, false);
 		mColor = color;
+		mBuildHidden = buildHidden;
 	}
 
-
 	Location(String name, Component display) {
+		this(name, display, false);
+	}
+
+	Location(String name, Component display, boolean buildHidden) {
 		mName = name;
 		mDisplayName = MessagingUtils.plainText(display);
 		mDisplay = display;
 		mColor = display.color();
+		mBuildHidden = buildHidden;
 	}
-
 
 	Location(PlayerClass cls) {
 		this(cls.mClassName.toLowerCase(Locale.getDefault()), cls.mClassName, cls.mClassColor);
@@ -212,7 +230,7 @@ public enum Location {
 
 	public static Location[] availableLocations() {
 		boolean build = ServerProperties.isBuildShard();
-		return Arrays.stream(values()).toArray(Location[]::new);
+		return Arrays.stream(values()).filter(l -> !(build && l.mBuildHidden)).toArray(Location[]::new);
 	}
 
 	public static Location getLocation(String name) {

@@ -281,7 +281,7 @@ public class ChanceCubes {
 				}
 			}
 			case 4 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(20);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 20, false);
 				for (Player player : nearbyPlayers) {
 					loc.getWorld().playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_AMBIENT, SoundCategory.HOSTILE, 2f, 0.8f);
 					loc.getWorld().playSound(loc, Sound.ENTITY_ELDER_GUARDIAN_AMBIENT, SoundCategory.HOSTILE, 2f, 0.8f);
@@ -306,12 +306,9 @@ public class ChanceCubes {
 				}
 			}
 			case 5 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(15);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 15, false);
 				Map<Player, Entity> lockedEnemies = new HashMap<>();
 				for (Player player : nearbyPlayers) {
-					if (player.getGameMode() == GameMode.SPECTATOR) {
-						continue;
-					}
 					if (lockedEnemies.containsKey(player)) {
 						continue;
 					}
@@ -401,7 +398,10 @@ public class ChanceCubes {
 					Material.RED_SHULKER_BOX,
 					Material.BLACK_SHULKER_BOX,
 					Material.GOLD_BLOCK,
-					Material.IRON_BLOCK
+					Material.IRON_BLOCK,
+					Material.AIR,
+					Material.CAVE_AIR,
+					Material.VOID_AIR
 				);
 
 				List<Player> players = PlayerUtils.playersInRange(loc, range, true);
@@ -428,7 +428,7 @@ public class ChanceCubes {
 							if (mTicks == 0) {
 								target.playSound(target.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 4f);
 								loc.getWorld().playSound(loc, Sound.ENTITY_ENDER_DRAGON_GROWL, SoundCategory.HOSTILE, 1f, 5f);
-								target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 4));
+								target.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 2));
 								if (FastUtils.RANDOM.nextBoolean()) {
 									mMaterial = Material.LAVA;
 								}
@@ -442,7 +442,7 @@ public class ChanceCubes {
 											BlockState state = blockLocation.getBlock().getState();
 											if (!ignoredMats.contains(state.getType()) &&
 												!BlockUtils.INTERACTABLE.contains(state.getType()) &&
-												FastUtils.RANDOM.nextInt(100) < 37) {
+												FastUtils.RANDOM.nextInt(100) < 27) {
 												mBlocksToRestore.add(state);
 											}
 										}
@@ -465,7 +465,7 @@ public class ChanceCubes {
 				}
 			}
 			case 7 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(15);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 15, false);
 				for (Player player : nearbyPlayers) {
 					loc.getWorld().playSound(loc, Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.HOSTILE, 1f, 1f);
 					int potionDice = FastUtils.randomIntInRange(1, 12);
@@ -544,7 +544,7 @@ public class ChanceCubes {
 				task.runTaskTimer(Plugin.getInstance(), 0, 5);
 			}
 			case 10 -> {
-				List<Player> nearbyPlayers = (List<Player>) loc.getNearbyPlayers(7);
+				List<Player> nearbyPlayers = PlayerUtils.playersInRange(loc, 7, false);
 				for (Player player : nearbyPlayers) {
 					PlayerUtils.healPlayer(Plugin.getInstance(), player, EntityUtils.getMaxHealth(player), player);
 					AbsorptionUtils.addAbsorption(player, 6, 6, 300);

@@ -188,7 +188,8 @@ public final class SignUtils {
 				location = existingBlock.getLocation();
 			} else {
 				signMat = Material.OAK_SIGN;
-				location = player.getLocation().clone();
+				location = player.getLocation().clone().add(0, 3, 0);
+				// 3 blocks up, out of player hitbox, to prevent weird visual clipping/rubberbanding on non-full blocks
 			}
 			mPosition = new BlockPosition(location.getBlockX(), location.getBlockY(), location.getBlockZ());
 

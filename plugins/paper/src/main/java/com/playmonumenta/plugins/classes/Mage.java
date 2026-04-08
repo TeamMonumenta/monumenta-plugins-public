@@ -1,6 +1,8 @@
 package com.playmonumenta.plugins.classes;
 
 import com.google.common.collect.ImmutableList;
+import com.playmonumenta.plugins.abilities.AbilityManager;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.mage.ArcaneStrike;
 import com.playmonumenta.plugins.abilities.mage.Channeling;
 import com.playmonumenta.plugins.abilities.mage.ElementalArrows;
@@ -16,14 +18,25 @@ import com.playmonumenta.plugins.abilities.mage.arcanist.SagesInsight;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Blizzard;
 import com.playmonumenta.plugins.abilities.mage.elementalist.ElementalSpiritFire;
 import com.playmonumenta.plugins.abilities.mage.elementalist.Starfall;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.utils.DescriptionUtils.MAGE_LORE;
 
 public class Mage extends PlayerClass {
 
 	public static final int CLASS_ID = 1;
 	public static final int ARCANIST_SPEC_ID = 1;
 	public static final int ELEMENTALIST_SPEC_ID = 2;
+
+	public static final Style ARCANE_COLOR = Style.style(TextColor.color(0xB548E8));
+	public static final Style FIRE_COLOR = Style.style(TextColor.color(0xE26928));
+	public static final Style ICE_COLOR = Style.style(TextColor.color(0x7CEBFF));
+	public static final Style THUNDER_COLOR = Style.style(TextColor.color(0xF0D330));
+
 
 	public Mage() {
 		mAbilities.add(ArcaneStrike.INFO);
@@ -71,5 +84,43 @@ public class Mage extends PlayerClass {
 			ManaLance.INFO,
 			ThunderStep.INFO
 		);
+	}
+
+	@Override
+	public Component getDescription(Player player) {
+		return new FormattedDescriptionBuilder<>(() -> Channeling.INFO)
+			.addDashedLine()
+			.addLine("*Mages are masters of area damage*").styles(MAGE_LORE)
+			.addLine("*and use wands to assail their foes.*").styles(MAGE_LORE)
+			.addLine()
+			.addLine("*Channeling (Class Passive):*").styles(Style.style(mClassColor))
+			.add(Channeling.getDescription())
+			.addDashedLine()
+			.get(AbilityManager.getManager().getPlayerAbilityIgnoringSilence(player, Channeling.class), player);
+	}
+
+	@Override
+	public Component getSpecOneDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Arcanists utilize arcane magic to*").styles(MAGE_LORE)
+			.addLine("*accelerate their spell combos, dealing*").styles(MAGE_LORE)
+			.addLine("*devastating area damage to anything*").styles(MAGE_LORE)
+			.addLine("*that gets in their way.*").styles(MAGE_LORE)
+			.addLine("(Burst Damage, Cooldown Reduction)")
+			.addDashedLine()
+			.get();
+	}
+
+	@Override
+	public Component getSpecTwoDescription(Player player) {
+		return new FormattedDescriptionBuilder<>()
+			.addDashedLine()
+			.addLine("*Elementalists wield the power of the*").styles(MAGE_LORE)
+			.addLine("*elements, controlling large zones and*").styles(MAGE_LORE)
+			.addLine("*dealing huge bursts of area damage.*").styles(MAGE_LORE)
+			.addLine("(Area Damage, Crowd Control)")
+			.addDashedLine()
+			.get();
 	}
 }

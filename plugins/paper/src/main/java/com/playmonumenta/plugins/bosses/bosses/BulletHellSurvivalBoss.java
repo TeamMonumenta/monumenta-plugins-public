@@ -7,6 +7,7 @@ import com.playmonumenta.plugins.effects.EffectManager;
 import com.playmonumenta.plugins.effects.RespawnStasis;
 import com.playmonumenta.plugins.events.DamageEvent;
 import com.playmonumenta.plugins.particle.PartialParticle;
+import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.NmsUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
@@ -79,6 +80,10 @@ public final class BulletHellSurvivalBoss extends BossAbilityGroup {
 					if (!mBoss.isDead()) {
 						final DamageTernary outcome = shouldDamage();
 						if (outcome == DamageTernary.DAMAGE) {
+							// Deal a small amount of damage attributed to players to ensure kill credit for Bestiary
+							for (Player player : PlayerUtils.playersInRange(mBoss.getLocation(), mParam.RADIUS, false)) {
+								DamageUtils.damage(player, mBoss, DamageEvent.DamageType.OTHER, 0.0001, null, true, false);
+							}
 							mBoss.setHealth(Math.max(mBoss.getHealth() - mParam.DAMAGE_SELF * EntityUtils.getMaxHealth(mBoss), 0));
 						} else if (outcome == DamageTernary.HEAL) {
 							mBoss.setHealth(Math.min(mBoss.getHealth() + mParam.HEALING * EntityUtils.getMaxHealth(mBoss),

@@ -128,6 +128,7 @@ public class GraveManager {
 			manager.mLoggedOut = true;
 
 			/* If the player's INSTANCE map hasn't been cleared in 1s and they're still logged out, clear it
+			 * There's some memory leak here where sometimes players don't get removed from this map
 			 */
 			UUID playerUUID = player.getUniqueId();
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

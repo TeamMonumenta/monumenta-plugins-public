@@ -69,6 +69,10 @@ public class SpellLacerate extends Spell {
 					return;
 				}
 
+				if (EntityUtils.shouldPauseSpells(mLauncher)) {
+					return;
+				}
+
 				mTicks++;
 				chargeActions(mTargetLocation, mTicks);
 				if (mTicks >= mParameters.TELEGRAPH_DURATION) {

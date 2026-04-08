@@ -13,11 +13,15 @@ import com.playmonumenta.plugins.utils.NamespacedKeyUtils;
 import com.playmonumenta.plugins.utils.SignUtils;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -34,9 +38,10 @@ public class EnchantopediaGui extends Gui {
 	private static final Component BASE_TITLE = Component.text("Enchantopedia");
 	private static final String ROOT_PATH = "monumenta:handbook/enchantments/root";
 
-	private final List<Advancement> mCategories;
-	private final List<Advancement> mEnchants;
-	private final LinkedHashMap<Advancement, Advancement> mCategoryMap;
+	private static boolean loadedAdvancements = false;
+	private static final List<Advancement> enchantmentCategories = new ArrayList<>();
+	private static final List<Advancement> enchantments = new ArrayList<>();
+	private static final Map<Advancement, Advancement> categoryMap = new LinkedHashMap<>();
 
 	private int mRow = 0;
 	private int mFilterIndex = -1;
@@ -47,38 +52,10 @@ public class EnchantopediaGui extends Gui {
 	public EnchantopediaGui(Player player) {
 		super(player, INV_SIZE, BASE_TITLE);
 
-		mCategories = new ArrayList<>();
-		mEnchants = new ArrayList<>();
-		mCategoryMap = new LinkedHashMap<>();
-
-		Advancement root = Bukkit.getAdvancement(NamespacedKeyUtils.fromString(ROOT_PATH));
-		if (root == null) {
-			return;
+		tryLoadAdvancements();
+		if (!loadedAdvancements) {
+			player.sendMessage(Component.text("Unable to load enchantment advancement data, please report this as a bug", NamedTextColor.RED));
 		}
-
-		// Get all custom enchantment advancements from server
-		ArrayDeque<Advancement> stack = new ArrayDeque<>();
-		root.getChildren().stream()
-			.filter(a -> !a.getKey().asString().equals("monumenta:handbook/enchantments/agility"))    // "Agility" isn't a category of advancements
-			.forEach(category -> {
-				mCategories.add(category);
-				stack.addAll(category.getChildren());
-				int categorySize = 0;
-				while (!stack.isEmpty()) {
-					var enchant = stack.pop();
-					mEnchants.add(enchant);
-					mCategoryMap.put(enchant, category);
-					stack.addAll(enchant.getChildren());
-					categorySize += 1;
-				}
-				int spacersNeeded = 9 - categorySize % 9;
-				if (categorySize % 9 != 0) {
-					spacersNeeded += 9;
-				}
-				for (int i = 0; i < spacersNeeded; i++) {
-					mEnchants.add(null);
-				}
-			});
 	}
 
 	@Override
@@ -91,7 +68,7 @@ public class EnchantopediaGui extends Gui {
 		int nextArrowSlot = 8;      // Next arrow
 
 		int offset = 9;
-		List<Advancement> displayedEnchants = mEnchants;
+		List<Advancement> displayedEnchants = enchantments;
 
 		// Back arrow
 		if (mRow > 0) {
@@ -113,12 +90,14 @@ public class EnchantopediaGui extends Gui {
 
 		ItemStack finalFilter = mFilterItem; // Theoretically isn't necessary, but reviewdog gets cranky without it
 		if (finalFilter != null) {
-			displayedEnchants = mEnchants.stream().filter(adv -> {
+			displayedEnchants = enchantments.stream().filter(adv -> {
 				if (adv == null) {
 					return false;
 				}
 				for (var filter : getEnchantNames(finalFilter)) {
-					if (MessagingUtils.plainText(adv.displayName()).contains(filter.getFirst().getName())) {
+					String plainText = MessagingUtils.plainText(adv.displayName());
+					plainText = plainText.substring(1, plainText.length() - 1).trim(); // display name contains brackets around name
+					if (plainText.equals(filter.getFirst().getName())) {
 						return true;
 					}
 				}
@@ -147,37 +126,33 @@ public class EnchantopediaGui extends Gui {
 			update();
 		}));
 
-		if (!mFilterTerm.equals("")) {
-			displayedEnchants = mEnchants.stream().filter(adv -> adv != null && MessagingUtils.plainText(adv.displayName()).toUpperCase(Locale.ROOT).contains(mFilterTerm.toUpperCase(Locale.ROOT))).toList();
+		if (!mFilterTerm.isEmpty()) {
+			displayedEnchants = enchantments.stream().filter(adv -> adv != null && MessagingUtils.plainText(adv.displayName()).toUpperCase(Locale.ROOT).contains(mFilterTerm.toUpperCase(Locale.ROOT))).toList();
 		}
 
 
 		// Category filter
 		Advancement category = null;
-		if (mFilterIndex > -1 && mFilterIndex < mCategories.size()) {
-			category = mCategories.get(mFilterIndex);
+		if (mFilterIndex > -1 && mFilterIndex < enchantmentCategories.size()) {
+			category = enchantmentCategories.get(mFilterIndex);
 		}
 
 		addCategoryFilter(categoryFilterSlot, category);
 
 		Advancement finalCategory = category;
 		if (category != null) {
-			displayedEnchants = mEnchants.stream().filter(adv -> {
+			displayedEnchants = enchantments.stream().filter(adv -> {
 				if (adv == null) {
 					return false;
 				} else {
-					Advancement match = mCategoryMap.get(adv);
-					if (match == null) {
-						return false;
-					} else {
-						return match.equals(finalCategory);
-					}
+					Advancement match = categoryMap.get(adv);
+					return match != null && match.equals(finalCategory);
 				}
 			}).toList();
 		}
 
 		if (!mFilterSelected) {
-			displayedEnchants = mCategories;
+			displayedEnchants = enchantmentCategories;
 			offset = 18;
 		}
 
@@ -229,11 +204,13 @@ public class EnchantopediaGui extends Gui {
 		} else {
 			List<Component> lore = new ArrayList<>();
 			for (var enchant : getEnchantNames(mFilterItem)) {
-				for (var enchant2 : mEnchants) {
+				for (var enchant2 : enchantments) {
 					if (enchant2 == null) {
 						continue;
 					}
-					if (MessagingUtils.plainText(enchant2.displayName()).contains(enchant.getFirst().getName())) {
+					String plainText = MessagingUtils.plainText(enchant2.displayName());
+					plainText = plainText.substring(1, plainText.length() - 1).trim(); // display name contains brackets around name
+					if (plainText.equals(enchant.getFirst().getName())) {
 						lore.add(enchant.getFirst().getDisplay(enchant.getSecond()));
 					}
 				}
@@ -264,7 +241,9 @@ public class EnchantopediaGui extends Gui {
 			List.of("Left or right click to cycle through filters", "Shift-click to reset"),
 			NamedTextColor.GRAY);
 
-		if (category != null && category.getDisplay() != null) {
+		final @Nullable var advancementDisplay = category != null ? category.getDisplay() : null;
+
+		if (category != null && advancementDisplay != null) {
 			var name = MessagingUtils.plainText(category.displayName()).replace("[", "").replace("]", "");
 			var c = NamedTextColor.WHITE;
 			if (name.contains("Curses")) {
@@ -272,7 +251,7 @@ public class EnchantopediaGui extends Gui {
 			}
 
 			categoryIcon = GUIUtils.createBasicItem(
-				category.getDisplay().icon(),
+				advancementDisplay.icon(),
 				1,
 				Component.text("Category: " + name, c).decoration(TextDecoration.ITALIC, false),
 				List.of(Component.text("Left or right click to cycle through filters", NamedTextColor.GRAY), Component.text("Shift-click to reset", NamedTextColor.GRAY)),
@@ -286,13 +265,13 @@ public class EnchantopediaGui extends Gui {
 				mFilterIndex = -1;
 			} else if (evt.isLeftClick()) {
 				mFilterIndex += 1;
-				if (mFilterIndex >= mCategories.size()) {
+				if (mFilterIndex >= enchantmentCategories.size()) {
 					mFilterIndex = -1;
 				}
 			} else if (evt.isRightClick()) {
 				mFilterIndex -= 1;
 				if (mFilterIndex < -1) {
-					mFilterIndex = mCategories.size() - 1;
+					mFilterIndex = enchantmentCategories.size() - 1;
 				}
 			}
 			mRow = 0;
@@ -306,10 +285,10 @@ public class EnchantopediaGui extends Gui {
 		int i = 0;
 		int offset = offsetStart;
 		while (i + offset < INV_SIZE) {
-			if (i >= mCategories.size()) {
+			if (i >= enchantmentCategories.size()) {
 				break;
 			}
-			var cat = mCategories.get(i);
+			var cat = enchantmentCategories.get(i);
 			if (cat == null) {
 				i += 1;
 				offset += 1;
@@ -398,7 +377,7 @@ public class EnchantopediaGui extends Gui {
 				MessagingUtils.plainText(adv.displayName()).replace("[", "").replace("]", "");
 
 			TextColor nameColor = NamedTextColor.WHITE;
-			Advancement category = mCategoryMap.get(adv);
+			Advancement category = categoryMap.get(adv);
 			if (category != null && MessagingUtils.plainText(category.displayName()).contains("Curses")) {
 				nameColor = NamedTextColor.RED;
 			}
@@ -455,5 +434,115 @@ public class EnchantopediaGui extends Gui {
 			}
 		}
 		return enchants;
+	}
+
+	private static void tryLoadAdvancements() {
+		if (!loadedAdvancements) {
+			Advancement root = Bukkit.getAdvancement(NamespacedKeyUtils.fromString(ROOT_PATH));
+			if (root == null) {
+				MMLog.warning("[Enchantopedia] Could not find the root advancement for enchantment descriptions");
+				return;
+			}
+
+			// Get all custom enchantment advancements from server
+			Deque<Advancement> stack = new ArrayDeque<>();
+			root.getChildren().stream()
+				.filter(a -> !"monumenta:handbook/enchantments/agility".equals(a.getKey().asString())) // "Agility" isn't a category of advancements
+				.forEach(category -> {
+					enchantmentCategories.add(category);
+					stack.addAll(category.getChildren());
+					int categorySize = 0;
+					while (!stack.isEmpty()) {
+						var enchant = stack.pop();
+						enchantments.add(enchant);
+						categoryMap.put(enchant, category);
+						stack.addAll(enchant.getChildren());
+						categorySize += 1;
+					}
+					int spacersNeeded = 9 - categorySize % 9;
+					if (categorySize % 9 != 0) {
+						spacersNeeded += 9;
+					}
+					for (int i = 0; i < spacersNeeded; i++) {
+						enchantments.add(null);
+					}
+				});
+
+			loadedAdvancements = true;
+		}
+	}
+
+	public static void enchantmentSearchCommand(Player player, String query) {
+		tryLoadAdvancements();
+		if (!loadedAdvancements) {
+			player.sendMessage(Component.text("Unable to load enchantment advancement data, please report this as a bug", NamedTextColor.RED));
+			return;
+		}
+		query = query.toLowerCase(Locale.ROOT); // case insensitive search
+		Advancement exactMatch = null;
+		List<Advancement> partialMatches = new ArrayList<>();
+		for (Advancement ench : enchantments) {
+			if (ench == null) {
+				continue;
+			}
+			String plainText = MessagingUtils.plainText(ench.displayName());
+			plainText = plainText.substring(1, plainText.length() - 1).trim().toLowerCase(Locale.ROOT); // display name contains brackets around name
+			if (plainText.equals(query)) {
+				exactMatch = ench;
+				break;
+			} else if (plainText.contains(query)) {
+				partialMatches.add(ench);
+			}
+		}
+		if (exactMatch == null && partialMatches.size() == 1) {
+			exactMatch = partialMatches.getFirst();
+		}
+		if (exactMatch != null) {
+			if (!player.getAdvancementProgress(exactMatch).isDone()) {
+				player.sendMessage(Component.text("[Enchantment Search] ", NamedTextColor.AQUA)
+					.append(Component.text("You have not unlocked that enchantment yet.", NamedTextColor.WHITE)));
+				return;
+			}
+			String enchantmentName = MessagingUtils.plainText(exactMatch.displayName());
+			enchantmentName = enchantmentName.substring(1, enchantmentName.length() - 1).trim();
+			TextColor nameColor = NamedTextColor.WHITE;
+			Advancement category = categoryMap.get(exactMatch);
+			if (category != null && MessagingUtils.plainText(category.displayName()).contains("Curses")) {
+				nameColor = NamedTextColor.RED;
+			}
+			String description = MessagingUtils.plainText(Objects.requireNonNull(exactMatch.getDisplay()).description())
+				.replace("\n", " ").replace("  ", " ");
+			player.sendMessage(
+				Component.text("[Enchantment Search] ", NamedTextColor.AQUA)
+					.append(Component.text(enchantmentName + ": ", nameColor).decorate(TextDecoration.BOLD))
+					.append(Component.text(description, NamedTextColor.WHITE))
+			);
+		} else if (!partialMatches.isEmpty()) {
+			// multiple matches
+			int matches = partialMatches.size();
+			List<Advancement> unlocked = partialMatches.stream().filter(adv -> player.getAdvancementProgress(adv).isDone()).toList();
+			int lockedCount = matches - unlocked.size();
+			Component builder = Component.text("[Enchantment Search] ", NamedTextColor.AQUA)
+				.append(Component.text("Your query returned " + matches + " results", NamedTextColor.WHITE));
+			if (!unlocked.isEmpty()) {
+				builder = builder.append(Component.text(": ", NamedTextColor.WHITE));
+				for (int i = 0; i < unlocked.size(); i++) {
+					builder = builder.append(unlocked.get(i).displayName().replaceText(TextReplacementConfig.builder().match(" {2,}").replacement("").build()));
+					if (i + 1 != unlocked.size()) {
+						// not the last one
+						builder = builder.append(Component.text(", ", NamedTextColor.WHITE));
+					}
+				}
+				if (lockedCount > 0) {
+					builder = builder.append(Component.text(", and " + lockedCount + " enchantment" + (lockedCount == 1 ? "" : "s") + " you have not unlocked", NamedTextColor.WHITE));
+				}
+			} else {
+				builder = builder.append(Component.text(", but you have not unlocked any of them", NamedTextColor.WHITE));
+			}
+			player.sendMessage(builder);
+		} else {
+			player.sendMessage(Component.text("[Enchantment Search] ", NamedTextColor.AQUA)
+				.append(Component.text("Your query \"" + query + "\" did not match any enchantments.", NamedTextColor.WHITE)));
+		}
 	}
 }

@@ -4,7 +4,7 @@ import com.playmonumenta.plugins.Plugin;
 import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.rogue.DodgingCS;
@@ -30,6 +30,11 @@ import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.Nullable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.perLevel;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class Dodging extends Ability {
 
@@ -181,25 +186,38 @@ public class Dodging extends Ability {
 	}
 
 	private static Description<Dodging> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Block an arrow, thrown potion, blaze fireball, or snowball that would have hit you.")
-			.addCooldown(DODGING_COOLDOWN_1, Ability::isLevelOne);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
+			.addDashedLine()
+			.addLine("Periodically block a incoming")
+			.addLine("projectile or potion attack.")
+			.addLine()
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(DODGING_COOLDOWN_1))
+			.addDashedLine();
 	}
 
 	private static Description<Dodging> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("When this ability is triggered, you gain ")
-			.addPercent(a -> a.mSpeed, PERCENT_SPEED)
-			.add(" speed for ")
-			.addDuration(a -> a.mDuration, DODGING_SPEED_EFFECT_DURATION)
-			.add(" seconds.")
-			.addCooldown(DODGING_COOLDOWN_2, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Reduce *Dodging*'s cooldown.").styles(UNDERLINED)
+			.addLine()
+			.addLine("When *Dodging* activates, gain speed.").styles(UNDERLINED)
+			.addLine()
+			.addStat("Effect: +%p Speed for %t")
+				.statValues(stat(a -> a.mSpeed, PERCENT_SPEED), stat(a -> a.mDuration, DODGING_SPEED_EFFECT_DURATION))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(DODGING_COOLDOWN_1), cooldown(DODGING_COOLDOWN_2))
+			.addDashedLine();
 	}
 
 	private static Description<Dodging> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Gain a secondary independent cooldown to block a magic attack that would otherwise have hit you. The cooldown is ")
-			.addPercent(MAGIC_DODGING_COOLDOWN_MULTIPLIER)
-			.add(" of your cooldown for Dodging.");
+		return new FormattedDescriptionBuilder<>(() -> INFO)
+			.addDashedLine()
+			.addLine("Gain a second, independent ability")
+			.addLine("to block an incoming magic attack.")
+			.addLine()
+			.addStat("Cooldown: %t")
+				.statValues(perLevel(a -> a.getCharmCooldown((int) ((a.isLevelOne() ? DODGING_COOLDOWN_1 : DODGING_COOLDOWN_2) * MAGIC_DODGING_COOLDOWN_MULTIPLIER)), DODGING_COOLDOWN_1 * MAGIC_DODGING_COOLDOWN_MULTIPLIER, DODGING_COOLDOWN_2 * MAGIC_DODGING_COOLDOWN_MULTIPLIER))
+			.addDashedLine();
 	}
 }

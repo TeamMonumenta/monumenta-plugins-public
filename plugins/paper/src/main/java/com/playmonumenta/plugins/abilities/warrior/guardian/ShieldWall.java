@@ -7,7 +7,7 @@ import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.AbilityWithDuration;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.classes.ClassAbility;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.warrior.guardian.ShieldWallCS;
@@ -31,6 +31,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class ShieldWall extends Ability implements AbilityWithDuration {
 
@@ -195,29 +199,43 @@ public class ShieldWall extends Ability implements AbilityWithDuration {
 	}
 
 	private static Description<ShieldWall> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to create a ")
-			.add(a -> a.mAngle, SHIELD_WALL_ANGLE)
-			.add(" degree arc of particles from 1 block below to ")
-			.add(a -> a.mHeight, SHIELD_WALL_HEIGHT)
-			.add(" blocks above the user's location and with a ")
-			.add(a -> a.mRadius, SHIELD_WALL_RADIUS)
-			.add(" block radius in front of the user. Enemies that pass through the wall are dealt ")
-			.add(a -> a.mDamage, SHIELD_WALL_DAMAGE)
-			.add(" melee damage and knocked back. The wall also blocks all nonmagical enemy projectiles. The wall lasts ")
-			.addDuration(a -> a.mDuration, SHIELD_WALL_1_DURATION, false, Ability::isLevelOne)
-			.add(" seconds and moves along with the user. Triggering again while active makes the wall stationary at the same location for the remainder of the duration, with radius increased to ")
-			.add(a -> a.mRadiusStationary, SHIELD_WALL_RADIUS_STATIONARY)
-			.add(" blocks.")
-			.addCooldown(SHIELD_WALL_1_COOLDOWN, Ability::isLevelOne);
+			.addDashedLine()
+			.addLine("Create a shield in front of you that blocks")
+			.addLine("enemy projectiles. Mobs that touch the shield")
+			.addLine("take damage and are knocked back.")
+			.addLine()
+			.addStat("Damage: %d (m)")
+				.statValues(stat(a -> a.mDamage, SHIELD_WALL_DAMAGE))
+			.addStat("Radius: %r")
+				.statValues(stat(a -> a.mRadius, SHIELD_WALL_RADIUS))
+			.addStat("Height: %r")
+			.statValues(stat(a -> a.mHeight, SHIELD_WALL_HEIGHT))
+			.addStat("Duration: %t1")
+				.statValues(stat(a -> a.mDuration, SHIELD_WALL_1_DURATION))
+			.addStat("Cooldown: %t1")
+				.statValues(cooldown(SHIELD_WALL_1_COOLDOWN))
+			.addLine()
+			.addLine("You may recast *Shield Wall* to place the").styles(UNDERLINED)
+			.addLine("shield at its current location and increase")
+			.addLine("its radius.")
+			.addLine()
+			.addStatComparison("Radius: %r1 -> %r2")
+				.statValues(stat(SHIELD_WALL_RADIUS), stat(a -> a.mRadiusStationary, SHIELD_WALL_RADIUS_STATIONARY))
+			.addDashedLine();
 	}
 
 	private static Description<ShieldWall> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("The shield wall lasts ")
-			.addDuration(a -> a.mDuration, SHIELD_WALL_2_DURATION, false, Ability::isLevelTwo)
-			.add(" seconds instead.")
-			.addCooldown(SHIELD_WALL_2_COOLDOWN, Ability::isLevelTwo);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Shield Wall*'s duration").styles(UNDERLINED)
+			.addLine("and reduce its cooldown.")
+			.addLine()
+			.addStatComparison("Duration: %t1 -> %t2")
+				.statValues(stat(SHIELD_WALL_1_DURATION), stat(a -> a.mDuration, SHIELD_WALL_2_DURATION))
+			.addStatComparison("Cooldown: %t1 -> %t2")
+				.statValues(cooldown(SHIELD_WALL_1_COOLDOWN), cooldown(SHIELD_WALL_2_COOLDOWN))
+			.addDashedLine();
 	}
 }

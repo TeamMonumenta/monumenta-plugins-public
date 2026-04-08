@@ -34,6 +34,14 @@ public class IronTinctureCS implements CosmeticSkill {
 		world.playSound(loc, Sound.ENTITY_SNOWBALL_THROW, SoundCategory.PLAYERS, 1, 0.15f);
 	}
 
+	public void hitGroundEffect(Location location, Player caster, double stunRadius) {
+		location.getWorld().playSound(location, Sound.BLOCK_BREWING_STAND_BREW, SoundCategory.PLAYERS, 1.5f, 2f);
+		new PartialParticle(Particle.TOTEM, location)
+			.count(50)
+			.extra(0.75)
+			.spawnAsPlayerActive(caster);
+	}
+
 	public void onGroundEffect(Location location, Player caster, int twoTicks) {
 		new PartialParticle(Particle.SPELL, location, 3, 0, 0, 0, 0.1).spawnAsPlayerActive(caster);
 	}

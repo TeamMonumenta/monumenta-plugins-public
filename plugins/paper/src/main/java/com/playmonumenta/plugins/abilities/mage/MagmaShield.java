@@ -1,14 +1,14 @@
 package com.playmonumenta.plugins.abilities.mage;
 
 import com.playmonumenta.plugins.Plugin;
-import com.playmonumenta.plugins.abilities.Ability;
 import com.playmonumenta.plugins.abilities.AbilityInfo;
 import com.playmonumenta.plugins.abilities.AbilityTrigger;
 import com.playmonumenta.plugins.abilities.AbilityTriggerInfo;
 import com.playmonumenta.plugins.abilities.Description;
-import com.playmonumenta.plugins.abilities.DescriptionBuilder;
+import com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder;
 import com.playmonumenta.plugins.abilities.MultipleChargeAbility;
 import com.playmonumenta.plugins.classes.ClassAbility;
+import com.playmonumenta.plugins.classes.Mage;
 import com.playmonumenta.plugins.cosmetics.skills.CosmeticSkills;
 import com.playmonumenta.plugins.cosmetics.skills.mage.MagmaShieldCS;
 import com.playmonumenta.plugins.effects.PercentAbilityDamageReceived;
@@ -16,6 +16,7 @@ import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.events.DamageEvent.DamageType;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.attributes.SpellPower;
+import com.playmonumenta.plugins.itemstats.enchantments.Inferno;
 import com.playmonumenta.plugins.utils.DamageUtils;
 import com.playmonumenta.plugins.utils.EntityUtils;
 import com.playmonumenta.plugins.utils.Hitbox;
@@ -25,6 +26,10 @@ import java.util.EnumSet;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.cooldown;
+import static com.playmonumenta.plugins.abilities.FormattedDescriptionBuilder.StatValue.stat;
+import static com.playmonumenta.plugins.utils.DescriptionUtils.UNDERLINED;
 
 public class MagmaShield extends MultipleChargeAbility {
 
@@ -135,37 +140,55 @@ public class MagmaShield extends MultipleChargeAbility {
 	}
 
 	private static Description<MagmaShield> getDescription1() {
-		return new DescriptionBuilder<>(() -> INFO)
+		return new FormattedDescriptionBuilder<>(() -> INFO, 1)
 			.addTrigger()
-			.add(" to summon a torrent of flames, dealing ")
-			.add(a -> a.mLevelDamage, DAMAGE_1, false, Ability::isLevelOne)
-			.add(" fire magic damage to all enemies in front of you within ")
-			.add(a -> a.mRadius, RADIUS)
-			.add(" blocks, setting them on fire for ")
-			.addDuration(a -> a.mFireDuration, FIRE_TICKS)
-			.add(" seconds, and knocking them away.")
-			.addCooldown(COOLDOWN_TICKS, false, a -> !a.isEnhanced());
+			.addDashedLine()
+			.addLine("Deal *Fire* damage, ignite, and").styles(Mage.FIRE_COLOR)
+			.addLine("knock back mobs in front of you.")
+			.addLine()
+			.addStat("Damage: %d1 (s)")
+				.statValues(stat(a -> a.mLevelDamage, DAMAGE_1))
+			.addStat("Effect: Fire for %t")
+				.statValues(stat(a -> a.mFireDuration, FIRE_TICKS))
+			.addStat("Radius: %r (Cone-Shaped)")
+				.statValues(stat(a -> a.mRadius, RADIUS))
+			.addStat("Cooldown: %t1e_only")
+				.statValues(cooldown(COOLDOWN_TICKS))
+			.addDashedLine();
 	}
 
 	private static Description<MagmaShield> getDescription2() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Damage is increased to ")
-			.add(a -> a.mLevelDamage, DAMAGE_2, false, Ability::isLevelTwo)
-			.add(".");
+		return new FormattedDescriptionBuilder<>(() -> INFO, 2)
+			.addDashedLine()
+			.addLine("Increase *Magma Shield*'s damage.").styles(UNDERLINED)
+			.addLine()
+			.addStatComparison("Damage: %d1 -> %d2 (s)")
+				.statValues(stat(DAMAGE_1), stat(a -> a.mLevelDamage, DAMAGE_2))
+			.addDashedLine();
 	}
 
 	private static Description<MagmaShield> getDescriptionEnhancement() {
-		return new DescriptionBuilder<>(() -> INFO)
-			.add("Magma Shield now has two charges. All charge stacks are consumed at once on use, per additional charge over 1 consumed: deal ")
-			.add(a -> a.mEnhancementDamageBonus, DAMAGE_ENHANCE)
-			.add(" extra damage, deal ")
-			.addPercent(a -> a.mFireBonusDamage, ENHANCEMENT_FIRE_DAMAGE_BONUS)
-			.add(" extra damage from fire/inferno ticks and deal ")
-			.addPercent(a -> a.mFireAbilityBonusDamage, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS)
-			.add(" extra damage from fire abilities for ")
-			.addDuration(a -> a.mEnhancementDuration, ENHANCEMENT_BONUS_DURATION)
-			.add(" seconds.")
-			.addCooldown(ENHANCEMENT_COOLDOWN, false, Ability::isEnhanced);
+		return new FormattedDescriptionBuilder<>(() -> INFO, 3)
+			.addDashedLine()
+			.addLine("*Magma Shield* gains an additional charge").styles(UNDERLINED)
+			.addLine("and its cooldown is reduced.")
+			.addLine()
+			.addLine("All charges are consumed at once. For each")
+			.addLine("extra charge consumed, *Magma Shield* deals").styles(UNDERLINED)
+			.addLine("increased damage and makes mobs take more")
+			.addLine("fire, *Inferno*, and *Fire* ability damage.").styles(Inferno.INFERNO_COLOR, Mage.FIRE_COLOR)
+			.addLine()
+			.addStat("Bonus Damage: +%d (s) (per extra charge)")
+				.statValues(stat(a -> a.mEnhancementDamageBonus, DAMAGE_ENHANCE))
+			.addStat("Effect: +%p Fire/Inferno Damage for %t")
+				.statValues(stat(a -> a.mFireBonusDamage, ENHANCEMENT_FIRE_DAMAGE_BONUS), stat(a -> a.mEnhancementDuration, ENHANCEMENT_BONUS_DURATION))
+			.addStat("Effect: +%p Fire Ability Damage for %t")
+				.statValues(stat(a -> a.mFireAbilityBonusDamage, ENHANCEMENT_FIRE_ABILITY_DAMAGE_BONUS), stat(a -> a.mEnhancementDuration, ENHANCEMENT_BONUS_DURATION))
+			.addStatComparison("Charges: %d -> %d")
+				.statValues(stat(1), stat(a -> a.mMaxCharges, 2))
+			.addStatComparison("Cooldown: %t1e -> %t3 (per charge)")
+				.statValues(cooldown(COOLDOWN_TICKS), cooldown(ENHANCEMENT_COOLDOWN))
+			.addDashedLine();
 	}
 
 }

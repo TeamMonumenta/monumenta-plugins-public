@@ -41,51 +41,32 @@ public class ArcaneTabooCS extends TabooCS {
 	}
 
 	@Override
-	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks, boolean inBurst) {
+	public void periodicEffects(Player player, boolean twoHertz, boolean oneSecond, int ticks, double currentSelfDamage, double absorptionLossThreshold) {
+		Location loc = player.getLocation();
 		if (oneSecond) {
-			Location loc = player.getLocation();
 			AbilityUtils.playPassiveAbilitySound(player, player.getLocation(), Sound.BLOCK_CONDUIT_AMBIENT, 0.8f, 1);
 
 			new PPCircle(Particle.ENCHANTMENT_TABLE, loc.clone().add(0, -0.25, 0), 0.5)
 				.countPerMeter(ArcanePotionsCS.ENCHANT_PARTICLE_PER_METER)
 				.directionalMode(true).delta(0, 1, 0).extra(1)
 				.spawnAsPlayerPassive(player);
-			new PPCircle(inBurst ? Particle.FALLING_LAVA : Particle.FALLING_OBSIDIAN_TEAR, loc.clone().add(0, 0.75, 0), 0.5)
-				.count(inBurst ? 10 : 3)
+			new PPCircle(Particle.FALLING_OBSIDIAN_TEAR, loc.clone().add(0, 0.75, 0), 0.5)
+				.count(3)
 				.spawnAsPlayerPassive(player);
 		}
 
-		if (inBurst) {
-			new PartialParticle(Particle.FALLING_LAVA, player.getLocation().add(0, 0.6, 0), 5)
-				.delta(0.2, 0.6, 0.2)
-				.spawnAsPlayerPassive(player);
+		if (currentSelfDamage >= absorptionLossThreshold) {
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_GRAVEL_BREAK, 0.2f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 2f, 1f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_DEATH, 2f, 1f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_DEATH, 2f, 1f);
+		} else if (currentSelfDamage >= absorptionLossThreshold / 2 && twoHertz) {
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_GRAVEL_BREAK, 0.25f, 0.5f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.5f, 1f);
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_CHORUS_FLOWER_GROW, 1.5f, 1f);
+		} else if (oneSecond) {
+			AbilityUtils.playPassiveAbilitySound(player, loc, Sound.BLOCK_GRAVEL_BREAK, 0.2f, 0.5f);
 		}
-	}
-
-	@Override
-	public void burstEffects(Player player) {
-		World world = player.getWorld();
-		Location loc = player.getLocation();
-		world.playSound(loc, Sound.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.0f, 1.7f);
-		world.playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_3, SoundCategory.PLAYERS, 0.4f, 0.6f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_CHARGE, SoundCategory.PLAYERS, 0.7f, 0.4f);
-		world.playSound(loc, Sound.ENTITY_WARDEN_DEATH, SoundCategory.PLAYERS, 0.8f, 0.2f);
-		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 2.0f, 1.7f);
-
-		ArcanePotionsCS.drawAlchemyCircle(player, loc, 6, 5, false, ArcanePotionsCS.BISMUTH, true, false, false);
-		new PartialParticle(Particle.FALLING_LAVA, player.getLocation().add(0, 0.6, 0), 20)
-			.delta(0.2, 0.6, 0.2)
-			.spawnAsPlayerActive(player);
-	}
-
-	@Override
-	public void unburstEffects(Player player) {
-		World world = player.getWorld();
-		Location loc = player.getLocation();
-		world.playSound(loc, Sound.BLOCK_AMETHYST_CLUSTER_STEP, SoundCategory.PLAYERS, 0.7f, 0.7f);
-		world.playSound(loc, Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, SoundCategory.PLAYERS, 0.7f, 0.6f);
-		world.playSound(loc, "minecraft:block.amethyst_block.resonate", SoundCategory.PLAYERS, 1.2f, 0.5f);
-		world.playSound(loc, Sound.BLOCK_AMETHYST_BLOCK_CHIME, SoundCategory.PLAYERS, 2.0f, 0.4f);
 	}
 
 	@Override
