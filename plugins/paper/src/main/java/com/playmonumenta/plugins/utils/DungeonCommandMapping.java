@@ -190,7 +190,7 @@ public enum DungeonCommandMapping {
 	}
 
 	public boolean canInvite(Player player, int date) {
-		if (isChallenge(player)) {
+		if (isChallenge(player) || SKT.equals(this)) {
 			return false;
 		}
 

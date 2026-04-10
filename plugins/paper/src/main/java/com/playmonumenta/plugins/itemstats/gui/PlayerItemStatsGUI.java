@@ -467,10 +467,10 @@ public class PlayerItemStatsGUI extends CustomInventory {
 	private static @Nullable ItemStack getWarningIcon(PSGUIStats stats) {
 		List<Component> warnings = new ArrayList<>();
 		if (stats.getRegionScaling(stats.mPlayer, false) > 0) {
-			warnings.add(Component.text("Build has equipment of a later region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+			warnings.add(Component.text("Build has equipment of an incompatible region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (stats.getRegionScaling(stats.mPlayer, true) > 0) {
-			warnings.add(Component.text("Build has mainhand of a later region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
+			warnings.add(Component.text("Build has mainhand of an incompatible region.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));
 		}
 		if (stats.get(EnchantmentType.CURSE_OF_CORRUPTION) > 1) {
 			warnings.add(Component.text("Build has more than one Curse of Corruption item.", NamedTextColor.RED).decoration(TextDecoration.ITALIC, false));

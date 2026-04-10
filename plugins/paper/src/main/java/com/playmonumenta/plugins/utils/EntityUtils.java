@@ -1347,14 +1347,17 @@ public class EntityUtils {
 	 */
 	public static Location getProjectileHitLocation(ProjectileHitEvent event) {
 		Projectile proj = event.getEntity();
+		if (event.getHitBlock() != null) {
+			return proj.getLocation();
+		}
+
 		World world = proj.getWorld();
 		BoundingBox hitbox = proj.getBoundingBox();
 		Vector increment = proj.getVelocity();
 		int increments = (int) (increment.length() * 15);
 		increment.normalize().multiply(0.1);
 
-		Block block = event.getHitBlock();
-		BoundingBox target = block != null ? block.getBoundingBox() : event.getHitEntity().getBoundingBox();
+		BoundingBox target = event.getHitEntity().getBoundingBox();
 
 		for (int i = 0; i < increments; i++) {
 			hitbox.shift(increment);

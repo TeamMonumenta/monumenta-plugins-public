@@ -179,7 +179,7 @@ public class TabAddListing implements MarketGuiTab {
 			lore.add(Component.empty());
 
 
-			lore.add(Component.text((mItemsPerTrade * mAmountOfTrades) + ItemUtils.getPlainName(mItemToSell), NamedTextColor.WHITE)
+			lore.add(Component.text((mItemsPerTrade * mAmountOfTrades) + ItemUtils.getPlainName(mItemToSell) + " ", NamedTextColor.WHITE)
 				.append(MarketGuiIcons.getCheckboxOrXmark(enoughItemsInInventory)).decoration(TextDecoration.ITALIC, false));
 			if (!enoughItemsInInventory) {
 				lore.add(Component.text("You do not possess enough", NamedTextColor.RED));

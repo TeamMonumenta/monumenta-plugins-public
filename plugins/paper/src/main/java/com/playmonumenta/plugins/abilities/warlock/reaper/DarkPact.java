@@ -159,7 +159,7 @@ public class DarkPact extends Ability {
 		NavigableSet<Effect> antiHealEffects = mPlugin.mEffectManager.getEffects(mPlayer, PERCENT_HEAL_EFFECT_NAME);
 		if (antiHealEffects != null) {
 			// extend the non -100% healing effect
-			Effect extendedAntiheal = antiHealEffects.first();
+			Effect extendedAntiheal = antiHealEffects.last();
 			extendedAntiheal.setDuration(extendedAntiheal.getDuration() + mDurationIncreaseOnKill);
 		}
 	}

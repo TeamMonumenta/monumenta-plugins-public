@@ -308,7 +308,7 @@ public class TabBuyListing implements MarketGuiTab {
 			}
 			if (currentMult == maxMultiplier) {
 				lore.add(Component.empty());
-				lore.add(Component.text("right click to go back to multiplier x1.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
+				lore.add(Component.text("Right click to go back to multiplier x1.", NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false));
 			}
 			bannerMeta.lore(lore);
 			// Hide patterns:
