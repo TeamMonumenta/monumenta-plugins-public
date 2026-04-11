@@ -165,7 +165,7 @@ public class GaleShot extends Ability implements AbilityWithChargesOrStacks, Abi
 		ProjectileLaunchEvent event = new ProjectileLaunchEvent(galeArrow);
 		Bukkit.getPluginManager().callEvent(event);
 
-		galeArrow.setPierceLevel(127);
+		galeArrow.setPierceLevel(67);
 		galeArrow.setCritical(true);
 		galeArrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
 		galeArrow.setShooter(mPlayer);
