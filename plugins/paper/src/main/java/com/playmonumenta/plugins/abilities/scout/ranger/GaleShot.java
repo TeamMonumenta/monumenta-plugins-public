@@ -18,9 +18,11 @@ import com.playmonumenta.plugins.effects.Aesthetics;
 import com.playmonumenta.plugins.effects.Effect;
 import com.playmonumenta.plugins.events.AbilityCastEvent;
 import com.playmonumenta.plugins.events.DamageEvent;
+import com.playmonumenta.plugins.itemstats.ItemStat;
 import com.playmonumenta.plugins.itemstats.ItemStatManager;
 import com.playmonumenta.plugins.itemstats.abilities.CharmManager;
 import com.playmonumenta.plugins.itemstats.enchantments.Grappling;
+import com.playmonumenta.plugins.itemstats.enums.AttributeType;
 import com.playmonumenta.plugins.itemstats.enums.EnchantmentType;
 import com.playmonumenta.plugins.listeners.DamageListener;
 import com.playmonumenta.plugins.utils.AbilityUtils;
@@ -32,6 +34,7 @@ import com.playmonumenta.plugins.utils.MetadataUtils;
 import com.playmonumenta.plugins.utils.MovementUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
 import java.util.List;
+import java.util.Objects;
 import java.util.WeakHashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -162,6 +165,15 @@ public class GaleShot extends Ability implements AbilityWithChargesOrStacks, Abi
 		// Destroy the original projectile and use an arrow instead because it pierces
 
 		AbilityUtils.inheritProjectileStats(mPlayer, galeArrow, projectile); // Needed for Explosive aspect transfer!
+		@Nullable
+		ItemStatManager.PlayerItemStats stats = DamageListener.getProjectileItemStats(galeArrow);
+		if (stats != null) {
+			ItemStatManager.PlayerItemStats.ItemStatsMap statsMap = stats.getItemStats();
+			double originalProjDamage = statsMap.get(AttributeType.PROJECTILE_DAMAGE_ADD);
+			ItemStat projAddStat = Objects.requireNonNull(AttributeType.PROJECTILE_DAMAGE_ADD.getItemStat());
+			statsMap.set(projAddStat, mDamageFlat + mDamagePercent * originalProjDamage);
+		}
+
 		ProjectileLaunchEvent event = new ProjectileLaunchEvent(galeArrow);
 		Bukkit.getPluginManager().callEvent(event);
 
@@ -211,11 +223,11 @@ public class GaleShot extends Ability implements AbilityWithChargesOrStacks, Abi
 						break;
 					}
 
+					// This hacky iframe system needs to stay because of the current L2.
 					if (MetadataUtils.checkOnceInRecentTicks(mPlugin, enemy, GALE_SHOT_IFRAME_METAKEY + mPlayer.getUniqueId(), 5)) {
-						// This hacky iframe system needs to stay because of the current L2.
-						double amount = AbilityUtils.projectileFinalDamage(mGaleArrow, enemy, mDamageFlat, mDamagePercent);
 						DamageEvent.Metadata metadata = new DamageEvent.Metadata(DamageEvent.DamageType.PROJECTILE, ClassAbility.GALE_SHOT, null, null);
-						DamageUtils.damage(mPlayer, mGaleArrow, enemy, metadata, amount, true, false, false);
+						// Damage handled by damage pipeline because it thinks this is an arrow
+						DamageUtils.damage(mPlayer, mGaleArrow, enemy, metadata, mDamageFlat, true, false, false);
 
 						Location enemyLoc = enemy.getLocation();
 						enemyLoc.setY(Math.clamp(galeArrow.getY(), enemy.getY(), enemy.getHeight() + enemy.getY()));
