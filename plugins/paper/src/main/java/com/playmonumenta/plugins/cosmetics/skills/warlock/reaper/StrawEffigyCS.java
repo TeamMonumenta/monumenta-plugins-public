@@ -114,7 +114,7 @@ public class StrawEffigyCS extends JudgementChainCS {
 		Particle.DustOptions data = isBreak ? STRAW : STRAW_SMALL;
 
 		double length = 1;
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < targetLoc.distance(playerLoc); i++) {
 			double[] rotation = VectorUtils.vectorToRotation(direction);
 			Vector offset = VectorUtils.rotateTargetDirection(new Vector(0.3, 0, 0), rotation[0], rotation[1]);
 

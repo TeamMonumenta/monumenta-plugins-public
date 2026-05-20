@@ -129,7 +129,7 @@ public class FirmamentOverride {
 					RepairExplosionsListener.getInstance().playerReplacedBlockViaPlugin(player, event.getBlock());
 				}
 				placeEvent.getBlockReplacedState().setBlockData(blockData);
-				if (!event.isCancelled()) {
+				if (!placeEvent.isCancelled()) {
 					// Place the chosen block instead of the Firmament
 					// This is done by setting the "replaced" block state to the desired block state, and then cancelling the event, which will "revert" the block to this state
 					event.getBlockReplacedState().setBlockData(blockData);

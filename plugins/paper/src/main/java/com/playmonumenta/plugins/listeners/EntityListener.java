@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import io.papermc.paper.event.entity.EntityInsideBlockEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -398,6 +399,16 @@ public class EntityListener implements Listener {
 				return;
 			}
 
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+	public void entityInsideBlockEvent(EntityInsideBlockEvent event) {
+		Block block = event.getBlock();
+		if (Tag.PRESSURE_PLATES.isTagged(block.getType())
+			&& ZoneUtils.hasZoneProperty(block.getLocation(), ZoneProperty.ADVENTURE_MODE)
+			&& !(event.getEntity() instanceof Player)) {
 			event.setCancelled(true);
 		}
 	}

@@ -107,7 +107,7 @@ public class TealSpirit extends SerializedLocationBossAbilityGroup {
 				new TealSpiritSummon(mSpawnLoc, 40 * 20),
 				new SpellBlockBreak(mBoss),
 				new SpellShieldStun(10 * 20),
-				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> LocationUtils.xzDistance(mSpawnLoc, mBoss.getLocation()) > 26),
+				new SpellConditionalTeleport(mBoss, mSpawnLoc, mBoss -> LocationUtils.xzDistance(mSpawnLoc, mBoss.getLocation()) > 28),
 				new TealAntiCheat(boss, 20, spawnLoc)
 			);
 

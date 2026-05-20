@@ -5,6 +5,7 @@ import com.playmonumenta.plugins.bosses.ChargeUpManager;
 import com.playmonumenta.plugins.bosses.bosses.Kaul;
 import com.playmonumenta.plugins.bosses.spells.Spell;
 import com.playmonumenta.plugins.effects.PercentDamageDealt;
+import com.playmonumenta.plugins.effects.PercentDamageReceived;
 import com.playmonumenta.plugins.effects.PercentHealthBoost;
 import com.playmonumenta.plugins.effects.PercentSpeed;
 import com.playmonumenta.plugins.integrations.LibraryOfSoulsIntegration;
@@ -14,7 +15,6 @@ import com.playmonumenta.plugins.utils.FastUtils;
 import com.playmonumenta.plugins.utils.MMLog;
 import com.playmonumenta.plugins.utils.MessagingUtils;
 import com.playmonumenta.plugins.utils.PlayerUtils;
-import com.playmonumenta.plugins.utils.PotionUtils;
 import com.playmonumenta.plugins.utils.ScoreboardUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,8 +40,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,6 +69,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 	private static final String SLOWNESS_EFFECT_NAME = "KaulsJudgementSlowness";
 	private static final String STRENGTH_EFFECT_NAME = "KaulsJudgementStrength";
 	private static final String SPEED_EFFECT_NAME = "KaulsJudgementSpeed";
+	private static final String RESISTANCE_EFFECT_NAME = "KaulsJudgementResistance";
 	private static final String SPELL_NAME = "Kaul's Judgement";
 
 	private final Plugin mPlugin = Plugin.getInstance();
@@ -266,7 +265,7 @@ public class SpellKaulsJudgement extends Spell implements Listener {
 		player.removeScoreboardTag(KAULS_JUDGEMENT_TAG);
 
 		player.setHealth(EntityUtils.getMaxHealth(player));
-		PotionUtils.applyPotion(mPlugin, player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 8 * 20, 8));
+		mPlugin.mEffectManager.addEffect(player, RESISTANCE_EFFECT_NAME , new PercentDamageReceived(8 * 20, -1.0));
 		if (player.getFireTicks() > 0) {
 			player.setFireTicks(1);
 		}

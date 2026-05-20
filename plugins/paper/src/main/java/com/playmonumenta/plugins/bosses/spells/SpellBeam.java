@@ -123,6 +123,7 @@ public class SpellBeam extends Spell {
 				@Override
 				public void run() {
 					if (EntityUtils.shouldCancelSpells(mBoss)) {
+						mActiveRunnables.remove(this);
 						this.cancel();
 						return;
 					}
@@ -160,11 +161,13 @@ public class SpellBeam extends Spell {
 								.spawnAsEntityActive(mBoss);
 						}
 						castBeam(mDirection);
+						mActiveRunnables.remove(this);
 						this.cancel();
 						return;
 					}
 					mTicks++;
 					if (mTicks > mParameters.SPELL_DELAY || mBoss.isDead()) {
+						mActiveRunnables.remove(this);
 						this.cancel();
 					}
 				}

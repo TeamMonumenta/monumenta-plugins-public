@@ -18,6 +18,7 @@ import com.playmonumenta.plugins.utils.ZoneUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -106,7 +107,9 @@ public class StarfallBoss extends BossAbilityGroup {
 			public void run() {
 				if (p.DOES_TARGETING) {
 					List<? extends LivingEntity> targets = p.TARGETS.getTargetsList(mBoss);
-					targets.forEach(e -> spawnStarfall(p, mBoss, e.getLocation(), (ticks, oldLoc) -> (ticks <= p.TRACKING && !e.isDead() && !(e instanceof Player player && AbilityUtils.isStealthed(player))) ? e.getLocation() : oldLoc));
+					targets.forEach(e -> spawnStarfall(p, mBoss, e.getLocation(), (ticks, oldLoc) -> (ticks <= p.TRACKING && !e.isDead() && !(e instanceof Player player && (AbilityUtils.isStealthed(player) || player.getGameMode() == GameMode.SPECTATOR)))
+						? e.getLocation()
+						: oldLoc));
 				} else {
 					List<Location> locs = new ArrayList<>();
 					for (int i = 1; i <= p.COUNT; i++) {
