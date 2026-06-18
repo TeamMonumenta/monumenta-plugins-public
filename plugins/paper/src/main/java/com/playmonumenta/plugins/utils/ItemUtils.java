@@ -1356,11 +1356,14 @@ public class ItemUtils {
 	}
 
 	public static boolean isUtilityItem(ItemStack item) {
+		String plainName = getPlainName(item);
 		return ItemStatUtils.hasEnchantment(item, EnchantmentType.MULTITOOL)
 			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RECOIL)
 			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.RIPTIDE)
+			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.LURE)
 			|| ItemStatUtils.hasEnchantment(item, EnchantmentType.WORLDLY_PROTECTION)
-			|| utilityItemNames.contains(getPlainName(item));
+			|| utilityItemNames.contains(plainName)
+			|| (plainName != null && plainName.startsWith("Tesseract of"));
 	}
 
 	/**
